@@ -160,7 +160,7 @@ struct SymptomView: View {
                 }
                 Section("What we think is happening") {
                     Text(s.cause).foregroundStyle(t.ink)
-                    HStack { Tag(style: .inferred(s.confidence)); Text("Matches reports, not proof for your phone").font(.system(size: 12.5)).foregroundStyle(t.ink3) }
+                    HStack { Tag(style: .inferred(nil)); Text("Known explanation; not confirmed on this phone.").font(.footnote).foregroundStyle(t.ink2) }
                 }.rowCard()
 
                 if let key = s.culprit {

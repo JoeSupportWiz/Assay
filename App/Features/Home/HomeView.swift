@@ -22,10 +22,10 @@ struct HomeView: View {
             }
 
             Section("Device") {
-                if let snap = model.snapshot, let score = snap.healthScore {
-                    LabeledContent("Health") { Text("\(score) / 100").monospacedDigit() }
+                if let snap = model.snapshot, snap.isDemo, let score = snap.healthScore {
+                    LabeledContent("Sample health score") { Text("\(score) / 100").monospacedDigit() }
                 } else {
-                    LabeledContent("Health") { Text("Run a check").foregroundStyle(t.ink3) }
+                    LabeledContent("Last device check") { if let d = model.lastCheck { Text(d, style: .relative) } else { Text("Not checked") } }
                 }
                 if let b = model.snapshot?.backup { backupRow(b) }
                 LabeledContent("Verified preference changes") { Text("\(model.receipts.verifiedChangeCount(engine: model.engine.mode))").monospacedDigit() }
@@ -47,7 +47,7 @@ struct HomeView: View {
             }.rowCard()
         }
         .themedList()
-        .navigationTitle(model.userName.isEmpty ? "Home" : "Hi, \(model.userName)")
+        .navigationTitle("Home")
         .navigationBarTitleDisplayMode(.large)
         .task { if model.lastCheck == nil { await model.runCheck() } }
         .refreshable { await model.runCheck() }
@@ -63,8 +63,8 @@ struct HomeView: View {
         HStack(spacing: 12) {
             IconTile(symbol: "iphone", hue: .sky, size: 36)
             VStack(alignment: .leading, spacing: 2) {
-                Text(model.snapshot?.name ?? "This iPhone").font(.system(size: 17, weight: .semibold)).foregroundStyle(t.ink)
-                Text(subtitle).font(.system(size: 13.5)).foregroundStyle(t.ink2)
+                Text(model.snapshot?.name ?? "This iPhone").font(.headline).foregroundStyle(t.ink)
+                Text(subtitle).font(.subheadline).foregroundStyle(t.ink2)
             }
             Spacer()
             if model.snapshot?.isDemo == true { Tag(style: .neutral, text: "Demo") }
@@ -80,7 +80,7 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 8) {
             switch b.phase {
             case .running(let p):
-                HStack { Text("Backup"); Spacer(); Text("\(Int(p * 100))%").monospacedDigit().foregroundStyle(t.ink2) }
+                HStack { Text("Sample backup"); Spacer(); Text("\(Int(p * 100))%").monospacedDigit().foregroundStyle(t.ink2) }
                 ProgressView(value: p).tint(t.accentColor)
             case .paused:
                 LabeledContent("Backup") { Text("Paused") }

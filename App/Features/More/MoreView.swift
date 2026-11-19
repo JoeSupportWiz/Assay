@@ -16,16 +16,12 @@ struct MoreView: View {
                 Toggle("Expert mode", isOn: $model.expertMode)
             } footer: { Text("Expert mode shows raw keys, bundle IDs and UUIDs inline.") }.rowCard()
 
-            Section("Coming up") {
-                ForEach(Self.upcoming, id: \.title) { u in
-                    HStack { Label(u.title, systemImage: u.symbol).foregroundStyle(t.ink2); Spacer(); Tag(style: .neutral, text: u.phase) }
-                }
-            }.rowCard()
+            Section { Button("Browse Assay builds") { model.selectedTab = .studio; model.studioPath = [.module(.signet), .buildLibrary] } }.rowCard()
 
             Section {
                 LabeledContent("Version") { Text("\(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—") (\(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"))") }
-                LabeledContent("Build") { Text("Device utilities preview") }
-            } footer: { Text("Assay is a working name · not affiliated with Apple.") }.rowCard()
+                LabeledContent("Build") { Text("Developer preview") }
+            } footer: { Text("Assay is independent and is not affiliated with Apple.") }.rowCard()
         }
         .themedList()
         .navigationTitle("More")
@@ -58,7 +54,8 @@ struct AppearanceView: View {
                         }
                     }
                 }
-            } footer: { Text("Millennium and Pinstripe are original homages. Wallpaper match uses a colour palette; iOS doesn't share your wallpaper with apps.") }.rowCard()
+            } footer: { Text("Wallpaper match uses your scene’s palette, not the system wallpaper.") }.rowCard()
+            FoldIconPicker()
         }
         .themedList()
         .navigationTitle("Appearance")

@@ -76,8 +76,8 @@ For an actual whole-device backup, use **Finder over USB** or the [standalone Ma
 |:--|:--|:--|:--|
 | **Scenes** | ◧ | Wallpaper, layout, widgets, Shortcuts and Focus, saved together · guided apply · snapshots | 🔨 landing |
 | **Gild** | ☰ | Tweak catalogue with safety tiers, presets, compatibility, custom builder | Catalogue and staged review · demo writes |
-| **Canvas** | ✦ | `.tendies` / Poster projects — layers, timeline, validate, export | ○ Phase 4 |
-| **Cards** | ▭ | Wallet card visuals. Visual only — never payment data | ○ Phase 4 |
+| **Canvas** | ✦ | ZIP wallpaper-project inspection and selected-layer replacement | simulator-verified |
+| **Cards** | ▭ | Local card artwork and PNG export. Visual only — never payment data | simulator-verified |
 | **Alchemy** | ✧ | AI assets with Minis, hosted providers or local Ollama | Chat · demo and provider configuration |
 | **Signet** | ◎ | In-app installer & signer: per-target profiles, entitlements, expiry | Inspector only · no signing |
 | **Lab** | ⊙ | Device check, passport, diagnose, fix flow with receipts | ✅ passport |

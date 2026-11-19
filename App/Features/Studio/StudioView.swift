@@ -5,7 +5,7 @@ enum StudioModule: String, CaseIterable, Identifiable, Hashable {
     var id: String { rawValue }
     var title: String { rawValue.capitalized }
     var subtitle: String {
-        switch self { case .gild: "Customise"; case .canvas: "Wallpapers"; case .cards: "Wallet visuals"; case .alchemy: "AI workshop"; case .signet: "Signing" }
+        switch self { case .gild: "Review tweaks and presets"; case .canvas: "Inspect and replace wallpaper layers"; case .cards: "Design and export card art"; case .alchemy: "Ask about a device or project"; case .signet: "Inspect builds and prepare profiles" }
     }
     var symbol: String {
         switch self { case .gild: "slider.horizontal.3"; case .canvas: "photo.artframe"; case .cards: "creditcard"; case .alchemy: "sparkles"; case .signet: "signature" }
@@ -31,63 +31,19 @@ struct StudioView: View {
                 ForEach(StudioModule.allCases) { m in
                     NavigationLink(value: StudioRoute.module(m)) {
                         HStack(spacing: 12) {
-                            IconTile(symbol: m.symbol, hue: m.hue, size: 34)
+                            Image("fold-" + (m == .signet ? "signing" : m.rawValue)).renderingMode(.template).resizable().scaledToFit().frame(width: 24, height: 24).foregroundStyle(t.ink).frame(width: 40, height: 44).accessibilityHidden(true)
                             VStack(alignment: .leading, spacing: 1) {
-                                Text(m.title).font(.system(size: 17, weight: .medium)).foregroundStyle(t.ink)
-                                Text(m.subtitle).font(.system(size: 13)).foregroundStyle(t.ink2)
+                                Text(m.title).font(.body.weight(.semibold)).foregroundStyle(t.ink)
+                                Text(m.subtitle).font(.subheadline).foregroundStyle(t.ink2)
                             }
-                            Spacer(); Tag(style: .neutral, text: m.phase)
+
                         }
                     }
                 }
-            } footer: { Text("Built one at a time. Each lands with its own tests and screenshots.") }.rowCard()
+            }.rowCard()
         }
         .themedList()
         .navigationTitle("Studio")
 
-    }
-}
-
-struct ModuleComingView: View {
-    @Environment(\.theme) private var t
-    let module: StudioModule
-    var body: some View {
-        List {
-            Section {
-                VStack(alignment: .leading, spacing: 10) {
-                    IconTile(symbol: module.symbol, hue: module.hue, size: 44)
-                    Text(module.title).font(.system(size: 24, weight: .bold)).foregroundStyle(t.ink)
-                    Text(module.blurb).foregroundStyle(t.ink2)
-                }.padding(.vertical, 4)
-            }.rowCard()
-            Section { LabeledContent("Status") { Text("Not built yet") }; LabeledContent("Planned") { Text(module.phase) } }.rowCard()
-        }
-        .themedList()
-        .navigationTitle(module.title)
-        .navigationBarTitleDisplayMode(.inline)
-    }
-}
-
-struct ScenesView: View {
-    @Environment(\.theme) private var t
-    var body: some View {
-        List {
-            Section {
-                VStack(alignment: .leading, spacing: 10) {
-                    IconTile(symbol: "square.2.layers.3d", hue: .lilac, size: 44)
-                    Text("Scenes").font(.system(size: 24, weight: .bold)).foregroundStyle(t.ink)
-                    Text("Wallpaper, Home Screen layout, widgets and Shortcuts, saved together.").foregroundStyle(t.ink2)
-                }.padding(.vertical, 4)
-            }.rowCard()
-            Section("Planned recipes") {
-                ForEach(["Work", "Minimal", "One page", "Colour flow", "Sleep", "Travel", "Research"], id: \.self) { Text($0).foregroundStyle(t.ink2) }
-            }.rowCard()
-            Section {
-                Text("iOS doesn't let apps rearrange the Home Screen, so Assay will guide each move and only mark it done when you confirm.")
-                    .font(.system(size: 14)).foregroundStyle(t.ink2)
-            } header: { Text("How it will work") } footer: { Text("Planned for Phase 4.") }.rowCard()
-        }
-        .themedList()
-        .navigationTitle("Scenes")
     }
 }

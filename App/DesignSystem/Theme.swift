@@ -59,7 +59,7 @@ enum ThemeID: String, CaseIterable, Identifiable, Codable {
         switch self {
         case .auto: "Follows iOS"; case .light: "Paper and pastels"; case .dark: "Near-black, raised cards"
         case .millennium: "A friendly homage to 2001"; case .pinstripe: "Glossy, skeuomorphic homage"
-        case .wallpaper: "Glass over your wallpaper"
+        case .wallpaper: "Glass over your palette"
         }
     }
 }
@@ -98,21 +98,21 @@ private func gloss(_ a: UInt32, _ b: UInt32, _ c: UInt32, _ d: UInt32) -> AnySha
 
 extension Theme {
     static let light = Theme(id: .light, bg: Color(hex: 0xF3F2EE), card: .white, cardBorder: nil,
-        ink: Palette.ink, ink2: Color(hex: 0x6B6B72), ink3: Color(hex: 0xA3A3AA), soft: Color(hex: 0xECEBE6),
+        ink: Palette.ink, ink2: Color(hex: 0x6B6B72), ink3: Color(hex: 0x66666D), soft: Color(hex: 0xECEBE6),
         primary: S(Palette.ink), onPrimary: .white, hero: S(Palette.ink), heroInk: .white,
         accent: S(Palette.butter), accentInk: Palette.ink,
         tabBar: S(Palette.ink), tabActive: S(.white), tabActiveInk: Palette.ink, tabInk: Color.white.opacity(0.62),
         cardRadius: 28, tileRadius: 18, pillRadius: 999)
 
     static let dark = Theme(id: .dark, bg: Color(hex: 0x0B0B0D), card: Color(hex: 0x17171A), cardBorder: Color(hex: 0x202024),
-        ink: Palette.paper, ink2: Color(hex: 0x9A9AA2), ink3: Color(hex: 0x5E5E66), soft: Color(hex: 0x222226),
+        ink: Palette.paper, ink2: Color(hex: 0x9A9AA2), ink3: Color(hex: 0x98989F), soft: Color(hex: 0x222226),
         primary: S(Palette.paper), onPrimary: Palette.ink, hero: S(Color(hex: 0x1D1D21)), heroInk: Palette.paper,
         accent: S(Palette.butter), accentInk: Palette.ink,
         tabBar: S(Color(hex: 0x1C1C20)), tabActive: S(Palette.paper), tabActiveInk: Palette.ink, tabInk: Color.white.opacity(0.55),
         cardRadius: 28, tileRadius: 18, pillRadius: 999, isDark: true)
 
     static let millennium = Theme(id: .millennium, bg: Color(hex: 0xECE9D8), card: .white, cardBorder: Color(hex: 0x7F9DB9),
-        ink: .black, ink2: Color(hex: 0x4D4D4D), ink3: Color(hex: 0x808080), soft: Color(hex: 0xF1EFE2),
+        ink: .black, ink2: Color(hex: 0x4D4D4D), ink3: Color(hex: 0x565651), soft: Color(hex: 0xF1EFE2),
         primary: G([(0x3C9A2E, 0), (0x5CC84A, 0.45), (0x2A8422, 1)]), onPrimary: .white,
         hero: G([(0x0A5BE8, 0), (0x3A8CFF, 0.12), (0x0B55DB, 0.55), (0x0844C7, 1)]), heroInk: .white,
         accent: S(Color(hex: 0xFFF6C9)), accentInk: .black,
@@ -121,7 +121,7 @@ extension Theme {
         cardRadius: 8, tileRadius: 4, pillRadius: 4, fontName: "Tahoma", listCorner: 4)
 
     static let pinstripe = Theme(id: .pinstripe, bg: Color(hex: 0xC5CCD4), card: .white, cardBorder: Color(hex: 0xA7ABB2),
-        ink: .black, ink2: Color(hex: 0x4C566C), ink3: Color(hex: 0x7A8394), soft: Color(hex: 0xE3E6EA),
+        ink: .black, ink2: Color(hex: 0x4C566C), ink3: Color(hex: 0x424B5A), soft: Color(hex: 0xE3E6EA),
         primary: gloss(0x8FB2EE, 0x4C82E0, 0x2D66D6, 0x2F6BDA), onPrimary: .white,
         hero: gloss(0x5A5A5E, 0x2E2E31, 0x141416, 0x0A0A0B), heroInk: .white,
         accent: gloss(0xFFF3A8, 0xFBE25C, 0xF5D338, 0xF2C925), accentInk: Color(hex: 0x3A2A00),
@@ -131,7 +131,7 @@ extension Theme {
     /// Glass over a wallpaper palette (lightest → primary, darkest → onPrimary).
     static func wallpaper(_ palette: WallpaperPalette) -> Theme {
         Theme(id: .wallpaper, bg: palette.darkest, card: .white.opacity(0.13), cardBorder: .white.opacity(0.2),
-              ink: .white, ink2: .white.opacity(0.78), ink3: .white.opacity(0.5), soft: .white.opacity(0.12),
+              ink: .white, ink2: .white.opacity(0.78), ink3: .white.opacity(0.88), soft: .white.opacity(0.12),
               primary: S(palette.lightest), onPrimary: palette.darkest, hero: S(Color.black.opacity(0.32)), heroInk: .white,
               accent: S(palette.lightest.opacity(0.9)), accentInk: palette.darkest,
               tabBar: S(Color.black.opacity(0.38)), tabActive: S(palette.lightest), tabActiveInk: palette.darkest, tabInk: .white.opacity(0.75),

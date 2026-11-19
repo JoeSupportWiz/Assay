@@ -55,6 +55,7 @@ struct SceneAppearanceLabel: View {
         if !options.contains(where: { $0.value == initial.appearance.palette }) {
             options.append(("Saved palette", initial.appearance.palette))
         }
+        if !options.contains(where: { $0.value == draft.appearance.palette }) { options.append(("Draft palette",draft.appearance.palette)) }
         return options
     }
 
@@ -69,6 +70,7 @@ struct SceneAppearanceLabel: View {
                     Picker("Palette", selection: $draft.appearance.palette.hex) {
                         ForEach(palettes, id: \.value.hex) { item in Text(item.name).tag(item.value.hex) }
                     }
+                    NavigationLink("Choose colours from a photo") { ScenePaletteLabView { draft.appearance.palette = $0 } }
                     SceneAppearanceLabel(appearance: draft.appearance)
                 } header: { Text("Assay appearance") } footer: {
                     Text("Wallpaper match displays these colours inside Assay. Other themes keep the palette for later.")

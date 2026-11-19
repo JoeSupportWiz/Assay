@@ -10,7 +10,7 @@ on:
       capture_set:
         description: "Full gallery or the four new utility screens"
         type: choice
-        options: [all, four-utilities, studio, acceptance]
+        options: [all, four-utilities, studio, acceptance, brand-audit]
         default: all
       commit_screens:
         description: "Commit screenshots to docs/app-screens"
@@ -44,6 +44,12 @@ jobs:
           swiftc -parse-as-library App/Core/Catalog.swift App/Features/PresetFiles/PortableEdits.swift tests/preset-files/Fixture.swift -o "$RUNNER_TEMP/preset-test"
           "$RUNNER_TEMP/preset-test"
           sh tests/build-library/run.sh
+          bash tests/layout-studio/smoke.sh
+          bash tests/scene-transfer/smoke.sh
+          bash tests/palette-lab/smoke.sh
+          swiftc -parse-as-library App/Features/CrashReview/CrashReview.swift tests/crash-review/Fixture.swift -o "$RUNNER_TEMP/crash-fixture"
+          "$RUNNER_TEMP/crash-fixture"
+          python3 scripts/check-fold-assets.py
           sh tests/supporter/run.sh
           swiftc -parse-as-library App/Features/Signet/SignetBinaryEvidence.swift tests/macho/Fixture.swift -o "$RUNNER_TEMP/mach-check"
           "$RUNNER_TEMP/mach-check"

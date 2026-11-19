@@ -25,6 +25,7 @@ final class AppModel {
     var labPath: [LabRoute] = []
     var studioPath: [StudioRoute] = []
     var morePath: [MoreRoute] = []
+    var scenePath: [PlannerRoute] = []
     var toast: Toast?
     private(set) var engine: any DeviceEngine = DemoEngine()
     var snapshot: DeviceSnapshot?
@@ -56,6 +57,9 @@ final class AppModel {
         rebuildEngine()
         if let i = args.firstIndex(of: "-route"), i + 1 < args.count {
             let r = args[i + 1]
+            if r == "scene-transfer" { selectedTab = .scenes; scenePath = [.transfer]; return }
+            if r == "crash-review" { selectedTab = .lab; labPath = [.crashReview]; return }
+            if r == "layout-planner" { selectedTab = .scenes; scenePath = [.layout]; return }
             if r == "alchemy" { selectedTab = .studio; studioPath = [.module(.alchemy)]; return }
             if r == "canvas" || r == "cards" { selectedTab = .studio; studioPath = [.module(r == "canvas" ? .canvas:.cards)]; return }
             if r == "privacy-lock" || r == "supporter" { selectedTab = .more; morePath = [r == "privacy-lock" ? .lock:.supporter]; return }
@@ -174,6 +178,7 @@ struct Toast: Identifiable, Equatable {
 
 
 /// Screens pushed inside the Studio tab.
+enum PlannerRoute: Hashable { case layout, transfer }
 enum MoreRoute: Hashable { case lock, supporter }
 enum StudioRoute: Hashable {
     case module(StudioModule)
@@ -183,7 +188,7 @@ enum StudioRoute: Hashable {
 
 /// Screens pushed inside the Lab tab.
 enum LabRoute: Hashable {
-    case diagnose, history, bluetooth, network, minis, displayCheck, fileVault
+    case diagnose, history, bluetooth, network, minis, displayCheck, fileVault, crashReview
     case symptom(String)
     case receipt(Int)
 }

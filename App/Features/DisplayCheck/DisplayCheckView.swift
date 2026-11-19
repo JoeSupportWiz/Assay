@@ -6,6 +6,8 @@ struct DisplayCheckView: View {
     @State private var typed = ""
     @State private var sample: DisplayClockSample?
     @State private var older: DisplayClockSample?
+    @State private var lineReport: String?
+    @State private var lineTime: Date?
     @State private var evidence: DisplayImportEvidence?
     @State private var picking = false
     @State private var reading = false
@@ -50,12 +52,18 @@ struct DisplayCheckView: View {
             } header: { Text("Look for the two known settings") } footer: {
                 Text("Only exact names in complete preset-import lists count. Repeated imports may be the same preset. This is historical evidence, not a read-back from the phone.")
             }
+            Section {
+                Menu(lineReport ?? "Record what you see") {
+                    ForEach(["Green line", "Red line", "No line", "Not sure"],id: \.self) { value in Button(value) { lineReport=value; lineTime=Date() } }
+                }
+                if let d=lineTime { Text("Reported by you at \(d.formatted(date: .omitted,time:.shortened)).").font(.footnote) }
+            } header: { Text("Lock Screen line") } footer: { Text("This observation is separate from the clock and from the preset log. Assay cannot inspect the live Lock Screen.") }
             Section("What to do next") {
                 Text("If device time is right and the status time differs, first stop any active screen recording or mirroring and compare again. Don’t change Date & Time just to remove a display override.")
                 Text("If you enabled the unlock-test indicator or recording-status override in another app, use that app’s undo or targeted reset for that setting. Don’t select a whole-device reset. If the source tool can’t restore the original value, this app can’t safely invent it.")
                 Text("If the device time itself is wrong against a trusted clock, check Settings → General → Date & Time, including the time zone.")
             }
-            if sample != nil || evidence != nil {
+            if sample != nil || evidence != nil || lineReport != nil {
                 Section { ShareLink(item: report) { Label("Share check summary", systemImage: "square.and.arrow.up") } } footer: { Text("Shares just these measurements and counts, never the imported log.") }
             }
         }
@@ -88,6 +96,7 @@ struct DisplayCheckView: View {
     private var report: String {
         var rows=["Assay · Clock & Lock Screen (read-only)"]
         for s in [older,sample].compactMap({$0}) {rows.append("\(s.at.ISO8601Format()) · user-reported: \(s.visible) · \(s.description)")}
+        if let lineReport, let lineTime { rows.append("\(lineTime.ISO8601Format()) · Lock Screen, user-reported: \(lineReport). Not read from system preferences.") }
         if let e=evidence {rows.append("Historical preset imports: \(e.records). Recording override listed: \(e.recordingRecords). Unlock indicator listed: \(e.authLineRecords). No current preference value observed.")}
         return rows.joined(separator:"\n")
     }

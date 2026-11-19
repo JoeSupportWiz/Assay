@@ -73,13 +73,13 @@ struct MainShell: View {
                 Group {
                     switch tab {
                     case .home: NavigationStack { HomeView() }
-                    case .scenes: NavigationStack { SceneLibraryView() }
+                    case .scenes: ScenePlannerRoot()
                     case .studio: StudioRoot()
                     case .lab: LabRoot()
                     case .more: MoreRoot()
                     }
                 }
-                .tabItem { Label(tab.title, systemImage: tab.symbol) }
+                .tabItem { Label { Text(tab.title) } icon: { Image("fold-" + tab.rawValue).renderingMode(.template) } }
                 .tag(tab)
             }
         }
@@ -134,6 +134,7 @@ struct LabRoot: View {
                     case .history: HistoryView()
                     case .displayCheck: DisplayCheckView()
                     case .fileVault: FileVaultView()
+                    case .crashReview: CrashReviewView()
                     case .minis: MinisReviewView()
                     case .bluetooth: BluetoothRootView()
                     case .network: NetworkRootView()
@@ -152,5 +153,13 @@ struct MoreRoot: View {
         NavigationStack(path: $model.morePath) { MoreView().navigationDestination(for: MoreRoute.self) { route in
             switch route { case .lock: AssayPrivacyLockSettings(); case .supporter: SupporterView() }
         }}
+    }
+}
+
+struct ScenePlannerRoot: View {
+    @Environment(AppModel.self) private var model
+    var body: some View {
+        @Bindable var model = model
+        NavigationStack(path: $model.scenePath) { SceneLibraryView().navigationDestination(for: PlannerRoute.self) { r in switch r { case .layout: SceneLayoutPlannerView(); case .transfer: SceneTransferView() } } }
     }
 }

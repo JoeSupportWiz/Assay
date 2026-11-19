@@ -33,6 +33,16 @@ shot() { # name, appearance, args...
 }
 
 for look in light dark; do
+  if [[ "${ASSAY_CAPTURE_SET:-all}" == "brand-audit" ]]; then
+    shot "00-onboarding-$look" "$look" -onboarding
+    shot "01-home-$look" "$look" -uiDemo -tab home
+    shot "07-studio-$look" "$look" -uiDemo -tab studio
+    shot "02-lab-$look" "$look" -uiDemo -tab lab
+    shot "29-layout-$look" "$look" -uiDemo -route layout-planner -layoutSample
+    shot "30-scene-transfer-$look" "$look" -uiDemo -route scene-transfer
+    shot "31-crash-review-$look" "$look" -uiDemo -route crash-review
+    continue
+  fi
   if [[ "${ASSAY_CAPTURE_SET:-all}" == "all" || "${ASSAY_CAPTURE_SET:-all}" == "acceptance" ]]; then
     shot "25-preset-files-$look" "$look" -uiDemo -route preset-files
     shot "26-privacy-lock-$look" "$look" -uiDemo -route privacy-lock
@@ -80,6 +90,15 @@ shot "09-gild-wallpaper"  dark  -uiDemo -route gild -theme wallpaper
 
 fi
 
+if [[ "${ASSAY_CAPTURE_SET:-all}" == "brand-audit" ]]; then
+  shot "01-home-wallpaper" dark -uiDemo -tab home -theme wallpaper
+  shot "01-home-millennium" light -uiDemo -tab home -theme millennium
+  shot "01-home-pinstripe" light -uiDemo -tab home -theme pinstripe
+  xcrun simctl ui "$UDID" content_size accessibility-extra-extra-extra-large
+  shot "32-studio-accessibility" light -uiDemo -tab studio
+  shot "33-onboarding-accessibility" dark -onboarding
+  xcrun simctl ui "$UDID" content_size large
+fi
 # Contact sheet for quick review
 python3 - "$OUT" <<'PY'
 import sys, pathlib

@@ -10,6 +10,8 @@ import SwiftUI
     var body: some View {
         let live = SceneAppearance(model: model)
         List {
+            Section { NavigationLink(value: PlannerRoute.layout) { Label("Plan a Home Screen page", systemImage: "square.grid.3x3") } }
+            Section { NavigationLink(value: PlannerRoute.transfer) { Label("Share or import a scene", systemImage: "square.and.arrow.up.on.square") } }
             Section("In use in Assay") {
                 VStack(alignment: .leading, spacing: 5) {
                     Text(library.state.scene(library.state.selectedID)?.name ?? "Current appearance").font(.headline)

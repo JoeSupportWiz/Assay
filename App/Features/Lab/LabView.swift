@@ -9,10 +9,10 @@ struct LabView: View {
             Section {
                 Button { Task { await model.runCheck() } } label: {
                     HStack {
-                        Label("Run device check", systemImage: "stethoscope").font(.system(size: 17, weight: .semibold))
+                        Label("Run device check", systemImage: "stethoscope").font(.body.weight(.semibold))
                         Spacer()
                         if model.checking { ProgressView() }
-                        else if let d = model.lastCheck { Text(d, style: .relative).font(.system(size: 13)).foregroundStyle(t.ink3) }
+                        else if let d = model.lastCheck { Text(d, style: .relative).font(.footnote).foregroundStyle(t.ink3) }
                     }
                 }.disabled(model.checking)
             } footer: { Text("Reads only. Changes nothing.") }.rowCard()
@@ -37,6 +37,7 @@ struct LabView: View {
                 NavigationLink(value: LabRoute.displayCheck) { Label("Clock & Lock Screen", systemImage: "clock") }
                 NavigationLink(value: LabRoute.minis) { Label("Analyse with Minis", systemImage: "doc.text.magnifyingglass") }
                 NavigationLink(value: LabRoute.diagnose) { Label("Diagnose a problem", systemImage: "text.magnifyingglass") }
+                NavigationLink(value: LabRoute.crashReview) { Label("Read a crash report", systemImage: "doc.text.magnifyingglass") }
                 NavigationLink(value: LabRoute.history) {
                     HStack {
                         Label("Undo history", systemImage: "clock.arrow.circlepath")
@@ -55,7 +56,7 @@ struct LabView: View {
                 } header: {
                     HStack { Text("Device passport"); Spacer(); if snap.isDemo { Text("Demo") } }
                 } footer: {
-                    Text("Obs = read from iOS · ? = iOS doesn't say, so Assay doesn't guess.")
+                    Text("Observed values come from the selected device. Unknown means the value isn’t available.")
                 }.rowCard()
             }
         }

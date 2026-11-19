@@ -50,8 +50,8 @@ Real [file checkpoints and verified export](features/file-vault.md), [scene acti
 |---|---|---|
 | 4.1 | Scene library, activation, wallpaper PNG export, undo | Local scene CRUD/appearance; system layout, widget automation and snapshots pending |
 | 4.2 | Palette Lab (x06) + Wallpaper-match theme | ○ |
-| 4.3 | Canvas / Poster Studio: `.tendies` import, inspect, layers, timeline, validate, export (x11) | ○ |
-| 4.4 | Cards: Wallet visual editor | ○ |
+| 4.3 | Canvas: inspect a local ZIP wallpaper project, replace one chosen PNG layer, export a new ZIP | simulator + fixture; no timeline or system-wallpaper install |
+| 4.4 | Cards: local art editor, 1600×1000 PNG export | simulator; art only, no Wallet pass |
 | 4.5 | Icon packs (x05) | ○ |
 | 4.6 | Scene sharing `.assayscene` (x09) + automations via Shortcuts (x08) | ○ |
 
@@ -67,9 +67,9 @@ Real [file checkpoints and verified export](features/file-vault.md), [scene acti
 | # | Slice | Status |
 |---|---|---|
 | 6.1 | IPA inspector: targets, entitlements, Info.plist, privacy manifests (x04) | local inspector · sample included |
-| 6.2 | Signing matrix + entitlement diff | profile matrix · binary entitlements not read |
-| 6.3 | App Store Connect API key: certificates, profiles, devices, expiry | ○ 🔒 |
-| 6.4 | Per-target sign & verify, build receipts | ○ 🔒 |
+| 6.2 | Signing matrix + entitlement diff | profile claims plus bounded Mach-O entitlement evidence; unsupported cases stay Unknown |
+| 6.3 | App Store Connect API key: certificates, profiles, devices, expiry | team inventory + reviewed development-profile request; synthetic tests, no live account run |
+| 6.4 | Per-target sign & verify, build receipts | preflight and verified build retrieval; signing and install remain pending |
 | 6.5 | Expiry calendar (x12) + renewal assistant | expiry export only; renewal pending |
 | 6.6 | **In-app installer/signer** — pulls the build, reads every target's entitlements, creates bundle IDs, capabilities and per-target profiles, signs each part, verifies, installs | ○ 🔒 |
 | 6.7 | Sign-in: App Store Connect API key (default, official) · Apple ID login (opt-in, labelled risky, free accounts) · or import your own .p12 + profiles and Assay checks their entitlements against each target | ○ |
@@ -87,15 +87,15 @@ Real [file checkpoints and verified export](features/file-vault.md), [scene acti
 ## Phase 8 — System surfaces
 | # | Slice | Status |
 |---|---|---|
-| 8.1 | Widgets (Home + Lock Screen), Live Activity, Dynamic Island | ○ |
-| 8.2 | Control Centre controls + App Intents / Shortcuts | ○ |
-| 8.3 | App lock (Assay only, Face ID) (x07) | ○ |
+| 8.1 | Widgets (Home + Lock Screen), Live Activity, Dynamic Island | embedded; simulator compiled; Vault Live Activity needs device verification |
+| 8.2 | Control Centre controls + App Intents / Shortcuts | open-app control and two Shortcuts; device verification pending |
+| 8.3 | App lock (Assay only, Face ID) (x07) | optional foreground lock; device verification pending |
 | 8.4 | "Still good?" follow-ups (x17) | ○ |
 
 ## Phase 9 — Assay Pro
 | # | Slice | Status |
 |---|---|---|
-| 9.1 | StoreKit 2 supporter purchase: Yearly £9.99 · Lifetime £29.99 — every feature stays free; Pro adds a badge and alternate icons | ○ |
+| 9.1 | StoreKit 2 supporter purchase: Yearly £9.99 · Lifetime £29.99 — every feature stays free | client and local test file; App Store Connect/TestFlight untested |
 | 9.2 | App Store Connect products `assay.pro.yearly`, `assay.pro.lifetime` | ○ 🔒 |
 
 > **StoreKit note:** real purchases only work for App Store / TestFlight builds. A sideloaded build can test with the included StoreKit configuration file in the simulator only.

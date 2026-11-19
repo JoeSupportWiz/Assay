@@ -9,7 +9,7 @@ struct OnboardingView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Group {
+            ScrollView {
                 switch step {
                 case 0: welcome
                 default: engine
@@ -32,11 +32,11 @@ struct OnboardingView: View {
 
     private var welcome: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Spacer().frame(height: 60)
-            FoldMark().fill(t.ink).frame(width: 56, height: 80)
-            Text("Assay").font(.system(size: 40, weight: .heavy)).tracking(-1.5).foregroundStyle(t.ink)
-            Text("Customise, sign and inspect your iPhone. Every change is previewed first, checked afterwards, and can be undone.")
-                .font(.system(size: 17)).foregroundStyle(t.ink2)
+            Spacer().frame(height: 24)
+            Image("fold-symbol").renderingMode(.template).resizable().scaledToFit().frame(width: 94, height: 94).foregroundStyle(t.ink).accessibilityHidden(true)
+            Text("Assay").font(.largeTitle.weight(.bold)).tracking(-1).foregroundStyle(t.ink)
+            Text("Check your iPhone, edit wallpapers and inspect the apps you sign.")
+                .font(.body).foregroundStyle(t.ink2)
             TextField("Your name (optional)", text: $name)
                 .padding(14).background(t.card, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 .padding(.top, 12)
@@ -46,10 +46,10 @@ struct OnboardingView: View {
     private var engine: some View {
         VStack(alignment: .leading, spacing: 14) {
             Spacer().frame(height: 40)
-            Text("How should Assay reach your iPhone?").font(.system(size: 28, weight: .bold)).foregroundStyle(t.ink)
+            Text("How should Assay reach your iPhone?").font(.title.bold()).foregroundStyle(t.ink)
             Text("You can change this later in More › Engine.").foregroundStyle(t.ink2)
-            option(.mac, "Mac companion", "Planned. Mac pairing and USB backups aren’t available in this build.")
-            option(.iphone, "iPhone only", "Read local device details now. System preference changes and backups aren’t available in this build.")
+            option(.mac, "Mac companion", "Not connected. Use Finder on your Mac for a USB device backup.")
+            option(.iphone, "iPhone only", "Checks this iPhone. System preferences are read-only here.")
         }
     }
 
@@ -59,13 +59,13 @@ struct OnboardingView: View {
                 Image(systemName: choice == m ? "largecircle.fill.circle" : "circle").foregroundStyle(choice == m ? t.accentColor : t.ink3).font(.system(size: 22))
                 VStack(alignment: .leading, spacing: 4) {
                     Text(title).font(.system(size: 17, weight: .semibold)).foregroundStyle(t.ink)
-                    Text(detail).font(.system(size: 14)).foregroundStyle(t.ink2).multilineTextAlignment(.leading)
+                    Text(detail).font(.subheadline).foregroundStyle(t.ink2).multilineTextAlignment(.leading)
                 }
                 Spacer(minLength: 0)
             }
             .padding(14).background(t.card, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(choice == m ? t.accentColor : .clear, lineWidth: 2))
-        }.buttonStyle(.plain)
+        }.buttonStyle(.plain).disabled(m == .mac)
     }
 
     private func advance() {

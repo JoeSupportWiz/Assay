@@ -1,0 +1,82 @@
+{
+  "App/Assets.xcassets/AppIcon.appiconset/AppIcon.png": {
+    "source": "icons/AppIcon.appiconset/AppIcon.png",
+    "sha256": "5513470be61ec5b81acee52cda2609f364447254c6a58cb8b524f947ec9c3c7e"
+  },
+  "App/Assets.xcassets/AppIcon.appiconset/AppIcon-Dark.png": {
+    "source": "icons/AlternateIcons/Assay-Dark.png",
+    "sha256": "9e7969553021779bf20b59b6d2f80f6d789ee92e26bcc0519b80e6e8264a088d"
+  },
+  "App/Assets.xcassets/AppIcon.appiconset/AppIcon-Tinted.png": {
+    "source": "icons/AlternateIcons/Assay-Tinted.png",
+    "sha256": "9ab32b180b2133dc184bc3638cdfa570cf894618af01141ac3ea7677125d61ab"
+  },
+  "App/Assets.xcassets/FoldMillennium.appiconset/AppIcon.png": {
+    "source": "icons/AlternateIcons/XP/AppIcon.png",
+    "sha256": "012a66815de6096d823b097fd3cca0e14f2bc5ce117764af7d0110dd14c6898f"
+  },
+  "App/Assets.xcassets/FoldPinstripe.appiconset/AppIcon.png": {
+    "source": "icons/AlternateIcons/Pinstripe/AppIcon.png",
+    "sha256": "759273807ccb5284bbdf314eacc2b6cecab2a36c4d18ce00421985c8a77b3cd3"
+  },
+  "App/Assets.xcassets/fold-studio.imageset/fold-studio.svg": {
+    "source": "svg/glyphs/studio.svg",
+    "sha256": "4b81a5ef23e4f819b38bb8ad498b3100ee93d4b0dc5a9c825dacd5672124ff29"
+  },
+  "App/Assets.xcassets/fold-alchemy.imageset/fold-alchemy.svg": {
+    "source": "svg/glyphs/alchemy.svg",
+    "sha256": "1edaa5c9ee816b035abac8fb24d2ce7d26536be7322abefd518af0b7003ef7fd"
+  },
+  "App/Assets.xcassets/fold-device-check.imageset/fold-device-check.svg": {
+    "source": "svg/glyphs/device-check.svg",
+    "sha256": "a3876f66159c0edc7c01063c412c46ab719d809208ddb586af24fdacfc6e277f"
+  },
+  "App/Assets.xcassets/fold-home.imageset/fold-home.svg": {
+    "source": "svg/glyphs/home.svg",
+    "sha256": "85f8ed07dc103f38e67413f9d551e62e14db21334867989445d556d2b383176d"
+  },
+  "App/Assets.xcassets/fold-scenes.imageset/fold-scenes.svg": {
+    "source": "svg/glyphs/scenes.svg",
+    "sha256": "09966a6dae44bad1b11bbf49e8a25e99e836edd20a84ca91236898b0925d5c04"
+  },
+  "App/Assets.xcassets/fold-network.imageset/fold-network.svg": {
+    "source": "svg/glyphs/network.svg",
+    "sha256": "bff0a236a233f93bc65cba8f741697350e7d540ea3fe4bdae3738f735d625cb8"
+  },
+  "App/Assets.xcassets/fold-signing.imageset/fold-signing.svg": {
+    "source": "svg/glyphs/signing.svg",
+    "sha256": "4b132e1b745d7e7c182c62ab6dbafea452a37810342ac99b3c882c94054c45eb"
+  },
+  "App/Assets.xcassets/fold-cards.imageset/fold-cards.svg": {
+    "source": "svg/glyphs/cards.svg",
+    "sha256": "58c3334970f45c59a07a5d5976c7f18673395cd88bc0ff956a296889f3917441"
+  },
+  "App/Assets.xcassets/fold-vault.imageset/fold-vault.svg": {
+    "source": "svg/glyphs/vault.svg",
+    "sha256": "934815fd2ca491ae11ab4c2983a4004919939145e828a89b0ab0f7017d00b4d9"
+  },
+  "App/Assets.xcassets/fold-lab.imageset/fold-lab.svg": {
+    "source": "svg/glyphs/lab.svg",
+    "sha256": "a8514bee6c59d8c6b33391ad886917a170758c7d55f5d5b3c7ee893d088478a6"
+  },
+  "App/Assets.xcassets/fold-more.imageset/fold-more.svg": {
+    "source": "svg/glyphs/more.svg",
+    "sha256": "22eeb09a4a19e684066e58b2d78394b8c3a8b1ee85a6aca15b6881fa7b925895"
+  },
+  "App/Assets.xcassets/fold-gild.imageset/fold-gild.svg": {
+    "source": "svg/glyphs/gild.svg",
+    "sha256": "c0718d937bf93f14b9dbcc01c316fee4005c334f8d0a640a0a257496cb33a40c"
+  },
+  "App/Assets.xcassets/fold-canvas.imageset/fold-canvas.svg": {
+    "source": "svg/glyphs/canvas.svg",
+    "sha256": "c11c2da0014e0e5ebc3101e9ab2072f4585c6db1cebbc8ed03858517357feebb"
+  },
+  "App/Assets.xcassets/fold-ble.imageset/fold-ble.svg": {
+    "source": "svg/glyphs/ble.svg",
+    "sha256": "ffc2b282e5642c1b50640750fc768f8a8976715480e6a4e4adad2e8e81786ecd"
+  },
+  "App/Assets.xcassets/fold-symbol.imageset/fold-symbol.svg": {
+    "source": "svg/symbol.svg",
+    "sha256": "6ba1eedadb89b8f2aba177c4b1f6633e5625bdeb1878caa170b4abb0e4eb3a54"
+  }
+}

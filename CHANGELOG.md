@@ -7,6 +7,11 @@
 - Signet matches a public signing certificate to profiles for specified bundle IDs without requesting a private key.
 - Failed receipt items no longer count as verified changes. Old engine readings are cleared when you switch engines.
 
+## Unreleased · Build 6 review
+- Signet reads bounded per-target entitlement evidence from executables, with explicit Unknown states for unsupported or malformed binaries.
+- Added a verified Assay build library, preset import/export review, optional Assay-only privacy lock and supporter purchase client. No App Store, TestFlight or signed-device verification yet.
+- Repeat File Vault checkpoints reuse verified blobs without writing duplicate payloads.
+
 ## Unreleased · Studio and Lab integration
 - **Analyse with Minis**: review an allowlisted snapshot, optionally add receipt summaries or counts from an imported backup log, then share or export. A local read-only MCP server compares user-approved exports. No pairing file or model key required.
 - **Engine status** now distinguishes public iPhone checks from unimplemented system writes. The review sheet allows previews, not live writes, on real-device engines.
