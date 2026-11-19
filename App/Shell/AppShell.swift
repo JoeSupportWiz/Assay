@@ -76,7 +76,7 @@ struct MainShell: View {
                     case .scenes: NavigationStack { SceneLibraryView() }
                     case .studio: StudioRoot()
                     case .lab: LabRoot()
-                    case .more: NavigationStack { MoreView() }
+                    case .more: MoreRoot()
                     }
                 }
                 .tabItem { Label(tab.title, systemImage: tab.symbol) }
@@ -111,6 +111,7 @@ struct StudioRoot: View {
                         case .cards: CardArtRootView()
                         }
                     case .appleTeam: AppleTeamView()
+                    case .presetFiles: GildPresetFilesView()
                     case .signerPreflight: SignerPreflightView()
                     case .gild(let g): switch g { case .tweak(let id): TweakDetailView(id: id); case .preset(let id): PresetView(id: id) }
                     }
@@ -140,5 +141,15 @@ struct LabRoot: View {
                     }
                 }
         }
+    }
+}
+
+struct MoreRoot: View {
+    @Environment(AppModel.self) private var model
+    var body: some View {
+        @Bindable var model = model
+        NavigationStack(path: $model.morePath) { MoreView().navigationDestination(for: MoreRoute.self) { route in
+            switch route { case .lock: AssayPrivacyLockSettings(); case .supporter: SupporterView() }
+        }}
     }
 }

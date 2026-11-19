@@ -27,12 +27,14 @@ struct VaultFixture {
         try check(first.files.count == 2 && first.files[0].id != first.files[1].id, "two entries")
         try check(first.files[0].hash == first.files[1].hash, "matching digests")
         try check(try fm.contentsOfDirectory(atPath: blobs.path) == [first.files[0].hash], "one physical blob")
+        try check(first.storedBytes == old.count && first.reusedBytes == old.count, "initial duplicate counted once")
+        let warm = try await store.checkpoint([a,b]); try check(warm.storedBytes == 0 && warm.reusedBytes == old.count*2, "unchanged checkpoint writes zero payload bytes")
         try changed.write(to: a)
         let next = try await store.checkpoint([a, b])
         try check(next.files[0].hash != first.files[0].hash, "new revision")
         try check(try fm.contentsOfDirectory(atPath: blobs.path).count == 2, "incremental reuse")
         let reopened = VaultStore(root: root)
-        try check(try await reopened.history().snapshots.count == 2, "persisted history")
+        try check(try await reopened.history().snapshots.count == 3, "persisted history")
         let file = first.files[0].id
         try await reopened.restore(snapshot: first.id, file: file, to: out)
         try check(try Data(contentsOf: out.appendingPathComponent("a.bin")) == old, "restored previous bytes")
@@ -47,7 +49,7 @@ struct VaultFixture {
         let fresh = temp.appendingPathComponent("fresh" )
         try Data([1, 2, 3]).write(to: fresh)
         try await reject(.integrity) { _ = try await reopened.checkpoint([fresh, b]) }
-        try check(try await reopened.history().snapshots.count == 2, "failed checkpoint not committed")
+        try check(try await reopened.history().snapshots.count == 3, "failed checkpoint not committed")
         try check(try fm.contentsOfDirectory(atPath: blobs.path).count == 2, "failed transaction rolled back")
         print("PASS: dedup, history, version restore, no overwrite, unavailable/corrupt blob, atomic failure")
     }

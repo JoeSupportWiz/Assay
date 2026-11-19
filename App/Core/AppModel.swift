@@ -24,6 +24,7 @@ final class AppModel {
     var selectedTab: AppTab = .home
     var labPath: [LabRoute] = []
     var studioPath: [StudioRoute] = []
+    var morePath: [MoreRoute] = []
     var toast: Toast?
     private(set) var engine: any DeviceEngine = DemoEngine()
     var snapshot: DeviceSnapshot?
@@ -57,6 +58,8 @@ final class AppModel {
             let r = args[i + 1]
             if r == "alchemy" { selectedTab = .studio; studioPath = [.module(.alchemy)]; return }
             if r == "canvas" || r == "cards" { selectedTab = .studio; studioPath = [.module(r == "canvas" ? .canvas:.cards)]; return }
+            if r == "privacy-lock" || r == "supporter" { selectedTab = .more; morePath = [r == "privacy-lock" ? .lock:.supporter]; return }
+            if r == "preset-files" { selectedTab = .studio; studioPath = [.module(.gild), .presetFiles]; return }
             if r == "apple-team" { selectedTab = .studio; studioPath = [.module(.signet), .appleTeam]; return }
             if r == "signer-preflight" { selectedTab = .studio; studioPath = [.module(.signet), .signerPreflight]; return }
             if r == "signet" { selectedTab = .studio; studioPath = [.module(.signet)]; return }
@@ -170,10 +173,11 @@ struct Toast: Identifiable, Equatable {
 
 
 /// Screens pushed inside the Studio tab.
+enum MoreRoute: Hashable { case lock, supporter }
 enum StudioRoute: Hashable {
     case module(StudioModule)
     case gild(GildRoute)
-    case signerPreflight, appleTeam
+    case signerPreflight, appleTeam, presetFiles
 }
 
 /// Screens pushed inside the Lab tab.

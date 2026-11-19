@@ -11,8 +11,8 @@ struct MoreView: View {
                 NavigationLink { AppearanceView() } label: { LabeledContent("Appearance") { Text(model.themeID.title) } }
                 NavigationLink { EngineView() } label: { LabeledContent("Engine") { Text(model.engineMode?.title ?? "Not set") } }
                 NavigationLink { AISettingsView() } label: { Label("AI providers", systemImage: "brain") }
-                NavigationLink { AssayPrivacyLockSettings() } label: { Label("Privacy lock", systemImage: "lock") }
-                NavigationLink { SupporterView() } label: { Label("Support Assay", systemImage: "star") }
+                NavigationLink(value: MoreRoute.lock) { Label("Privacy lock", systemImage: "lock") }
+                NavigationLink(value: MoreRoute.supporter) { Label("Support Assay", systemImage: "star") }
                 Toggle("Expert mode", isOn: $model.expertMode)
             } footer: { Text("Expert mode shows raw keys, bundle IDs and UUIDs inline.") }.rowCard()
 

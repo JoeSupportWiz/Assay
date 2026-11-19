@@ -8,6 +8,8 @@ struct VaultFile: Codable, Identifiable, Sendable {
 
 struct VaultSnapshot: Codable, Identifiable, Sendable {
     let version: Int, id: UUID, date: Date, files: [VaultFile]
+    var storedBytes: Int? = nil
+    var reusedBytes: Int? = nil
 }
 
 struct VaultHistory: Sendable {
@@ -63,35 +65,40 @@ actor VaultStore {
         guard (1...32).contains(urls.count) else { throw VaultFault.selection }
         let dirs = try directories()
         var files: [VaultFile] = [], added: [URL] = [], total = 0, committed = false
+        var stored = 0, reused = 0
         defer { if !committed { for blob in added { try? fm.removeItem(at: blob) } } }
         for (index, url) in urls.enumerated() {
             let ordinal = "\(index + 1) of \(urls.count)"
             progress("Reading file \(ordinal)…")
             let name = url.lastPathComponent
             guard VaultIO.validName(name) else { throw VaultFault.type }
-            let temp = dirs.blobs.appendingPathComponent(".stage-" + UUID().uuidString)
-            let handle = try VaultIO.create(temp)
-            defer { try? handle.close(); try? fm.removeItem(at: temp) }
             let digest = try VaultIO.coordinated(url) { src in
-                let copy = try VaultIO.stream(src, into: handle, limit: min(VaultIO.fileLimit, VaultIO.snapshotLimit - total))
-                try handle.synchronize()
-                try handle.close()
-                progress("Verifying source \(ordinal)…")
-                try VaultIO.verify(src, copy)
-                return copy
+                let limit = min(VaultIO.fileLimit, VaultIO.snapshotLimit - total)
+                let key = try VaultIO.stream(src, limit: limit)
+                let blob = dirs.blobs.appendingPathComponent(key.hash)
+                if fm.fileExists(atPath: blob.path) {
+                    // A warm hit: re-hash the existing bytes before reuse. No temporary payload write.
+                    progress("Verifying stored file \(ordinal)…")
+                    try VaultIO.verify(blob, key)
+                    reused += key.size
+                } else {
+                    let temp = dirs.blobs.appendingPathComponent(".stage-" + UUID().uuidString)
+                    let handle = try VaultIO.create(temp)
+                    defer { try? handle.close(); try? fm.removeItem(at: temp) }
+                    let copy = try VaultIO.stream(src, into: handle, limit: limit)
+                    guard copy == key else { throw VaultFault.integrity }
+                    try handle.synchronize(); try handle.close()
+                    progress("Verifying stored file \(ordinal)…")
+                    try VaultIO.verify(temp, key)
+                    try fm.moveItem(at: temp, to: blob); added.append(blob)
+                    stored += key.size
+                }
+                return key
             }
-            progress("Verifying stored file \(ordinal)…")
-            let blob = dirs.blobs.appendingPathComponent(digest.hash)
-            if !fm.fileExists(atPath: blob.path) {
-                try fm.moveItem(at: temp, to: blob)
-                added.append(blob)
-            }
-            // Includes existing blobs: a matching filename is not proof of integrity.
-            try VaultIO.verify(blob, digest)
             files.append(VaultFile(id: UUID(), name: name, hash: digest.hash, size: digest.size))
             total += digest.size
         }
-        let snapshot = VaultSnapshot(version: 1, id: UUID(), date: Date(), files: files)
+        let snapshot = VaultSnapshot(version: 1, id: UUID(), date: Date(), files: files, storedBytes: stored, reusedBytes: reused)
         progress("Saving checkpoint…")
         try Task.checkCancellation()
         try JSONEncoder().encode(snapshot).write(to: dirs.snapshots.appendingPathComponent(snapshot.id.uuidString + ".json"), options: .atomic)

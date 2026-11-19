@@ -10,7 +10,7 @@ on:
       capture_set:
         description: "Full gallery or the four new utility screens"
         type: choice
-        options: [all, four-utilities, studio]
+        options: [all, four-utilities, studio, acceptance]
         default: all
       commit_screens:
         description: "Commit screenshots to docs/app-screens"
@@ -41,6 +41,8 @@ jobs:
           set -eu
           swiftc -parse-as-library App/Features/AppleTeam/TeamPortal.swift tests/apple-team/TeamFixture.swift -o "$RUNNER_TEMP/team-test"
           "$RUNNER_TEMP/team-test"
+          swiftc -parse-as-library App/Core/Catalog.swift App/Features/PresetFiles/PortableEdits.swift tests/preset-files/Fixture.swift -o "$RUNNER_TEMP/preset-test"
+          "$RUNNER_TEMP/preset-test"
           sh tests/supporter/run.sh
           swiftc -parse-as-library App/Features/Signet/SignetBinaryEvidence.swift tests/macho/Fixture.swift -o "$RUNNER_TEMP/mach-check"
           "$RUNNER_TEMP/mach-check"

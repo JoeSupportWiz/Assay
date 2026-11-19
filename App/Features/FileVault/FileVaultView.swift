@@ -60,6 +60,9 @@ struct FileVaultView: View {
                         VStack(alignment: .leading) {
                             Text(snapshot.date.formatted(date: .abbreviated, time: .standard))
                             Text("Files: \(snapshot.files.count)").font(.caption).foregroundStyle(.secondary)
+                            if let stored = snapshot.storedBytes, let reused = snapshot.reusedBytes {
+                                Text("New: \(stored.formatted()) B · reused: \(reused.formatted()) B").font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                            }
                         }
                     }.rowCard()
                 }
