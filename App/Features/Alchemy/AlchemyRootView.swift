@@ -15,6 +15,7 @@ struct AlchemyRootView: View {
 
     var body: some View {
         List {
+            Section { NavigationLink("Analyse with Minis") { MinisReviewView() } }.rowCard()
             introSection
             if chat.messages.isEmpty { startersSection }
             if !chat.messages.isEmpty || chat.sending || chat.errorText != nil { conversationSection }

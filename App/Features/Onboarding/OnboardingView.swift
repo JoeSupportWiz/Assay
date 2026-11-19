@@ -48,8 +48,8 @@ struct OnboardingView: View {
             Spacer().frame(height: 40)
             Text("How should Assay reach your iPhone?").font(.system(size: 28, weight: .bold)).foregroundStyle(t.ink)
             Text("You can change this later in More › Engine.").foregroundStyle(t.ink2)
-            option(.mac, "Mac companion", "Fastest. USB, no tunnel stalls, keeps going while the phone is locked. Data passes through your Mac. Needs Assay for Mac.")
-            option(.iphone, "iPhone only", "Most private. Everything stays on this phone. Slower, and iOS can pause it when the screen is off.")
+            option(.mac, "Mac companion", "Planned. Mac pairing and USB backups aren’t available in this build.")
+            option(.iphone, "iPhone only", "Read local device details now. System preference changes and backups aren’t available in this build.")
         }
     }
 

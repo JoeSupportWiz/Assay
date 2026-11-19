@@ -137,10 +137,11 @@ struct AIProviderDetailView: View {
                 LabeledContent("API") { Text(kind.authStyle.summary).foregroundStyle(t.ink2) }
             } footer: {
                 if kind == .minis {
-                    Text("Minis is a placeholder. Assay cannot talk to the Minis app from inside this app yet. If you run a local OpenAI-compatible server, enter its address below and it will be used as a normal local endpoint.")
+                    Text("Use Analyse with Minis for the native report handoff. No API key is needed. The optional local chat endpoint below is separate; it does not connect to your Minis account.")
                 }
             }.rowCard()
 
+            if kind == .minis { Section { NavigationLink("Analyse with Minis") { MinisReviewView() } }.rowCard() }
             if kind.usesKeychainKey { keySection }
             if kind.baseURLEditable || kind == .custom { endpointSection }
             modelSection

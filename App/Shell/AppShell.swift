@@ -118,6 +118,7 @@ struct LabRoot: View {
                     switch route {
                     case .diagnose: DiagnoseView()
                     case .history: HistoryView()
+                    case .minis: MinisReviewView()
                     case .bluetooth: BluetoothRootView()
                     case .network: NetworkRootView()
                     case .symptom(let id): SymptomView(id: id)

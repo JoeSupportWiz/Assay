@@ -54,7 +54,7 @@ struct OnDeviceEngine: DeviceEngine {
     let displayName = "This iPhone"
     let canRead = false
     func availability() async -> EngineAvailability {
-        .needsSetup("Import a pairing file and turn on the Assay loopback to make changes.")
+        .unavailable("Read-only on this iPhone. Lab can check device details, but pairing, the loopback and system changes aren’t available in this build.")
     }
     func read(_ key: PrefKey) async -> PlistValue? { nil }
     func write(_ key: PrefKey, _ value: PlistValue?) async -> WriteResult {
@@ -76,7 +76,7 @@ struct MacCompanionEngine: DeviceEngine {
     let displayName = "Assay for Mac"
     let canRead = false
     func availability() async -> EngineAvailability {
-        .needsSetup("Open Assay for Mac on the same network, then approve this iPhone.")
+        .unavailable("Assay for Mac is not included in this build. Choose iPhone only for local device checks, or Demo to preview changes.")
     }
     func read(_ key: PrefKey) async -> PlistValue? { nil }
     func write(_ key: PrefKey, _ value: PlistValue?) async -> WriteResult {

@@ -34,6 +34,7 @@ struct LabView: View {
             }
 
             Section("Tools") {
+                NavigationLink(value: LabRoute.minis) { Label("Analyse with Minis", systemImage: "doc.text.magnifyingglass") }
                 NavigationLink(value: LabRoute.diagnose) { Label("Diagnose a problem", systemImage: "text.magnifyingglass") }
                 NavigationLink(value: LabRoute.history) {
                     HStack {

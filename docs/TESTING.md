@@ -17,7 +17,7 @@
 | Demo engine (sample device) | ✅ | ✅ (labelled **Demo**) |
 | On-device facts (model, iOS, storage, battery) | partial | ✅ |
 | Bluetooth / local network | ✗ | ✅ after permission |
-| Loopback tunnel, backup, tweaks | ✗ | needs paid team + pairing file |
+| Loopback tunnel, system backup, real tweak writes | Not included | Not included; importing a pairing file or re-signing will not enable them in this version. Choose Demo for the simulated flow. |
 | StoreKit Pro | ✅ with `Assay.storekit` | sandbox only |
 
 Anything running on the Demo engine shows a **Demo** tag. Nothing is presented as live device data unless it was observed.

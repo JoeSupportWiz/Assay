@@ -276,22 +276,26 @@ struct FixSheet: View {
                 Label("Current values are read again right before writing.", systemImage: "arrow.triangle.2.circlepath")
                 Label(plan.changes.allSatisfy(\.beforeKnown) ? "Every change can be undone from Undo history." : "Some values can't be read first, so those can't be undone.",
                       systemImage: plan.changes.allSatisfy(\.beforeKnown) ? "arrow.uturn.backward.circle" : "exclamationmark.triangle")
-                if plan.needsRespring { Label("SpringBoard restarts so it takes effect. The screen flashes for a second.", systemImage: "arrow.clockwise") }
+                if plan.needsRespring { Label("The original change normally requires restarting SpringBoard. This preview won’t restart it.", systemImage: "arrow.clockwise") }
                 Label(model.engine.displayName + (model.engine.mode == .demo ? " — nothing real is touched" : ""), systemImage: "iphone")
             }.font(.system(size: 14)).foregroundStyle(t.ink).rowCard()
 
             Section {
-                Toggle("Dry run (write nothing)", isOn: $dryRun)
-                if plan.tier >= .caution && !dryRun {
+                if model.engine.mode != .demo {
+                    Label("Preview only. This build can’t change system preferences on a real device.", systemImage: "info.circle")
+                } else {
+                    Toggle("Dry run (write nothing)", isOn: $dryRun)
+                }
+                if plan.tier >= .caution && !dryRun && model.engine.mode == .demo {
                     Toggle("I understand the risk", isOn: $understood)
                 }
             } footer: { Text(plan.tier.explanation) }.rowCard()
 
         }
         .safeAreaInset(edge: .bottom) {
-            Button { Task { await run() } } label: { Text(dryRun ? "Run dry run" : "Apply") }
+            Button { Task { await run() } } label: { Text(model.engine.mode != .demo || dryRun ? "Run preview" : "Apply in Demo") }
                 .buttonStyle(PrimaryButtonStyle())
-                .disabled(!dryRun && plan.tier >= .caution && !understood)
+                .disabled(model.engine.mode == .demo && !dryRun && plan.tier >= .caution && !understood)
                 .padding(.horizontal, 20).padding(.vertical, 10)
                 .background(.bar)
         }
@@ -388,8 +392,8 @@ struct FixSheet: View {
                 }
 
                 Section {
-                    if r.dryRun {
-                        Button("Apply for real") { receipt = nil; dryRun = false; phase = .review }.buttonStyle(PrimaryButtonStyle())
+                    if r.dryRun && model.engine.mode == .demo {
+                        Button("Apply in Demo") { receipt = nil; dryRun = false; phase = .review }.buttonStyle(PrimaryButtonStyle())
                             .listRowBackground(Color.clear).listRowInsets(.init())
                     } else if r.undoable {
                         Button("Undo this") { model.activePlan = model.receipts.undoPlan(for: r) }.buttonStyle(SecondaryButtonStyle())
@@ -426,7 +430,7 @@ struct FixSheet: View {
 
     private func run() async {
         phase = .running(.snapshot)
-        let r = await model.execute(plan, dryRun: dryRun) { stage in phase = .running(stage) }
+        let r = await model.execute(plan, dryRun: dryRun || model.engine.mode != .demo) { stage in phase = .running(stage) }
         receipt = r
         phase = .result(r.id)
         if r.status == .complete { Haptics.success() } else if r.status == .failed { Haptics.error() }

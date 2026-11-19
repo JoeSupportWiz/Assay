@@ -40,8 +40,8 @@ extension DeviceEngine {
         }
         if !canRead {
             findings.append(Finding(id: "prefs-unreadable", title: "System preferences not readable yet",
-                reason: "This engine can't read SpringBoard preferences until setup is finished, so tweak-related problems can't be ruled out.",
-                severity: .info, evidence: [Fact(label: "Preference access", value: "Needs engine setup", evidence: .unknown, source: displayName)],
+                reason: "This build reads device details but not SpringBoard preferences. It can’t verify whether a system tweak caused the problem.",
+                severity: .info, evidence: [Fact(label: "Preference access", value: "Not available in this build", evidence: .unknown, source: displayName)],
                 fix: nil, symptomID: nil, confidence: nil))
         }
         for f in snapshot.facts {

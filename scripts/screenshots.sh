@@ -49,6 +49,8 @@ for look in light dark; do
   shot "13-network-$look"     "$look" -uiDemo -route network
   shot "14-signet-$look"      "$look" -uiDemo -route signet
   shot "15-alchemy-$look"     "$look" -uiDemo -route alchemy
+  shot "16-minis-$look"       "$look" -uiDemo -route minis-report
+  shot "17-minis-review-$look" "$look" -uiDemo -route minis-report -minisReportPreview
 done
 shot "01-home-millennium" light -uiDemo -tab home -theme millennium
 shot "01-home-pinstripe"  light -uiDemo -tab home -theme pinstripe

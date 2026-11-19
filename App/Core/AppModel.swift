@@ -70,7 +70,8 @@ final class AppModel {
                 return
             }
             selectedTab = .lab
-            if r == "diagnose" { labPath = [.diagnose] }
+            if r == "minis-report" { labPath = [.minis] }
+            else if r == "diagnose" { labPath = [.diagnose] }
             else if r == "history" { labPath = [.history] }
             else if r == "bluetooth" { labPath = [.bluetooth] }
             else if r == "network" { labPath = [.network] }
@@ -167,7 +168,7 @@ enum StudioRoute: Hashable {
 
 /// Screens pushed inside the Lab tab.
 enum LabRoute: Hashable {
-    case diagnose, history, bluetooth, network
+    case diagnose, history, bluetooth, network, minis
     case symptom(String)
     case receipt(Int)
 }

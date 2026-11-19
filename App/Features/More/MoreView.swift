@@ -87,7 +87,7 @@ struct EngineView: View {
                         }
                     }
                 }
-            } footer: { Text("Mac is faster and keeps going while the iPhone is locked. iPhone only keeps everything on the phone.") }.rowCard()
+            } footer: { Text("Use iPhone only for real device checks. Choose Demo to practise reviewing and undoing changes without changing your phone.") }.rowCard()
 
             Section("Status") {
                 switch availability {
@@ -106,8 +106,8 @@ struct EngineView: View {
 
     private func blurb(_ m: EngineMode) -> String {
         switch m {
-        case .mac: "Fastest · USB · needs Assay for Mac"
-        case .iphone: "Most private · nothing leaves the phone"
+        case .mac: "Planned · not available in this build"
+        case .iphone: "Read-only · checks this iPhone"
         case .demo: "Sample device to explore the app"
         }
     }
