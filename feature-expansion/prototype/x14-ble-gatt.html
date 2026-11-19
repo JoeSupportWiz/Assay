@@ -1,0 +1,17 @@
+<!-- tab:lab -->
+<style>.spark{height:40px}</style>
+<div class="top rise" style="--d:0"><span class="circ back"><svg width="11" height="18" viewBox="0 0 11 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2 2 9l7 7"/></svg></span><span class="tag neutral" style="height:34px;padding:0 14px;font-size:13px">Pinned · Session 3</span></div>
+<div class="title rise" style="--d:0">Heart-rate strap</div>
+<div class="sub rise" style="--d:0">BLE notebook · 4 services · read-only</div>
+<div class="rise card" style="--d:1;margin:16px 20px 0;padding:14px">
+  <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:14px">RSSI while you walk</b><span class="mono" style="font-size:12px;color:var(--ink-2)">-63 dBm</span></div>
+  <svg class="spark" width="100%" viewBox="0 0 300 40" preserveAspectRatio="none"><path d="M0 30 L20 28 L40 22 L60 24 L80 14 L100 12 L120 18 L140 10 L160 8 L180 16 L200 22 L220 26 L240 20 L260 28 L280 32 L300 30" fill="none" stroke="#7C5CFF" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="600" stroke-dashoffset="0" style="animation:ring 2s var(--ease) .4s both;--len:600"/></svg>
+</div>
+<div class="h2 rise" style="--d:2"><b>Services</b><span>Library names</span></div>
+<div class="rise card list" style="--d:3">
+  <div class="row"><div class="ic" style="background:#FFD6BF;color:#8A3300"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></svg></div><div class="rt"><b>Heart Rate</b><small class="mono">0x180D · 0x2A37 notify</small></div><span class="mono" style="font-size:15px;font-weight:700">72</span></div>
+  <div class="row"><div class="ic" style="background:#BDF3D7;color:#0D5C37"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="8" width="16" height="9" rx="2"/><path d="M21 11v3"/></svg></div><div class="rt"><b>Battery</b><small class="mono">0x180F · 0x2A19 read</small></div><span class="mono" style="font-size:15px;font-weight:700">81%</span></div>
+  <div class="row"><div class="ic" style="background:var(--soft);color:var(--ink-2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 9a3 3 0 1 1 4 2.8V14M12 17.5v.5"/></svg></div><div class="rt"><b>Unknown service</b><small class="mono">6E40…CA9E · likely Nordic UART</small></div><span class="tag inf">Inferred</span></div>
+</div>
+<div class="h2 rise" style="--d:4"><b>Compared to session 2</b><span></span></div>
+<div class="rise diff mono" style="--d:5;margin:0 20px"><span class="c"># 0x2A19 battery</span><br><span class="m">- 86%  (Mon 18:02)</span><br><span class="p">+ 81%  (Thu 02:58)</span><br><span class="c"># firmware rev unchanged · 2.4.1</span></div>
