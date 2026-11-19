@@ -62,29 +62,11 @@ And every change carries a risk tier:
 
 Auto follows iOS. **Millennium** and **Pinstripe** are original homages; **Wallpaper match** turns the whole app to glass over your own palette.
 
-## ⌁ Your engine, your call
+## ⌁ On your iPhone, today
 
-<table>
-<tr>
-<td width="50%" align="center">
-<img src="docs/app-screens/00-onboarding-light.png" width="270" alt="Onboarding">
-</td>
-<td width="50%" valign="top">
+**[Try the four device utilities →](docs/features/device-utilities.md)** Compare the live clock, restore an earlier file without overwriting the original, activate a saved Assay scene, or check a signing certificate against target profiles. These actions do not need a pairing record.
 
-First run asks how Assay should reach the device:
-
-| | 💻 **Mac companion** | 📱 **iPhone only** |
-|:--|:--|:--|
-| Speed | **Fastest** — USB, no tunnel stalls | Slower — on-device loopback |
-| While locked | Keeps going | iOS pauses it |
-| Privacy | Via your own Mac | **Nothing leaves the phone** |
-| Needs | Assay for Mac | Paid team for the loopback |
-
-Switch any time in **More › Engine**. A **Demo** engine lets you explore with nothing connected — and every demo value says so.
-
-</td>
-</tr>
-</table>
+For an actual whole-device backup, use **Finder over USB** or the [standalone Mac backup utility](Mac/usb-backup/README.md). This does **not** enable Assay to modify SpringBoard, and is not the future in-app Mac connection. For testing tweak requests without touching system settings, use Demo.
 
 ## ⊞ The app
 

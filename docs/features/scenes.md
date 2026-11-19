@@ -10,4 +10,6 @@
 
 The store compares the live pair on load/entry and immediately before an operation. Once attached, it observes writes to the two model properties even off-tab, invalidating selection and undo on outside changes (including changing away and back). Without the root attachment, changes made and reverted *before Scenes first opens on a new launch* cannot be detected. Separate AppModel defaults setters are not a crash-atomic transaction; a mismatched interrupted apply is not replayed automatically.
 
+**Wallpaper export:** Open a saved scene and tap **Export wallpaper PNG**. Assay renders a portrait gradient from that scene’s colours at the screen’s native pixel dimensions and lets you save it in Files. Nothing is installed or set automatically.
+
 **Checks:** From the repo root run `sh tests/scenes/smoke.sh` (Swift with Foundation and Observation). It compiles the production transitions and model adapter against synthetic UI-independent types using an isolated UserDefaults suite. For integration testing, save a Wallpaper match scene with a different palette and note; verify Save leaves live settings alone, review then Activate, relaunch, and tap Undo. Compare the original palette as well as the theme. Activate again, change the theme from More, then verify no undo is offered. Cancel a deletion before confirming it; neither path should change the live theme.

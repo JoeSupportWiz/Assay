@@ -1,0 +1,10 @@
+# Assay USB Backup · Mac preview
+
+An optional **standalone Mac command**, not an iPhone feature or the graphical Mac companion. It uses the usual MobileBackup2 service on a trusted USB connection. No on-phone VPN, changes to iPhone backup encryption, restore, deletion or app-specific tweak code. Requires a local Python 3 and a compatible `libimobiledevice` (`idevice_id`, `idevicebackup2`) already installed. Hardware performance and compatibility with your exact iOS build have not been verified; no speed guarantee. For an Apple-supported alternative, choose your iPhone in Finder → General → Back Up Now.
+
+1. Connect by USB, unlock your own iPhone, and approve Trust if iOS asks. Use a private **local** destination, not a sync/network folder. Enable encrypted local backups in Finder first if you want encryption. Know your existing password; this utility never asks for it.
+2. From this directory, preview: `python3 assay_usb_backup.py "$HOME/AssayBackups/My-iPhone"`. This lists USB devices only; no backup starts. If multiple devices are connected, disconnect the others or use the printed six-character suffix with `--device`.
+3. Start: `python3 assay_usb_backup.py "$HOME/AssayBackups/My-iPhone" --start`, then type `BACK UP`. The first backup can still take a long time. Use the **same destination** later. The utility never requests `--full`; the device decides what can be reused. Previous local backup state in that folder can be updated by libimobiledevice, so don't point it at an irreplaceable sole copy. Keep adequate free disk space.
+4. A clean exit is reported separately from validation of a fresh finished snapshot marker and a manifest. Neither is proof of a successful restore. If interrupted or validation fails, keep any partial data and do not delete a known-good backup. This is a standard iPhone local backup with Apple's normal exclusions, **not** a GoldenNugget protective baseline, and cannot satisfy that app's prerequisites.
+
+Run unit tests with `python3 -m unittest -v test_usb` (synthetic files only). The tool installs nothing and does not make a backup until you explicitly confirm.
