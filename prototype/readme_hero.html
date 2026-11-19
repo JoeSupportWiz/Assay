@@ -1,0 +1,36 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+:root{--spring:cubic-bezier(.2,1.35,.35,1)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1600px;height:1200px;overflow:hidden}
+body{font-family:Inter,sans-serif;letter-spacing:-.015em;color:#111113;background:#E9E6DE;position:relative;-webkit-font-smoothing:antialiased}
+.sphere{position:absolute;border-radius:50%;background:radial-gradient(circle at 32% 28%,#fff 0,#F4F2EC 35%,#D9D5CB 100%);box-shadow:0 40px 80px rgba(80,70,50,.12)}
+.phone{position:absolute;width:421px;height:880px;border-radius:68px;padding:14px;background:linear-gradient(135deg,#3B3B40,#151517 40%,#2E2E33 70%,#0E0E10);box-shadow:0 0 0 1.5px #55555c inset,0 50px 100px rgba(40,35,25,.28),0 12px 30px rgba(40,35,25,.18)}
+.phone .scr{width:393px;height:852px;border-radius:55px;overflow:hidden;background:#000}
+.phone iframe{width:393px;height:852px;border:0;display:block}
+.phone .b{position:absolute;background:#2A2A2E;border-radius:2px}
+.fc{position:absolute;background:#fff;border-radius:26px;box-shadow:0 30px 60px rgba(40,35,25,.16),0 6px 16px rgba(40,35,25,.08);opacity:0;transform:translateY(20px) scale(.85);animation:pop .8s var(--spring) forwards}
+@keyframes pop{to{opacity:1;transform:none}}
+.ph{opacity:0;transform:translateY(60px);animation:pop 1.1s var(--spring) forwards}
+.tag{position:absolute;height:40px;padding:0 18px;border-radius:20px;background:#fff;display:flex;align-items:center;font-size:16px;font-weight:600}
+.chip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 11px;border-radius:14px;font-size:13px;font-weight:600}
+.dot{width:7px;height:7px;border-radius:4px}
+
+html,body{width:1200px;height:600px} body{background:#F3F2EE}
+.lay{position:absolute;inset:0;transition:clip-path 1s cubic-bezier(.65,0,.35,1)} .lay iframe{width:393px;height:852px;border:0} .scr{position:relative}
+.mk g{opacity:0} .p1{transform:translateY(-8px);animation:fin .55s cubic-bezier(.2,1.25,.35,1) .2s forwards} .p2{transform:translateY(10px);animation:fin .6s cubic-bezier(.2,1.3,.35,1) .38s forwards} .p3{transform:translateY(12px) scaleY(.6);transform-origin:50% 80%;animation:fin .6s cubic-bezier(.2,1.5,.35,1) .6s forwards}
+@keyframes fin{to{opacity:1;transform:none}}
+.wm{opacity:0;transform:translateY(10px);animation:fin .6s cubic-bezier(.2,1.35,.35,1) .9s forwards}
+.tl{opacity:0;animation:fin .6s ease 1.2s forwards}
+.pill{display:inline-flex;align-items:center;height:36px;padding:0 15px;border-radius:18px;font:600 15px Inter;margin:0 6px 8px 0;opacity:0;transform:translateY(8px);animation:fin .5s cubic-bezier(.2,1.35,.35,1) forwards}
+#nm{transition:opacity .25s}
+</style></head><body>
+<div class="sphere" style="width:300px;height:300px;left:-120px;bottom:-140px"></div>
+<div style="position:absolute;left:80px;top:150px;width:560px">
+ <div style="display:flex;align-items:center;gap:18px;color:#111113"><svg class="mk" width="70" height="100" viewBox="17 5.5 50 71.5" fill="#111113" style="overflow:visible"><g class="p1"><path d="M17 25.5Q17 22.8 19.4 21.4L42.5 8.1Q47 5.5 47 10.8V24.2L28.2 35.1Q25.5 36.7 25.5 39.7V51.8Q25.5 54.6 23.1 56L17 59.5Z"/></g><g class="p2"><path d="M34 34.8Q34 32.1 36.4 30.7L62.6 15.6Q67 13.1 67 18.3V44.4Q67 47.1 64.6 48.5L38.4 63.6Q34 66.1 34 60.9Z"/></g><g class="p3"><path d="M34 57.4L54.8 45.4Q57.4 43.9 59.8 45.7L67 51V60.2L41.8 74.7Q37.4 77.2 37.4 72V61.8Q37.4 59.2 34 57.4Z"/></g></svg><span class="wm" style="font:750 88px 'Inter Display';letter-spacing:-.05em">Assay</span></div>
+ <div class="tl" style="font:700 30px 'Inter Display';letter-spacing:-.03em;margin-top:18px;line-height:1.15">Customise, sign &amp; inspect your iPhone.<br><span style="color:#A3A3AA">Shows its work.</span></div>
+ <div style="margin-top:26px"><span class="pill" style="background:#DCD1FF;animation-delay:1.5s">Scenes</span><span class="pill" style="background:#C4E6FF;animation-delay:1.6s">Studio</span><span class="pill" style="background:#BDF3D7;animation-delay:1.7s">Lab</span><span class="pill" style="background:#FFE58A;animation-delay:1.8s">Signing</span><span class="pill" style="background:#FFD6BF;animation-delay:1.9s">Vault</span></div>
+ <div style="margin-top:14px;font:600 14px Inter;color:#6B6B72">Theme: <span id="nm" style="color:#111113">Assay Light</span></div>
+</div>
+<div style="position:absolute;left:760px;top:40px;transform:scale(.62);transform-origin:0 0"><div class="phone" style="position:relative;left:0;top:0"><div class="scr"><div class="lay" id="L0" style=""><iframe src="splash.html?t=light&next=1"></iframe></div><div class="lay" id="L1" style="clip-path:circle(0 at 50% 8%)"><iframe src="home.html?t=dark&still=1"></iframe></div><div class="lay" id="L2" style="clip-path:circle(0 at 50% 8%)"><iframe src="home.html?t=wall&still=1"></iframe></div><div class="lay" id="L3" style="clip-path:circle(0 at 50% 8%)"><iframe src="home.html?t=ios4&still=1"></iframe></div><div class="lay" id="L4" style="clip-path:circle(0 at 50% 8%)"><iframe src="home.html?t=xp&still=1"></iframe></div></div></div></div>
+<script>const N=['Assay Light', 'Assay Dark', 'Wallpaper match', 'Pinstripe', 'Millennium'];let k=1;setTimeout(function go(){if(k>=N.length)return;document.getElementById('L'+k).style.clipPath='circle(150% at 50% 8%)';const n=document.getElementById('nm');n.style.opacity=0;const kk=k;setTimeout(()=>{n.textContent=N[kk];n.style.opacity=1},300);k++;setTimeout(go,1500)},4200);</script>
+</body></html>

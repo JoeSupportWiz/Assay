@@ -1,0 +1,22 @@
+<!-- tab:device -->
+<style>
+.radar{position:relative;height:210px;margin:16px 20px 0;overflow:hidden}
+.radar .rg{position:absolute;left:50%;top:50%;border-radius:50%;border:1.5px solid var(--ink-3);opacity:0;transform:translate(-50%,-50%) scale(.2);animation:rad 3s ease-out infinite}
+@keyframes rad{0%{opacity:.7;transform:translate(-50%,-50%) scale(.15)}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+.blip{position:absolute;width:14px;height:14px;border-radius:7px;box-shadow:0 0 0 5px rgba(255,255,255,.4);opacity:0;animation:pop .6s var(--spring) forwards}
+.sig{display:flex;gap:2px;align-items:flex-end;height:16px}.sig i{width:4px;border-radius:1px;background:var(--ink)}.sig i.o{background:var(--ink-3);opacity:.4}
+</style>
+<div class="top rise" style="--d:0"><div class="title" style="padding:0">Tools</div><span class="tag neutral" style="height:34px;padding:0 14px;font-size:13px"><span class="dot pulse" style="background:#2E9BFF"></span>Scanning · 0:42</span></div>
+<div class="rise" style="--d:1;margin-top:14px"><div class="scroll-x"><span class="fchip on">Bluetooth</span><span class="fchip">Local network</span><span class="fchip">Shortcuts</span></div></div>
+<div class="radar rise card" style="--d:2">
+  <div style="position:absolute;left:50%;top:50%;width:120px;height:120px;margin:-60px;border-radius:50%;border:1.5px dashed var(--ink-3);opacity:.5"></div><div style="position:absolute;left:50%;top:50%;width:220px;height:220px;margin:-110px;border-radius:50%;border:1.5px dashed var(--ink-3);opacity:.35"></div><div class="rg" style="width:300px;height:300px"></div><div class="rg" style="width:300px;height:300px;animation-delay:1s"></div><div class="rg" style="width:300px;height:300px;animation-delay:2s"></div>
+  <div style="position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:23px;background:var(--primary);color:var(--onPrimary);display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 7 10 10-5 5V2l5 5L7 17"/></svg></div>
+  <span class="blip" style="left:22%;top:28%;background:#7C5CFF;animation-delay:.9s"></span><span class="blip" style="left:72%;top:22%;background:#38C98A;animation-delay:1.3s"></span><span class="blip" style="left:64%;top:70%;background:#FF7A3D;animation-delay:1.7s"></span><span class="blip" style="left:30%;top:72%;background:#2E9BFF;animation-delay:2.1s"></span>
+</div>
+<div class="h2 rise" style="--d:3"><b>Nearby · 4</b><span>RSSI</span></div>
+<div class="rise card list" style="--d:4">
+  <div class="row"><div class="ic" style="background:#DCD1FF;color:#3A1FA8"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 14v-3a6 6 0 0 1 12 0v3M4 14h4v6H4zM16 14h4v6h-4z"/></svg></div><div class="rt"><b>Joe's headphones</b><small>Battery 80% · 6 services</small></div><div style="text-align:right"><div class="sig"><i style="height:5px"></i><i style="height:9px"></i><i style="height:13px"></i><i style="height:16px"></i></div><small class="mono" style="font-size:11px;color:var(--ink-2)">-48</small></div></div>
+  <div class="row"><div class="ic" style="background:#BDF3D7;color:#0D5C37"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="7"/><path d="M12 9v3l2 1"/></svg></div><div class="rt"><b>Heart-rate strap</b><small>0x180D · readable</small></div><div style="text-align:right"><div class="sig"><i style="height:5px"></i><i style="height:9px"></i><i style="height:13px"></i><i class="o" style="height:16px"></i></div><small class="mono" style="font-size:11px;color:var(--ink-2)">-63</small></div></div>
+  <div class="row"><div class="ic" style="background:#FFD6BF;color:#8A3300"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6l-1 6h4l-8 12 2-9H7z"/></svg></div><div class="rt"><b>Unknown peripheral</b><small>Custom GATT · tap to inspect</small></div><div style="text-align:right"><div class="sig"><i style="height:5px"></i><i style="height:9px"></i><i class="o" style="height:13px"></i><i class="o" style="height:16px"></i></div><small class="mono" style="font-size:11px;color:var(--ink-2)">-81</small></div></div>
+</div>
+<div class="rise" style="--d:5;font-size:12.5px;color:var(--ink-3);padding:10px 26px 0">Reads only. Writes always ask first. Scans stop when you leave.</div>

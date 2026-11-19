@@ -1,0 +1,24 @@
+<!-- tab:device -->
+<div class="top rise" style="--d:0"><span class="circ back"><svg width="11" height="18" viewBox="0 0 11 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2 2 9l7 7"/></svg></span><span class="tag neutral" style="height:34px;padding:0 14px;font-size:13px">Ran 12 s ago · 38 checks</span></div>
+<div class="title rise" style="--d:0">Device check</div>
+<div class="rise" style="--d:1;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 20px 0">
+  <div class="card" style="padding:14px"><div class="disp" style="font-size:30px;font-weight:700">35</div><div style="font-size:12.5px;color:var(--ink-2);margin-top:2px">Passed</div><div class="bar" style="margin-top:10px;height:6px"><i style="width:92%;background:var(--mint-d)"></i></div></div>
+  <div class="card" style="padding:14px;background:var(--accent);color:var(--accentInk)"><div class="disp" style="font-size:30px;font-weight:700">2</div><div style="font-size:12.5px;opacity:.7;margin-top:2px">Need a look</div><div class="bar" style="margin-top:10px;height:6px"><i style="width:30%"></i></div></div>
+  <div class="card" style="padding:14px"><div class="disp" style="font-size:30px;font-weight:700">1</div><div style="font-size:12.5px;color:var(--ink-2);margin-top:2px">Unknown</div><div class="bar" style="margin-top:10px;height:6px"><i style="width:12%;background:var(--ink-3)"></i></div></div>
+</div>
+<div class="rise" style="--d:2;margin-top:16px;overflow:hidden"><div class="scroll-x"><span class="fchip on">All</span><span class="fchip"><span class="dot" style="background:#2E9BFF;margin-right:7px"></span>Observed</span><span class="fchip"><span class="dot" style="background:#7C5CFF;margin-right:7px"></span>Inferred</span><span class="fchip">Unknown</span></div></div>
+
+<div class="rise card" style="--d:3;margin:14px 20px 0;padding:16px;box-shadow:0 0 0 2px var(--ink)">
+  <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag cau">Caution</span><span class="tag inf">Inferred · 82%</span></div>
+  <div style="font-size:18px;font-weight:700;margin-top:10px">Clock stuck at 09:41</div>
+  <div style="font-size:13.5px;color:var(--ink-2);margin-top:4px;line-height:1.4">A status-bar override was probably left behind after Tuesday's restore.</div>
+  <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px">
+    <div style="display:flex;gap:8px;align-items:center;font-size:13px"><span class="tag obs">Observed</span><span class="mono" style="font-size:12px">SBStatusBarTime = "09:41"</span></div>
+    <div style="display:flex;gap:8px;align-items:center;font-size:13px"><span class="tag obs">Observed</span>Restore ran 2 days ago</div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:14px"><div class="pb sec" style="flex:1;height:46px;font-size:15px">Evidence</div><div class="pb btn-p" style="flex:1.3;height:46px;font-size:15px">Preview fix</div></div>
+</div>
+<div class="rise card list" style="--d:4;margin-top:12px">
+  <div class="row"><div class="ic" style="background:#C4E6FF;color:#0A4A85"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="15" rx="2.5"/><path d="M8 12h8"/></svg></div><div class="rt"><b>Baseline is 9 days old</b><small>Next backup runs full</small></div><span class="tag obs">Observed</span></div>
+  <div class="row"><div class="ic" style="background:var(--soft);color:var(--ink-2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12a7 7 0 0 1 14 0M8.5 12a3.5 3.5 0 0 1 7 0"/><circle cx="12" cy="12" r="1"/></svg></div><div class="rt"><b>Tunnel packet loss</b><small>iOS gives no signal · run live test</small></div><span class="tag unk">Unknown</span></div>
+</div>

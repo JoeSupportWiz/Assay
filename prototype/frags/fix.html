@@ -1,0 +1,70 @@
+<!-- tab:none -->
+<style>
+.sheet{transform:translateY(110%);transition:transform .7s var(--spring)}
+.sheet.up{transform:none}
+.dim{opacity:0;transition:opacity .4s}.dim.up{opacity:1}
+.stage{display:none}.stage.on{display:block;animation:pop .5s var(--spring)}
+.toast{position:absolute;top:58px;left:16px;right:16px;z-index:80;border-radius:24px;background:var(--card);border:1px solid var(--cardBorder);box-shadow:0 20px 40px rgba(0,0,0,.25);padding:12px 12px 12px 14px;display:flex;gap:12px;align-items:center;transform:translateY(-220%);transition:transform .7s var(--spring)}
+.toast.on{transform:none}
+.press{transform:scale(.94);transition:transform .15s}
+</style>
+<div class="top"><span class="circ back"><svg width="11" height="18" viewBox="0 0 11 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2 2 9l7 7"/></svg></span></div>
+<div class="title">Clock stuck at 09:41</div>
+<div style="display:flex;gap:6px;padding:10px 22px 0"><span class="tag cau">Caution</span><span class="tag inf">Inferred · 82%</span></div>
+<div class="card" style="margin:16px 20px 0;padding:16px;font-size:14px;line-height:1.5;color:var(--ink-2)">
+  <b style="color:var(--ink);font-size:15px">Why we think this</b><br>The restore on Tuesday wrote a status-bar override and never cleared it. The same key appears in 41 matching reports for iOS 26.1.
+  <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">
+   <div style="display:flex;gap:8px;align-items:center"><span class="tag obs">Observed</span><span class="mono" style="font-size:12px;color:var(--ink)">SBStatusBarTime = "09:41"</span></div>
+   <div style="display:flex;gap:8px;align-items:center"><span class="tag inf">Inferred</span><span style="color:var(--ink)">Left by Restore #212</span></div>
+   <div style="display:flex;gap:8px;align-items:center"><span class="tag unk">Unknown</span><span style="color:var(--ink)">Whether a respring is needed</span></div>
+  </div>
+</div>
+<div class="dim" id="dim"></div>
+<div class="sheet" id="sheet">
+  <div class="grab"></div>
+  <div class="stage on" id="s1">
+    <div style="display:flex;justify-content:space-between;align-items:center"><div class="disp" style="font-size:22px;font-weight:700">Review fix</div><span class="tag rev">Reversible · Low risk</span></div>
+    <div class="diff mono" style="margin-top:14px"><span class="c"># com.apple.springboard.plist</span><br><span class="m">- SBStatusBarTime = "09:41"</span><br><span class="p">+ (key removed → system clock)</span></div>
+    <div style="margin-top:12px">
+      <div class="step"><span class="sd done">✓</span>Preflight: iOS 26.1 supported</div>
+      <div class="step"><span class="sd done">✓</span>Snapshot of current value saved</div>
+      <div class="step"><span class="sd wait">3</span>Apply · then you confirm the clock</div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:12px"><div class="pb sec" style="flex:1">Dry run</div><div class="pb btn-p" id="apply" style="flex:1.4">Apply fix</div></div>
+  </div>
+  <div class="stage" id="s2">
+    <div class="disp" style="font-size:22px;font-weight:700">Applying…</div>
+    <div style="margin-top:12px">
+      <div class="step"><span class="sd done">✓</span>Snapshot saved · receipt #213</div>
+      <div class="step" id="st2"><span class="sd act"><svg class="spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 3a9 9 0 1 1-9 9"/></svg></span>Writing preference</div>
+      <div class="step" id="st3"><span class="sd wait">3</span>Reading back value</div>
+      <div class="step"><span class="sd wait">4</span>You confirm the clock</div>
+    </div>
+    <div class="bar" style="margin-top:14px"><i id="pbar" style="width:45%;transition:width 1.2s var(--ease)"></i></div>
+    <div style="font-size:12.5px;color:var(--ink-2);margin-top:10px">One change at a time. If it's interrupted, nothing is half-applied.</div>
+  </div>
+  <div class="stage" id="s3">
+    <div style="display:flex;align-items:center;gap:12px"><div class="circ" style="width:52px;height:52px;background:var(--mint-d);color:#fff"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div><div><div class="disp" style="font-size:22px;font-weight:700">Value removed</div><div style="font-size:13px;color:var(--ink-2)">Read back OK · receipt #213</div></div></div>
+    <div class="card" style="margin-top:14px;padding:14px;background:var(--soft);font-size:14px;line-height:1.45">Is your clock showing the right time now? iOS can't tell us, so we're asking.</div>
+    <div style="display:flex;gap:10px;margin-top:12px"><div class="pb sec" style="flex:1">Roll back</div><div class="pb btn-p" style="flex:1.4">Yes, it's fixed</div></div>
+  </div>
+</div>
+<div class="toast" id="toast"><div class="ic" style="background:#BDF3D7;color:#0D5C37"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div><div class="rt"><b>Fix applied</b><small>Undo any time from History</small></div><span class="tag neutral" style="height:32px;padding:0 12px;font-size:13px">Undo</span></div>
+<script>
+const $=id=>document.getElementById(id);
+function show(n){['s1','s2','s3'].forEach((s,i)=>$(s).classList.toggle('on',i+1===n))}
+const st=q.get('s');
+if(st){ $('sheet').style.transition='none';$('dim').style.transition='none';
+  if(st!=='intro'){$('sheet').classList.add('up');$('dim').classList.add('up')}
+  if(st==='progress')show(2); if(st==='done'){show(3);$('toast').style.transition='none';$('toast').classList.add('on')} }
+else {
+  setTimeout(()=>{$('sheet').classList.add('up');$('dim').classList.add('up')},1400);
+  setTimeout(()=>$('apply').classList.add('press'),3600);
+  setTimeout(()=>{$('apply').classList.remove('press');show(2)},3800);
+  setTimeout(()=>$('pbar').style.width='80%',4300);
+  setTimeout(()=>{$('st2').firstElementChild.className='sd done';$('st2').firstElementChild.textContent='✓';$('st3').firstElementChild.className='sd act'},4900);
+  setTimeout(()=>{$('pbar').style.width='100%'},5400);
+  setTimeout(()=>{show(3);$('toast').classList.add('on')},6300);
+  setTimeout(()=>$('toast').classList.remove('on'),8600);
+}
+</script>

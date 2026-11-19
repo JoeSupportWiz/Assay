@@ -1,0 +1,12 @@
+# Generated Xcode project/build outputs
+Assay.xcodeproj/
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+.env
+.env.*
+*.p12
+*.mobileprovision
+*.mobiledevicepairing
+*.key

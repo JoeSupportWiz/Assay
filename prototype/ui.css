@@ -1,0 +1,38 @@
+.top{display:flex;align-items:center;justify-content:space-between;padding:10px 20px 0;gap:12px}
+.back{background:var(--card);color:var(--ink);border:1px solid var(--cardBorder);border-radius:var(--pill)}
+.title{font-family:var(--disp);letter-spacing:var(--track-ls);font-size:30px;font-weight:700;padding:14px 22px 0;line-height:1.05}
+.sub{font-size:14px;color:var(--ink-2);padding:6px 22px 0}
+.pb{height:54px;border-radius:var(--pill);display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:16px;background:var(--primary);color:var(--onPrimary)}
+.pb.sec{background:var(--card);color:var(--ink);border:1px solid var(--cardBorder)}
+.tag{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border-radius:var(--pill);font-size:11.5px;font-weight:700;letter-spacing:.01em;white-space:nowrap}
+.tag.rev{background:#BDF3D7;color:#0D5C37}.tag.cau{background:#FFE58A;color:#5A4300}.tag.exp{background:#FFD6BF;color:#8A3300}.tag.na{background:var(--soft);color:var(--ink-2)}
+.tag.obs{background:#C4E6FF;color:#0A4A85}.tag.inf{background:#DCD1FF;color:#3A1FA8}.tag.unk{background:transparent;color:var(--ink-2);border:1.5px dashed var(--ink-3)}
+.tag.neutral{background:var(--soft);color:var(--ink)}
+.list{margin:0 20px;overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;padding:12px 14px;position:relative}
+.row+.row::before{content:"";position:absolute;top:0;left:66px;right:0;height:1px;background:var(--line);opacity:.7}
+.t-dark .row+.row::before,.t-wall .row+.row::before{background:rgba(255,255,255,.08)}
+.ic{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex:none}
+.ic svg{width:21px;height:21px}
+.rt{flex:1;min-width:0}.rt b{display:block;font-size:15px;font-weight:600}.rt small{display:block;font-size:12.5px;color:var(--ink-2);margin-top:2px}
+.tog{width:50px;height:30px;border-radius:15px;background:var(--soft);padding:2px;display:flex;flex:none;transition:background .3s}
+.tog i{width:26px;height:26px;border-radius:13px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.25);transition:transform .4s var(--spring)}
+.tog.on{background:var(--mint-d)}.tog.on i{transform:translateX(20px)}
+.t-xp .tog{border-radius:3px}.t-xp .tog i{border-radius:2px}.t-ios4 .tog.on{background:linear-gradient(#2F7BF0,#5BA0FF)}
+.mono{font-family:"JBM",ui-monospace,monospace;letter-spacing:0}
+.scroll-x{display:flex;gap:8px;padding:0 20px;width:max-content}
+.fchip{height:36px;padding:0 15px;border-radius:var(--pill);background:var(--card);border:1px solid var(--cardBorder);display:flex;align-items:center;font-size:14px;font-weight:600;white-space:nowrap}
+.fchip.on{background:var(--primary);color:var(--onPrimary);border-color:transparent}
+.sheet{position:absolute;left:8px;right:8px;bottom:8px;border-radius:40px;background:var(--card);z-index:70;padding:10px 18px 28px;box-shadow:0 -10px 50px rgba(0,0,0,.25)}
+.t-wall .sheet{background:rgba(40,22,80,.86);backdrop-filter:blur(30px)}
+.t-xp .sheet{border-radius:8px 8px 0 0;left:0;right:0;bottom:0;border:1px solid #0831D9}
+.t-ios4 .sheet{border-radius:12px;background:linear-gradient(#F7F7F7,#E6E8EC)}
+.grab{width:38px;height:5px;border-radius:3px;background:var(--ink-3);opacity:.5;margin:0 auto 12px}
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.4);z-index:65}
+.diff{border-radius:16px;background:#111113;color:#E9E9EE;padding:12px 14px;font-size:12px;line-height:1.7}
+.diff .m{color:#FF9A8A}.diff .p{color:#8CF0B8}.diff .c{color:#8E8E96}
+.step{display:flex;gap:12px;align-items:center;padding:7px 0;font-size:14.5px}
+.sd{width:26px;height:26px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex:none;font-size:12px;font-weight:700}
+.sd.done{background:var(--mint-d);color:#fff}.sd.act{background:var(--accent);color:var(--accentInk);box-shadow:0 0 0 5px rgba(255,229,138,.35)}.sd.wait{background:var(--soft);color:var(--ink-3)}
+.spin{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.pulse{animation:pulse 1.6s ease-in-out infinite}@keyframes pulse{50%{opacity:.45}}

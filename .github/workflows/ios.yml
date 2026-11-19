@@ -1,0 +1,35 @@
+name: Assay iOS CI
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'App/**'
+      - 'project.yml'
+      - '.github/workflows/ios.yml'
+jobs:
+  build-unsigned:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        run: xcodegen generate --spec project.yml
+      - name: Build unsigned archive
+        run: |
+          xcodebuild -project Assay.xcodeproj -scheme Assay \
+            -configuration Release -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/Assay.xcarchive \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO archive
+      - name: Package unsigned IPA
+        run: |
+          mkdir -p build/Payload
+          cp -R build/Assay.xcarchive/Products/Applications/Assay.app build/Payload/
+          cd build && /usr/bin/zip -qry Assay-unsigned.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Assay-unsigned-ipa
+          path: build/Assay-unsigned.ipa
+          if-no-files-found: error

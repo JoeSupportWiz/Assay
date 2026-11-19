@@ -1,0 +1,100 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="theme.css">
+<script>const q=new URLSearchParams(location.search);</script>
+<style>
+.seg{position:relative;display:grid;grid-template-columns:repeat(3,1fr);height:46px;border-radius:23px;background:var(--card);padding:4px;margin:14px 20px 0}
+.seg .knob{position:absolute;top:4px;left:4px;height:38px;width:calc((100% - 8px)/3);border-radius:19px;background:var(--ink);transition:transform .5s var(--spring)}
+.seg div.o{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:var(--ink-2);transition:color .3s}
+.seg div.o.on{color:var(--bg)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 20px}
+.th{border-radius:22px;background:var(--card);padding:10px;position:relative;transition:transform .45s var(--spring),box-shadow .3s}
+.th.sel{transform:scale(1.03);box-shadow:0 0 0 2.5px var(--ink),0 14px 30px rgba(0,0,0,.35)}
+.th .mini{height:92px;border-radius:14px;overflow:hidden;position:relative;padding:9px;display:flex;flex-direction:column;gap:6px}
+.th .nm{display:flex;justify-content:space-between;align-items:center;padding:10px 4px 2px;font-size:14px;font-weight:600}
+.th .ck{width:22px;height:22px;border-radius:11px;border:1.5px solid var(--ink-3);display:flex;align-items:center;justify-content:center;transition:all .3s}
+.th.sel .ck{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.th .ck svg{opacity:0;transform:scale(.4);transition:all .35s var(--spring)}
+.th.sel .ck svg{opacity:1;transform:none}
+.mb{border-radius:6px}
+.sw{width:40px;height:40px;border-radius:20px;box-shadow:0 0 0 3px var(--card),0 6px 14px rgba(0,0,0,.3)}
+</style></head><body class="t-dark">
+<div class="island"></div>
+<div class="status"><span>9:41</span><span class="r">
+<svg width="19" height="12" viewBox="0 0 19 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+<svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><path d="M8.5 2.3c2.3 0 4.4.9 6 2.4l1.2-1.2A10.2 10.2 0 0 0 8.5.6 10.2 10.2 0 0 0 1.3 3.5l1.2 1.2a8.6 8.6 0 0 1 6-2.4zm0 3.4c1.4 0 2.6.5 3.6 1.4l1.2-1.2a6.8 6.8 0 0 0-9.6 0L4.9 7.1c1-.9 2.2-1.4 3.6-1.4zm0 3.4c.5 0 1 .2 1.3.5L8.5 11 7.2 9.6c.3-.3.8-.5 1.3-.5z"/></svg>
+<svg width="27" height="13" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="currentColor" opacity=".35"/><rect x="2" y="2" width="18" height="9" rx="2" fill="currentColor"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2z" fill="currentColor" opacity=".35"/></svg></span></div>
+
+<div class="rise" style="--d:0;display:flex;align-items:center;gap:14px;padding:10px 20px 0">
+  <span class="circ" style="background:var(--card);color:var(--ink)"><svg width="11" height="18" viewBox="0 0 11 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2 2 9l7 7"/></svg></span>
+  <div class="disp" style="font-size:28px;font-weight:700">Appearance</div>
+</div>
+
+<div class="seg rise" style="--d:1"><span class="knob" id="knob"></span><div class="o on" id="m0">Auto</div><div class="o" id="m1">Light</div><div class="o" id="m2">Dark</div></div>
+<div class="rise" style="--d:1;font-size:13px;color:var(--ink-2);padding:8px 26px 0">Auto follows your iPhone's Light/Dark setting.</div>
+
+<div class="h2 rise" style="--d:2;margin-top:20px"><b>Themes</b><span>4</span></div>
+<div class="grid">
+  <div class="th rise sel" style="--d:3" data-i="0">
+    <div class="mini" style="background:linear-gradient(135deg,#F3F2EE 50%,#0B0B0D 50%)">
+      <div class="mb" style="width:54%;height:10px;background:#111"></div>
+      <div style="display:flex;gap:6px;flex:1"><div class="mb" style="flex:1;background:#111;border-radius:9px"></div><div class="mb" style="flex:1;background:#FFE58A;border-radius:9px"></div></div>
+      <div style="display:flex;gap:5px"><div class="mb" style="flex:1;height:18px;background:#DCD1FF;border-radius:7px"></div><div class="mb" style="flex:1;height:18px;background:#C4E6FF;border-radius:7px"></div></div>
+    </div>
+    <div class="nm">Assay<span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m2 6.5 2.5 2.5L10 3.5"/></svg></span></div>
+  </div>
+  <div class="th rise" style="--d:4" data-i="1">
+    <div class="mini" style="background:#ECE9D8;padding:0">
+      <div style="height:16px;background:linear-gradient(180deg,#0A5BE8,#3A8CFF 30%,#0B55DB);display:flex;justify-content:flex-end;align-items:center;padding:0 4px;gap:2px"><i style="width:8px;height:8px;border-radius:2px;background:#E2572F;border:1px solid #fff;display:block"></i></div>
+      <div style="display:flex;gap:5px;padding:6px 7px 0;flex:1"><div style="flex:1;background:#fff;border:1px solid #7F9DB9;border-radius:3px"></div><div style="flex:1;background:#FFF6C9;border:1px solid #C9B26A;border-radius:3px"></div></div>
+      <div style="height:18px;margin-top:6px;background:linear-gradient(180deg,#3C81F3,#245EDB 20%,#1C4FC4);display:flex;align-items:center"><span style="height:100%;width:40px;background:linear-gradient(#4BB140,#2A8422);border-radius:0 8px 8px 0;display:block"></span></div>
+    </div>
+    <div class="nm">Millennium<span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m2 6.5 2.5 2.5L10 3.5"/></svg></span></div>
+  </div>
+  <div class="th rise" style="--d:5" data-i="2">
+    <div class="mini" style="background:repeating-linear-gradient(90deg,#C5CCD4 0 3px,#CBD2D8 3px 4px);padding:0">
+      <div style="height:16px;background:linear-gradient(180deg,#B0BCCD,#8195AF 50%,#6D84A2 50%,#6F86A5)"></div>
+      <div style="display:flex;gap:6px;padding:7px 8px 0;flex:1">
+        <div style="flex:1;border-radius:9px;background:linear-gradient(180deg,#5A5A5E,#2E2E31 50%,#141416 50%,#0A0A0B)"></div>
+        <div style="flex:1;border-radius:9px;background:#fff;border:1px solid #A7ABB2;display:flex;align-items:center;justify-content:center"><span style="width:20px;height:20px;border-radius:6px;background:linear-gradient(180deg,#8CC8FF,#1F6FE0);display:block;box-shadow:inset 0 9px 0 rgba(255,255,255,.35)"></span></div>
+      </div>
+      <div style="height:18px;margin-top:7px;background:linear-gradient(180deg,#4A4A4D,#262628 50%,#0E0E0F 50%,#050505)"></div>
+    </div>
+    <div class="nm">Pinstripe<span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m2 6.5 2.5 2.5L10 3.5"/></svg></span></div>
+  </div>
+  <div class="th rise" style="--d:6" data-i="3">
+    <div class="mini" style="background:radial-gradient(70% 50% at 20% 10%,rgba(255,229,138,.7),transparent 70%),radial-gradient(60% 50% at 95% 30%,rgba(255,140,90,.7),transparent 70%),linear-gradient(170deg,#C9783F,#2A1660 65%,#170E2E)">
+      <div class="mb" style="width:54%;height:10px;background:rgba(255,255,255,.9)"></div>
+      <div style="display:flex;gap:6px;flex:1"><div style="flex:1;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);border-radius:9px"></div><div style="flex:1;background:rgba(255,200,140,.9);border-radius:9px"></div></div>
+      <div style="display:flex;gap:5px"><div style="flex:1;height:18px;background:rgba(168,147,255,.4);border-radius:7px"></div><div style="flex:1;height:18px;background:rgba(255,158,107,.4);border-radius:7px"></div></div>
+    </div>
+    <div class="nm">Wallpaper<span class="ck"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m2 6.5 2.5 2.5L10 3.5"/></svg></span></div>
+  </div>
+</div>
+
+<div class="rise card" style="--d:7;margin:14px 20px 0;padding:14px;display:flex;gap:14px;align-items:center">
+  <div style="width:62px;height:96px;border-radius:14px;flex:none;position:relative;overflow:hidden;background:radial-gradient(70% 40% at 20% 15%,#FFE58A,transparent 70%),radial-gradient(60% 40% at 95% 35%,#FF9E6B,transparent 70%),linear-gradient(170deg,#FFB27A,#6E4BE0)"><div style="position:absolute;top:14px;width:100%;text-align:center;color:#fff;font-weight:600;font-size:17px">9:41</div></div>
+  <div style="flex:1">
+    <div style="font-size:16px;font-weight:700">Match my wallpaper</div>
+    <div style="font-size:13px;color:var(--ink-2);margin-top:2px">From “Dusk 02” in Canvas</div>
+    <div style="display:flex;margin-top:12px;gap:-6px">
+      <span class="sw pop" style="--d:12;background:#FFE58A"></span><span class="sw pop" style="--d:13;background:#FF9E6B;margin-left:-8px"></span><span class="sw pop" style="--d:14;background:#C9783F;margin-left:-8px"></span><span class="sw pop" style="--d:15;background:#7A58FF;margin-left:-8px"></span><span class="sw pop" style="--d:16;background:#2A1660;margin-left:-8px"></span>
+    </div>
+  </div>
+</div>
+<div class="rise" style="--d:8;display:flex;gap:10px;margin:12px 20px 0">
+  <div style="flex:1;height:50px;border-radius:25px;background:var(--card);display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:15px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="m4 16 4.5-4.5 4 4 2.5-2.5 5 5"/></svg>Choose photo</div>
+  <div style="flex:1;height:50px;border-radius:25px;background:var(--card);display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:15px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="m14 4 6 6M4 20l3-1 10-10-2-2L5 17z"/></svg>Pick colour</div>
+</div>
+<div class="rise" style="--d:9;font-size:12px;line-height:1.4;color:var(--ink-3);padding:12px 26px 0">iOS doesn&#39;t share your wallpaper with apps, so colours come from Canvas or a photo you pick.</div>
+<div class="home-ind"></div>
+<script>
+const ths=[...document.querySelectorAll('.th')];
+function sel(i){ths.forEach((t,j)=>t.classList.toggle('sel',j===i))}
+function mode(i){document.getElementById('knob').style.transform=`translateX(${i*100}%)`;[0,1,2].forEach(j=>document.getElementById('m'+j).classList.toggle('on',j===i))}
+if(q.get('demo')){
+  // order matches the shot: assay-light, assay-dark, millennium, pinstripe, wallpaper
+  const seq=[[0,1],[0,2],[1,0],[2,0],[3,0]]; let k=0;
+  const step=()=>{const [t,m]=seq[k%seq.length];sel(t);mode(m);k++};
+  setTimeout(()=>{step();setInterval(step,+q.get('demo'))},1800);
+}
+</script>
+</body></html>
