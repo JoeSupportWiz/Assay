@@ -126,7 +126,7 @@ extension Theme {
         hero: gloss(0x5A5A5E, 0x2E2E31, 0x141416, 0x0A0A0B), heroInk: .white,
         accent: gloss(0xFFF3A8, 0xFBE25C, 0xF5D338, 0xF2C925), accentInk: Color(hex: 0x3A2A00),
         tabBar: gloss(0x4A4A4D, 0x262628, 0x0E0E0F, 0x050505), tabActive: S(.white.opacity(0.14)), tabActiveInk: .white, tabInk: .white.opacity(0.7),
-        cardRadius: 11, tileRadius: 13, pillRadius: 9, glossy: true, fontName: "HelveticaNeue", listCorner: 10)
+        cardRadius: 11, tileRadius: 13, pillRadius: 9, fontName: "HelveticaNeue", listCorner: 10, glossy: true)
 
     /// Glass over a wallpaper palette (lightest → primary, darkest → onPrimary).
     static func wallpaper(_ palette: WallpaperPalette) -> Theme {

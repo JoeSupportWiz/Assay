@@ -20,7 +20,7 @@ enum StudioModule: String, CaseIterable, Identifiable, Hashable {
         case .signet: "Developer account, per-target profiles and entitlements, expiry and guided renewal."
         }
     }
-    var phase: String { switch self { case .gild: "Live"; case .canvas: "Phase 4"; case .cards: "Phase 4"; case .alchemy: "Phase 5"; case .signet: "Inspector" } }
+    var phase: String { switch self { case .gild: "Live"; case .canvas: "Phase 4"; case .cards: "Phase 4"; case .alchemy: "Chat"; case .signet: "Inspector" } }
 }
 
 struct StudioView: View {

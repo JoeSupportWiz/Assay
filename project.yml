@@ -30,7 +30,9 @@ targets:
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         ITSAppUsesNonExemptEncryption: false
         NSBluetoothAlwaysUsageDescription: Assay scans nearby Bluetooth devices only when you open the Bluetooth notebook. Reads only; writes always ask first.
-        NSLocalNetworkUsageDescription: Assay looks for services on networks you own or are allowed to test, and for Assay for Mac.
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+        NSLocalNetworkUsageDescription: Assay uses your local network for Bonjour discovery, Assay for Mac, and AI endpoints you choose.
         NSBonjourServices:
           - _assay-companion._tcp
           - _http._tcp

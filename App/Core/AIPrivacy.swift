@@ -118,15 +118,15 @@ enum AIRedactor {
         rule("pairing or key material", "[redacted pairing/key material]",
              #"(?i)\b(?:pair(?:ing)?(?:\s*record)?|host\s?id|system\s?buid|escrow\s?bag|(?:device|host|root)\s?certificate|private\s?key|public\s?key|api[\s_\-]?key|secret|token|password|passcode)\b\s*[:=]\s*\S+"#),
         rule("UDID", "[redacted UDID]",
-             #"\b[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4,16}){1,4}\b"#, validate: { hasDigit($0) }),
+             #"\b[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4,16}){1,4}\b"#, validate: { AIRedactor.hasDigit($0) }),
         rule("UDID", "[redacted UDID]",
-             #"\b[0-9A-Fa-f]{40}\b"#, validate: { hasDigit($0) }),
+             #"\b[0-9A-Fa-f]{40}\b"#, validate: { AIRedactor.hasDigit($0) }),
         rule("ECID", "[redacted ECID]",
-             #"(?i)\bECID\b\s*[:=]?\s*(?:0x)?[0-9a-f]{6,16}\b"#, validate: { hasDigit($0) }),
+             #"(?i)\bECID\b\s*[:=]?\s*(?:0x)?[0-9a-f]{6,16}\b"#, validate: { AIRedactor.hasDigit($0) }),
         rule("ECID", "[redacted ECID]",
              #"\b0x[0-9A-Fa-f]{12,16}\b"#),
         rule("serial number", "[redacted serial]",
-             #"(?i)\b(?:serial(?:\s*(?:number|no\.?))?|S/N|IMEI|MEID)\b\s*(?:is\s+)?[:=#]?\s*[A-Z0-9]{8,17}\b"#, validate: { hasDigit($0) }),
+             #"(?i)\b(?:serial(?:\s*(?:number|no\.?))?|S/N|IMEI|MEID)\b\s*(?:is\s+)?[:=#]?\s*[A-Z0-9]{8,17}\b"#, validate: { AIRedactor.hasDigit($0) }),
         rule("serial number", "[redacted serial]",
              #"\b(?=[A-Z0-9]*[0-9])(?=[A-Z0-9]*[A-Z])[A-Z0-9]{10,12}\b"#),
         rule("serial number", "[redacted serial]",
@@ -134,7 +134,7 @@ enum AIRedactor {
         rule("network address", "[redacted address]",
              #"\b(?:[0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}\b"#),
         rule("pairing or key material", "[redacted pairing/key material]",
-             #"[A-Za-z0-9+/_\-]{40,}={0,2}"#, validate: { ($0.count >= 64) || (hasDigit($0) && hasLetter($0)) })
+             #"[A-Za-z0-9+/_\-]{40,}={0,2}"#, validate: { ($0.count >= 64) || (AIRedactor.hasDigit($0) && AIRedactor.hasLetter($0)) })
     ].compactMap { $0 }
 
     static func redact(_ text: String) -> AIRedaction {

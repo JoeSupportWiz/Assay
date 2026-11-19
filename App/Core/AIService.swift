@@ -97,8 +97,9 @@ final class AIService {
     private(set) var keyRevision = 0
 
     init() {
-        settings = AIStoredSettings.load()
-        if ProcessInfo.processInfo.arguments.contains("-uiDemo") { settings.demoMode = true }
+        var s = AIStoredSettings.load()
+        if ProcessInfo.processInfo.arguments.contains("-uiDemo") { s.demoMode = true }   // screenshots: not saved
+        settings = s
     }
 
     // MARK: Status

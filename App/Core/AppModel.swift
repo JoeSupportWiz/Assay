@@ -55,6 +55,7 @@ final class AppModel {
         rebuildEngine()
         if let i = args.firstIndex(of: "-route"), i + 1 < args.count {
             let r = args[i + 1]
+            if r == "alchemy" { selectedTab = .studio; studioPath = [.module(.alchemy)]; return }
             if r == "signet" { selectedTab = .studio; studioPath = [.module(.signet)]; return }
             if r == "gild" || r == "gild-staged" || r.hasPrefix("tweak:") {
                 selectedTab = .studio

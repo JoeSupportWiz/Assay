@@ -3,12 +3,18 @@ import SwiftUI
 // MARK: - Diagnose
 
 struct DiagnoseView: View {
-    @Environment(AppModel.self) private var model
     @Environment(\.theme) private var t
     @State private var text = ""
-    @State private var showAll = false
+    @State private var pending: AIPendingSend?
+    @State private var requesting = false
+    @State private var advice: AIDiagnosisResult?
+    @State private var requestError: String?
     @FocusState private var focused: Bool
 
+    private var ai: AIService { AIService.shared }
+    private var destination: AIResolved { ai.settings.resolve(task: .diagnose) }
+    private var prompt: String { text.trimmingCharacters(in: .whitespacesAndNewlines) }
+    private var busy: Bool { pending != nil || requesting }
     private var matches: [(Symptom, Int)] { Knowledge.match(text) }
 
     var body: some View {
@@ -17,16 +23,19 @@ struct DiagnoseView: View {
                 TextField("Describe it, e.g. clock stuck at 9:41", text: $text, axis: .vertical)
                     .focused($focused)
                     .submitLabel(.search)
-            } footer: { Text("Matches your words against known problems. Nothing is sent anywhere.") }.rowCard()
+                    .disabled(busy)
+            } footer: { Text("Catalogue matching stays on your phone. Asking for a second opinion is optional.") }.rowCard()
 
-            if !text.trimmingCharacters(in: .whitespaces).isEmpty {
+            if !prompt.isEmpty {
                 Section(matches.isEmpty ? "No match" : "Best matches") {
                     if matches.isEmpty {
-                        Text("Nothing in the catalogue matches that yet. Try different words, or pick from the list below. Once an AI provider is connected, Assay can reason about problems that aren't listed.")
+                        Text("Nothing in the catalogue matches that yet. Try different words, or pick from the list below.")
                             .font(.system(size: 14)).foregroundStyle(t.ink2)
                     }
                     ForEach(matches.prefix(4), id: \.0.id) { s, _ in row(s) }
                 }.rowCard()
+
+                secondOpinion
             }
 
             Section(text.isEmpty ? "Common problems" : "All problems") {
@@ -36,6 +45,80 @@ struct DiagnoseView: View {
         .themedList()
         .navigationTitle("Diagnose")
         .navigationBarTitleDisplayMode(.inline)
+        .onChange(of: text) { advice = nil; requestError = nil }
+        .sheet(item: $pending) { preview in
+            AIConsentSheet(pending: preview, onConfirm: { confirm(preview) }, onCancel: { pending = nil })
+        }
+    }
+
+    private var secondOpinion: some View {
+        Section {
+            if ai.demoMode {
+                Text("Demo uses local keywords. No model is contacted.")
+            } else {
+                LabeledContent(destination.provider.displayName, value: destination.model)
+                Text(ai.privacyLabel(for: destination.provider).title).font(.footnote)
+            }
+            Button("Ask for a second opinion", action: ask).disabled(busy)
+            if requesting { ProgressView("Checking for a known symptom…") }
+            if let requestError { Text(requestError) }
+            if let advice {
+                if let id = advice.symptomID, let symptom = Knowledge.symptoms.first(where: { $0.id == id }) {
+                    Text(symptom.title).font(.headline)
+                } else {
+                    Text("No known symptom identified").font(.headline)
+                }
+                Text(verbatim: advice.explanation)
+                if let provider = advice.provider, let model = advice.model {
+                    Text("Reply from \(provider.displayName) · \(model)").font(.footnote)
+                }
+            }
+        } header: { Text("Second opinion") } footer: {
+            Text("Advice only. This does not read or change device settings.")
+        }.rowCard()
+    }
+
+    private func ask() {
+        guard !busy, !prompt.isEmpty else { return }
+        focused = false
+        advice = nil
+        requestError = nil
+        let target = destination
+        if !ai.demoMode {
+            switch ai.status(for: target.provider) {
+            case .needsKey: requestError = AIError.noKey.errorDescription; return
+            case .notAvailable(let reason): requestError = reason; return
+            case .configured: break
+            }
+        }
+        if AIDiagnosis.needsConsent() {
+            pending = AIPendingSend(provider: target.provider, model: target.model, baseURL: target.baseURL,
+                                    outgoing: AIDiagnosis.outgoing(for: prompt), withContext: false)
+        } else {
+            requestAdvice(for: prompt)
+        }
+    }
+
+    private func confirm(_ preview: AIPendingSend) {
+        guard pending?.id == preview.id else { return }
+        pending = nil
+        guard !ai.demoMode, preview.provider == destination.provider,
+              preview.model == destination.model, preview.baseURL == destination.baseURL else {
+            requestError = "AI settings changed. Check the provider and model before asking again."
+            return
+        }
+        ai.recordConsent(provider: preview.provider, withContext: false)
+        requestAdvice(for: prompt)
+    }
+
+    private func requestAdvice(for description: String) {
+        requesting = true
+        Task { @MainActor in
+            defer { requesting = false }
+            do { advice = try await AIDiagnosis.suggest(text: description) }
+            catch let error as AIError { requestError = error.errorDescription }
+            catch { requestError = "Could not get a second opinion. Try again." }
+        }
     }
 
     private func row(_ s: Symptom) -> some View {

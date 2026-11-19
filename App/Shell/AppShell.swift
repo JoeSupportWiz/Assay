@@ -96,6 +96,7 @@ struct StudioRoot: View {
                     case .module(let m):
                         switch m {
                         case .gild: GildView()
+                        case .alchemy: AlchemyRootView()
                         case .signet: SignetRootView()
                         default: ModuleComingView(module: m)
                         }

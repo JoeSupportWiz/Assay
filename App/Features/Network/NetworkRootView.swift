@@ -65,7 +65,7 @@ struct NetworkRootView: View {
         }
         .onAppear {
             bonjour.screenAppeared()
-            if !scope.accepted { showScope = true }
+            if !scope.accepted && !ProcessInfo.processInfo.arguments.contains("-uiDemo") { showScope = true }
         }
         .onDisappear { bonjour.screenDisappeared() }
         .onChange(of: scenePhase) { _, phase in

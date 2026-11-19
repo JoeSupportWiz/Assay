@@ -1,7 +1,7 @@
 import Foundation
 
 /// Refuses every redirect, so a key can never be forwarded to another host.
-private final class AINoRedirectDelegate: NSObject, URLSessionTaskDelegate {
+private final class AINoRedirectDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
     func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
                     newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
         completionHandler(nil)
