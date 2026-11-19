@@ -96,10 +96,7 @@ struct SymptomView: View {
                     }.rowCard()
 
                     Section {
-                        Button { model.activePlan = s.plan(current: current) } label: { Text("Review the fix") }
-                            .buttonStyle(PrimaryButtonStyle())
-                            .disabled(model.engine.canRead && loaded && current != s.culpritValue)
-                            .listRowBackground(Color.clear).listRowInsets(.init())
+                        EmptyView()
                     } footer: {
                         if model.engine.canRead && loaded && current != s.culpritValue {
                             Text("This setting isn't on, so it isn't the cause here.")
@@ -119,6 +116,15 @@ struct SymptomView: View {
             .themedList()
             .navigationTitle("Problem")
             .navigationBarTitleDisplayMode(.inline)
+            .safeAreaInset(edge: .bottom) {
+                if s.culprit != nil {
+                    Button { model.activePlan = s.plan(current: current) } label: { Text("Review the fix") }
+                        .buttonStyle(PrimaryButtonStyle())
+                        .disabled(model.engine.canRead && loaded && current != s.culpritValue)
+                        .padding(.horizontal, 20).padding(.vertical, 10)
+                        .background(.bar)
+                }
+            }
             .task(id: model.findings.count) {
                 if let key = s.culprit { current = await model.engine.read(key) }
                 loaded = true
@@ -193,12 +199,13 @@ struct FixSheet: View {
                 }
             } footer: { Text(plan.tier.explanation) }.rowCard()
 
-            Section {
-                Button { Task { await run() } } label: { Text(dryRun ? "Run dry run" : "Apply") }
-                    .buttonStyle(PrimaryButtonStyle())
-                    .disabled(!dryRun && plan.tier >= .caution && !understood)
-                    .listRowBackground(Color.clear).listRowInsets(.init())
-            }
+        }
+        .safeAreaInset(edge: .bottom) {
+            Button { Task { await run() } } label: { Text(dryRun ? "Run dry run" : "Apply") }
+                .buttonStyle(PrimaryButtonStyle())
+                .disabled(!dryRun && plan.tier >= .caution && !understood)
+                .padding(.horizontal, 20).padding(.vertical, 10)
+                .background(.bar)
         }
     }
 

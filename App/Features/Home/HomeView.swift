@@ -29,7 +29,6 @@ struct HomeView: View {
                 }
                 if let b = model.snapshot?.backup { backupRow(b) }
                 LabeledContent("Changes made") { Text("\(model.receipts.changeCount)").monospacedDigit() }
-                NavigationLink(value: 0) { EmptyView() }.hidden().frame(height: 0)
             }.rowCard()
 
             Section("Shortcuts") {
@@ -50,7 +49,6 @@ struct HomeView: View {
         .themedList()
         .navigationTitle(model.userName.isEmpty ? "Home" : "Hi, \(model.userName)")
         .navigationBarTitleDisplayMode(.large)
-        .navigationDestination(for: Int.self) { _ in EmptyView() }
         .task { if model.lastCheck == nil { await model.runCheck() } }
         .refreshable { await model.runCheck() }
     }
