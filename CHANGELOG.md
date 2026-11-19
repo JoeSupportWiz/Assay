@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased · Studio and Lab integration
+- **Analyse with Minis**: review an allowlisted snapshot, optionally add receipt summaries or counts from an imported backup log, then share or export. A local read-only MCP server compares user-approved exports. No pairing file or model key required.
+- **Engine status** now distinguishes public iPhone checks from unimplemented system writes. The review sheet allows previews, not live writes, on real-device engines.
 - Added [four feature test cards](docs/features/README.md): Bluetooth notebook, local network inventory, Signet IPA inspection and Alchemy chat. Simulator coverage is not live hardware or provider verification.
 - Added an explicit, advice-only AI second opinion in Diagnose; keyword matching still works offline.
 - Scoped custom AI credentials and hosted consent to their configured endpoints; credentials are never sent over HTTP.

@@ -1,6 +1,6 @@
 # AI providers and Alchemy chat (Phase 5.1 / 5.2)
 
-Folders: `App/Features/Alchemy/` and `App/Core/AI*.swift`. Root view: `AlchemyRootView` (place inside a `NavigationStack`; it pushes `AISettingsView` itself). All types are prefixed `AI`.
+Folders: `App/Features/Alchemy/` and `App/Core/AI*.swift`. For analysis by the actual Minis assistant, use [Analyse with Minis](minis.md); the optional generic local provider below is separate. Root view: `AlchemyRootView` (place inside a `NavigationStack`; it pushes `AISettingsView` itself). All types are prefixed `AI`.
 
 ## Files
 | File | Contents |

@@ -58,7 +58,7 @@ Built in order, one shippable slice at a time. Each slice ends with simulator sc
 | 5.1 | Providers: Minis, OpenAI, Anthropic, Google, OpenRouter, Ollama; Keychain keys; connection test | wired · simulator review; live providers not tested |
 | 5.2 | Explain-before-execute plans | optional chat & symptom suggestions; advice only |
 | 5.3 | Asset pipeline: prompt → draft → editor → before/after → apply | ○ |
-| 5.4 | MCP bridge (read-only first, on-device approval for changes) | ○ |
+| 5.4 | [Analyse with Minis](features/minis.md): reviewed snapshots, optional local log counts, status/latest/compare over STDIO | Read-only, no live device access or write tools |
 
 ## Phase 6 — Signet (signing)
 | # | Slice | Status |

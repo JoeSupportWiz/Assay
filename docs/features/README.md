@@ -11,4 +11,6 @@ This review uses sample inputs, not a paired iPhone. It does not grant permissio
 
 **Next physical checks:** use an accessory and LAN you own; try a known IPA from Files; connect one provider deliberately, inspect its destination and redacted preview, and cancel once before sending. No keys or real device identifiers belong in a bug report.
 
+**Minis analysis:** [Review, share and compare diagnostic snapshots](minis.md). This uses a read-only export and does not require an AI key or device pairing.
+
 **Further detail:** [Bluetooth](bluetooth.md) · [Network](network.md) · [Signet](signet.md) · [Alchemy](alchemy.md) · [Simulator captures](../app-screens/README.md).
