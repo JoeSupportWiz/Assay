@@ -3,6 +3,7 @@ import UniformTypeIdentifiers
 
 @MainActor
 struct FileVaultView: View {
+    @AppStorage("vault.liveStatus") private var liveStatus = false
     @State private var history = VaultHistory()
     @State private var picking = false
     @State private var restore: Selection?
@@ -23,6 +24,7 @@ struct FileVaultView: View {
             } header: { Text("Selected files only") } footer: {
                 Text("Save up to 32 individual files: 16 MiB per file, 64 MiB per checkpoint. Identical contents are stored once. This is not a device or app backup.")
             }
+            Section { Toggle("Show Live Activity", isOn: $liveStatus) } footer: { Text("Publish the last reported step on the Lock Screen while saving or restoring a file. No filenames, no background keep-alive.") }.rowCard()
             if !status.isEmpty {
                 Section("Status") {
                     HStack {
@@ -90,10 +92,12 @@ struct FileVaultView: View {
         guard operation == nil else { return }
         let token = UUID()
         operation = token
-        defer { operation = nil }
+        var verified = false
+        VaultStatusActivity.shared.start(id:token,restoring:selection != nil,enabled:liveStatus)
+        defer { VaultStatusActivity.shared.end(id: token,verified: verified); operation = nil }
         status = "Opening selection…"
         let progress: @Sendable (String) -> Void = { message in
-            DispatchQueue.main.async { if operation == token { status = message } }
+            DispatchQueue.main.async { if operation == token { status = message; VaultStatusActivity.shared.update(id:token,stage:message) } }
         }
         do {
             if let selection {
@@ -104,6 +108,7 @@ struct FileVaultView: View {
                 history.snapshots.insert(s, at: 0)
                 status = "Checkpoint saved and verified. Files: \(s.files.count)."
             }
+            verified = true
         } catch let fault as VaultFault { status = fault.rawValue }
         catch is CancellationError { status = "Operation cancelled." }
         catch { status = "Could not complete the operation. Check file availability, free space and access." }

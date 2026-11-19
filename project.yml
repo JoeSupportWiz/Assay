@@ -10,19 +10,27 @@ settings:
     IPHONEOS_DEPLOYMENT_TARGET: "17.0"
     TARGETED_DEVICE_FAMILY: "1"
     MARKETING_VERSION: "0.3.0"
-    CURRENT_PROJECT_VERSION: "4"
+    CURRENT_PROJECT_VERSION: "5"
 targets:
   Assay:
     type: application
     platform: iOS
     sources:
       - path: App
+      - path: SharedSurfaces
+    dependencies:
+      - target: AssayWidgets
+        embed: true
     info:
       path: App/Info.plist
       properties:
         CFBundleDisplayName: Assay
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSSupportsLiveActivities: true
+        CFBundleURLTypes:
+          - CFBundleURLName: com.joesupportwiz.assay.open
+            CFBundleURLSchemes: [assay]
         UILaunchScreen:
           UIColorName: LaunchBackground
         UIApplicationSceneManifest:
@@ -66,3 +74,29 @@ targets:
     scheme:
       testTargets: []
       gatherCoverageData: false
+
+  AssayWidgets:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: Widgets
+      - path: SharedSurfaces
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.joesupportwiz.assay.widgets
+        PRODUCT_NAME: AssayWidgets
+        APPLICATION_EXTENSION_API_ONLY: YES
+        SKIP_INSTALL: YES
+        CODE_SIGNING_ALLOWED: NO
+        CODE_SIGNING_REQUIRED: NO
+        TARGETED_DEVICE_FAMILY: "1"
+        SUPPORTS_MACCATALYST: NO
+    info:
+      path: Generated/AssayWidgets-Info.plist
+      properties:
+        CFBundleDisplayName: Assay widgets
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension

@@ -21,6 +21,14 @@ struct RootView: View {
         .environment(\.theme, theme)
         .tint(theme.accentColor)
         .preferredColorScheme(preferredScheme)
+        .onOpenURL { url in
+            guard model.hasOnboarded, let target = AssaySurfaceRoute(url: url) else { return }
+            switch target {
+            case .clock: model.selectedTab = .lab; model.labPath = [.displayCheck]
+            case .vault: model.selectedTab = .lab; model.labPath = [.fileVault]
+            case .scenes: model.selectedTab = .scenes
+            }
+        }
         .onAppear { SceneLibraryStore.shared.attach(to: model) }
         .task(id: model.engineGeneration) { await model.refresh() }
     }
