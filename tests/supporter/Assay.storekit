@@ -1,0 +1,49 @@
+{
+  "identifier": "DD34BCC7-5D63-4302-9C73-B28A132D2500",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "29.99",
+      "familyShareable": false,
+      "internalID": "41EB52E6-D5EA-40ED-B569-33747C71F508",
+      "localizations": [
+        {"description": "Support Assay with a one-time purchase.", "displayName": "Lifetime Supporter", "locale": "en_GB"}
+      ],
+      "productID": "assay.pro.lifetime",
+      "referenceName": "Lifetime Supporter",
+      "type": "NonConsumable"
+    }
+  ],
+  "settings": {
+    "_failTransactionsEnabled": false,
+    "_locale": "en_GB",
+    "_storefront": "GBR"
+  },
+  "subscriptionGroups": [
+    {
+      "id": "3928562F-CA0D-4CCA-ADD0-16D9064CB02F",
+      "localizations": [],
+      "name": "Assay Supporter",
+      "subscriptions": [
+        {
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "9.99",
+          "familyShareable": false,
+          "groupNumber": 1,
+          "internalID": "1AAE9278-6BA4-46FF-9B97-0DD7077BCEDB",
+          "introductoryOffer": null,
+          "localizations": [
+            {"description": "Support Assay for a year. Renews annually.", "displayName": "Annual Supporter", "locale": "en_GB"}
+          ],
+          "productID": "assay.pro.yearly",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Annual Supporter",
+          "subscriptionGroupID": "3928562F-CA0D-4CCA-ADD0-16D9064CB02F",
+          "type": "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version": {"major": 3, "minor": 0}
+}

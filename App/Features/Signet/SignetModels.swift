@@ -85,6 +85,7 @@ struct SignetTarget: Identifiable, Hashable, Sendable {
     var profile: SignetProfile?
     var hasCodeSignature: Bool
     var hasPrivacyManifest: Bool
+    var binary: SignetBinaryEvidence = .unavailable
     var isDemo = false
 
     var shortName: String {
@@ -149,6 +150,7 @@ extension SignetInspection {
     /// Entitlement keys we expect the target to need. Binary entitlements are not read in this slice,
     /// so this is reasoning from the extension point, Info.plist and the other targets (Inferred).
     func expectedEntitlements(for target: SignetTarget) -> [String] {
+        if target.binary.state == .xml { return target.binary.values.keys.sorted() }
         var keys: Set<String> = []
         if let ep = target.extensionPoint {
             if ep.hasPrefix("com.apple.networkextension.") { keys.insert(SignetKeys.networkExtension) }
@@ -200,7 +202,7 @@ extension SignetInspection {
         if target.hasCodeSignature {
             out.append(SignetCheck(title: "Code signature folder", detail: "_CodeSignature/CodeResources is present. The signature itself is not verified here.", status: .pass, evidence: .observed))
         } else {
-            out.append(SignetCheck(title: "Unsigned — ready for signing", detail: "No _CodeSignature/CodeResources found in this bundle.", status: .note, evidence: .observed))
+            out.append(SignetCheck(title: "No resource seal found", detail: "No _CodeSignature/CodeResources entry. This alone does not determine whether the executable is signed.", status: .note, evidence: .observed))
         }
 
         // Own profile
@@ -277,7 +279,7 @@ extension SignetInspection {
             out.append(SignetCheck(title: "Privacy manifest", detail: "No PrivacyInfo.xcprivacy in this bundle. App Store submissions may need one if required-reason APIs are used.", status: .note, evidence: .observed))
         }
 
-        out.append(SignetCheck(title: "Binary entitlements", detail: "Binary entitlements not read in this slice. What the compiled binary actually requests is Unknown.", status: .note, evidence: .unknown))
+        out.append(SignetCheck(title: "Binary entitlements", detail: target.binary.summary + ". Signature validity is not checked.", status: .note, evidence: target.binary.observed ? .observed : .unknown))
         return out
     }
 }
@@ -421,7 +423,7 @@ enum SignetReceipt {
         s.append("Targets (\(i.targets.count)):")
         for t in i.targets {
             s.append("- \(t.kind.rawValue): \(t.bundleID)")
-            s.append("  Signed folder present: \(t.hasCodeSignature ? "yes" : "no (unsigned)")")
+            s.append("  Signed folder present: \(t.hasCodeSignature ? "yes" : "no")")
             if let p = t.profile {
                 let days = p.daysLeft(now: now).map { "\($0) days left" } ?? "no expiry"
                 let exp = p.expirationDate.map { df.string(from: $0) } ?? "Not available"
@@ -434,7 +436,7 @@ enum SignetReceipt {
             }
         }
         s.append("")
-        s.append("Binary entitlements were not read (Unknown).")
+        for target in i.targets { s.append("  \(target.shortName): \(target.binary.summary)") }; s.append("Signature and installability not verified.")
         return s.joined(separator: "\n") + "\n"
     }
 }

@@ -41,6 +41,9 @@ jobs:
           set -eu
           swiftc -parse-as-library App/Features/AppleTeam/TeamPortal.swift tests/apple-team/TeamFixture.swift -o "$RUNNER_TEMP/team-test"
           "$RUNNER_TEMP/team-test"
+          sh tests/supporter/run.sh
+          swiftc -parse-as-library App/Features/Signet/SignetBinaryEvidence.swift tests/macho/Fixture.swift -o "$RUNNER_TEMP/mach-check"
+          "$RUNNER_TEMP/mach-check"
           bash tests/file-vault/run.sh
           swiftc -parse-as-library App/Features/Canvas/CanvasArchive.swift App/Features/Signet/SignetZip.swift tests/canvas/Fixture.swift -o "$RUNNER_TEMP/canvas-test"
           "$RUNNER_TEMP/canvas-test" App/ArtResources/AssayCanvasSample.zip

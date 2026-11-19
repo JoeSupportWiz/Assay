@@ -9,6 +9,7 @@ struct GildView: View {
         List {
             if ts.search.isEmpty && ts.category == nil {
                 Section("Presets") {
+                    NavigationLink { GildPresetFilesView() } label: { Label("Import or export a preset", systemImage: "doc.on.doc") }
                     ForEach(Preset.all) { p in
                         NavigationLink(value: StudioRoute.gild(.preset(p.id))) {
                             HStack {

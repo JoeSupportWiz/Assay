@@ -4,7 +4,7 @@ import SwiftUI
 struct AssayApp: App {
     @State private var model = AppModel()
     var body: some Scene {
-        WindowGroup { RootView().environment(model) }
+        WindowGroup { AssayPrivacyGate { RootView().environment(model) }.task { await AssaySupporterStore.shared.start() } }
     }
 }
 

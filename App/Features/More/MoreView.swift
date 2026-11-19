@@ -11,6 +11,8 @@ struct MoreView: View {
                 NavigationLink { AppearanceView() } label: { LabeledContent("Appearance") { Text(model.themeID.title) } }
                 NavigationLink { EngineView() } label: { LabeledContent("Engine") { Text(model.engineMode?.title ?? "Not set") } }
                 NavigationLink { AISettingsView() } label: { Label("AI providers", systemImage: "brain") }
+                NavigationLink { AssayPrivacyLockSettings() } label: { Label("Privacy lock", systemImage: "lock") }
+                NavigationLink { SupporterView() } label: { Label("Support Assay", systemImage: "star") }
                 Toggle("Expert mode", isOn: $model.expertMode)
             } footer: { Text("Expert mode shows raw keys, bundle IDs and UUIDs inline.") }.rowCard()
 
@@ -33,7 +35,6 @@ struct MoreView: View {
     private static let upcoming: [Upcoming] = [
         .init(title: "Permissions and privacy", symbol: "hand.raised", phase: "Phase 8"),
         .init(title: "Updates", symbol: "arrow.down.circle", phase: "Phase 2"),
-        .init(title: "Assay Pro", symbol: "star", phase: "Phase 9"),
     ]
 }
 
