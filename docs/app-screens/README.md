@@ -39,4 +39,8 @@ Rendered by CI in the iOS Simulator (demo engine, 9:41 status bar).
 <td align="center"><img src="14-signet-dark.png" width="200"><br><sub>14-signet-dark</sub></td>
 <td align="center"><img src="14-signet-light.png" width="200"><br><sub>14-signet-light</sub></td></tr><tr>
 <td align="center"><img src="15-alchemy-dark.png" width="200"><br><sub>15-alchemy-dark</sub></td>
-<td align="center"><img src="15-alchemy-light.png" width="200"><br><sub>15-alchemy-light</sub></td></tr></table>
+<td align="center"><img src="15-alchemy-light.png" width="200"><br><sub>15-alchemy-light</sub></td>
+<td align="center"><img src="16-minis-dark.png" width="200"><br><sub>16-minis-dark</sub></td>
+<td align="center"><img src="16-minis-light.png" width="200"><br><sub>16-minis-light</sub></td></tr><tr>
+<td align="center"><img src="17-minis-review-dark.png" width="200"><br><sub>17-minis-review-dark</sub></td>
+<td align="center"><img src="17-minis-review-light.png" width="200"><br><sub>17-minis-review-light</sub></td></tr></table>
