@@ -35,9 +35,12 @@ jobs:
       - name: Build for simulator
         if: inputs.mode == 'screenshots'
         run: |
+          mkdir -p build
+          set -o pipefail
           xcodebuild -project Assay.xcodeproj -scheme Assay -configuration Debug \
             -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
-            -derivedDataPath build/dd CODE_SIGNING_ALLOWED=NO build | tail -30
+            -derivedDataPath build/dd CODE_SIGNING_ALLOWED=NO build 2>&1 | tee build/build.log | rg -N '(error:|BUILD (SUCCEEDED|FAILED))' || true
+          grep -q 'BUILD SUCCEEDED' build/build.log || { echo '::group::compile errors'; grep -E 'error:' build/build.log | sort -u | head -80; echo '::endgroup::'; exit 1; }
 
       - name: Render screens
         if: inputs.mode == 'screenshots'
@@ -64,11 +67,14 @@ jobs:
       - name: Build unsigned archive
         if: inputs.mode == 'ipa'
         run: |
+          set -o pipefail
+          mkdir -p build
           xcodebuild -project Assay.xcodeproj -scheme Assay \
             -configuration Release -sdk iphoneos \
             -destination 'generic/platform=iOS' \
             -archivePath build/Assay.xcarchive \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO archive | tail -30
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO archive 2>&1 | tee build/archive.log | tail -5
+          grep -q 'ARCHIVE SUCCEEDED' build/archive.log || { grep -E 'error:' build/archive.log | sort -u | head -80; exit 1; }
 
       - name: Package unsigned IPA
         if: inputs.mode == 'ipa'
