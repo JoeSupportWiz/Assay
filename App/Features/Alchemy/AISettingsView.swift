@@ -145,7 +145,7 @@ struct AIProviderDetailView: View {
             if kind.baseURLEditable || kind == .custom { endpointSection }
             modelSection
             if status.isReady || kind.isHostedService { testSection(status: status) }
-            if ai.settings.consented.contains(kind.rawValue) {
+            if ai.settings.hasConsent(kind, withContext: false) {
                 Section {
                     Button("Ask me again before sending") { ai.revokeConsent(for: kind) }
                 } footer: { Text("You confirmed sending to \(kind.displayName). This asks again on the next message.") }.rowCard()

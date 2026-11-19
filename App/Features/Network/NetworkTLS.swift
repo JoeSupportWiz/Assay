@@ -271,6 +271,7 @@ extension NetAddressPolicy {
 
 // MARK: - Plain-text report
 
+@MainActor
 enum NetReport {
     static func text(devices: [NetDevice], probes: NetProbeStore, demo: Bool, now: Date = Date()) -> String {
         var out: [String] = []

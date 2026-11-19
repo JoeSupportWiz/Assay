@@ -52,7 +52,7 @@ enum AIHost {
         guard !s.isEmpty, let u = URL(string: s), let scheme = u.scheme?.lowercased(),
               scheme == "http" || scheme == "https",
               let host = u.host, !host.isEmpty,
-              u.user == nil, u.password == nil else { return nil }
+              u.user == nil, u.password == nil, u.query == nil, u.fragment == nil else { return nil }
         return u
     }
 
@@ -219,6 +219,7 @@ struct AIStoredSettings: Codable, Equatable {
     }
 
     func baseURL(for kind: AIProviderKind) -> String {
+        if kind.isHostedService { return kind.defaultBaseURL }
         let v = (baseURLs[kind.rawValue] ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         return v.isEmpty ? kind.defaultBaseURL : v
     }
@@ -255,9 +256,14 @@ struct AIStoredSettings: Codable, Equatable {
         return AIResolved(provider: p, model: model(for: p, task: task), baseURL: baseURL(for: p))
     }
 
+    func consentKey(_ kind: AIProviderKind) -> String {
+        kind.rawValue + "|" + baseURL(for: kind)
+    }
+
     func hasConsent(_ kind: AIProviderKind, withContext: Bool) -> Bool {
-        let base = consented.contains(kind.rawValue)
-        return withContext ? (base && consentedWithContext.contains(kind.rawValue)) : base
+        let scope = consentKey(kind)
+        let base = consented.contains(scope)
+        return withContext ? (base && consentedWithContext.contains(scope)) : base
     }
 
     func label(for kind: AIProviderKind) -> AIPrivacyLabel {

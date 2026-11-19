@@ -73,6 +73,8 @@ actor AIClient {
         }
         guard let baseURL = AIHost.parse(base) else { throw AIError.badAddress }
         let label = AIHost.privacyLabel(forBaseURL: base)
+        if provider.isHostedService && base != provider.defaultBaseURL { throw AIError.badAddress }
+        if provider == .minis && label == .leavesPhone { throw AIError.badAddress }
         if baseURL.scheme?.lowercased() == "http" && label == .leavesPhone { throw AIError.insecureEndpoint }
         if model.isEmpty { throw AIError.modelMissing }
 
@@ -83,7 +85,8 @@ actor AIClient {
         if size > AIClient.maxPromptCharacters { throw AIError.promptTooLarge(size) }
 
         // Key (read late, used only in a header).
-        let key = AIKeychain.read(for: provider)
+        let key = provider.usesKeychainKey ? AIKeychain.read(for: provider, endpoint: base) : nil
+        if key != nil && baseURL.scheme?.lowercased() != "https" { throw AIError.insecureEndpoint }
         if provider.needsKey(baseURL: base) && key == nil { throw AIError.noKey }
 
         let request = try AIClient.buildRequest(provider: provider, baseURL: base, model: model, messages: trimmed,

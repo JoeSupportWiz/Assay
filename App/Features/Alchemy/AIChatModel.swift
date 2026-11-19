@@ -105,6 +105,9 @@ final class AIChatModel {
 
     func confirm() {
         guard let p = pending else { return }
+        guard p.provider == ai.defaultProvider, p.baseURL == ai.settings.baseURL(for: p.provider) else {
+            cancelPending(); errorText = "Destination changed. Review the message again."; return
+        }
         ai.recordConsent(provider: p.provider, withContext: p.withContext)
         let u = pendingUser
         pending = nil
