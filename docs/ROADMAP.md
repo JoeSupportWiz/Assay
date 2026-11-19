@@ -13,14 +13,16 @@ Built in order, one shippable slice at a time. Each slice ends with simulator sc
 | 0.4 | Onboarding: welcome, engine choice (Mac vs iPhone), permissions primer | ✅ | Fresh install |
 | 0.5 | CI: simulator screenshot mode + unsigned IPA mode | ✅ | Actions › Run workflow |
 
-## Phase 1 — The safety core
+## Phase 1 — The safety core ✅
+
+> Runs on the **Demo engine** (a simulated device that has your real symptoms). On iPhone-only and Mac engines the same screens work but writes are refused until the tunnel and companion land (3.2–3.5), and the app says so.
 | # | Slice | Status |
 |---|---|---|
-| 1.1 ⏳ | Operation pipeline: preflight → snapshot → diff → confirm → apply → verify → receipt → rollback | ○ |
-| 1.2 | Receipts store + Undo history (x01) | ○ |
-| 1.3 | Device check: on-device facts (model, OS, storage, battery, thermal) labelled Observed/Inferred/Unknown | ○ |
-| 1.4 | Diagnose: symptom picker + plain-English describe → matched findings (e.g. clock stuck at 09:41, green line) | ○ |
-| 1.5 | Fix flow sheet: review → dry run → applying → result | ○ |
+| 1.1 | Operation pipeline: re-read → diff → confirm → write → read back → receipt → rollback | ✅ |
+| 1.2 | Receipts store + Undo history, per-change undo, Restore to before Assay | ✅ |
+| 1.3 | Device check: real iOS facts + findings from known-culprit preference reads, tagged Observed / Inferred / Unknown | ✅ |
+| 1.4 | Diagnose: describe or pick a problem → cause, confidence, current value, fix (9:41 clock, green line, touch dots…) | ✅ keyword match · AI reasoning arrives with 5.x |
+| 1.5 | Fix sheet: review diff → dry run → applying → result → "is it fixed?" check | ✅ |
 
 ## Phase 2 — Gild (tweaks)
 | # | Slice | Status |
