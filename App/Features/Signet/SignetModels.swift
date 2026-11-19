@@ -347,7 +347,7 @@ enum SignetCalendar {
             let desc = "Profile \(u.profile.name) used by \(names)." + (inspection.isDemo ? " Demo data." : "")
             lines += [
                 "BEGIN:VEVENT",
-                "UID:signet-\(i)-\(Int(exp.timeIntervalSince1970))-\(abs(u.profile.name.hashValue % 100000))@assay.local",
+                "UID:signet-\(i)-\(Int(exp.timeIntervalSince1970))@assay.local",
                 "DTSTAMP:\(stamp)",
                 "DTSTART:\(utc(exp))",
                 "DTEND:\(utc(exp.addingTimeInterval(3600)))",

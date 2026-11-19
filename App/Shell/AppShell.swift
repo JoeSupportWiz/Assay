@@ -93,7 +93,12 @@ struct StudioRoot: View {
             StudioView()
                 .navigationDestination(for: StudioRoute.self) { r in
                     switch r {
-                    case .module(let m): if m == .gild { GildView() } else { ModuleComingView(module: m) }
+                    case .module(let m):
+                        switch m {
+                        case .gild: GildView()
+                        case .signet: SignetRootView()
+                        default: ModuleComingView(module: m)
+                        }
                     case .gild(let g): switch g { case .tweak(let id): TweakDetailView(id: id); case .preset(let id): PresetView(id: id) }
                     }
                 }
@@ -112,6 +117,8 @@ struct LabRoot: View {
                     switch route {
                     case .diagnose: DiagnoseView()
                     case .history: HistoryView()
+                    case .bluetooth: BluetoothRootView()
+                    case .network: NetworkRootView()
                     case .symptom(let id): SymptomView(id: id)
                     case .receipt(let id): ReceiptView(id: id)
                     }

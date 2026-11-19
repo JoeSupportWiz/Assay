@@ -31,7 +31,22 @@ targets:
         ITSAppUsesNonExemptEncryption: false
         NSBluetoothAlwaysUsageDescription: Assay scans nearby Bluetooth devices only when you open the Bluetooth notebook. Reads only; writes always ask first.
         NSLocalNetworkUsageDescription: Assay looks for services on networks you own or are allowed to test, and for Assay for Mac.
-        NSBonjourServices: [_assay-companion._tcp]
+        NSBonjourServices:
+          - _assay-companion._tcp
+          - _http._tcp
+          - _https._tcp
+          - _ssh._tcp
+          - _smb._tcp
+          - _airplay._tcp
+          - _raop._tcp
+          - _hap._tcp
+          - _ipp._tcp
+          - _printer._tcp
+          - _workstation._tcp
+          - _companion-link._tcp
+          - _device-info._tcp
+          - _googlecast._tcp
+          - _spotify-connect._tcp
         NSPhotoLibraryAddUsageDescription: Assay saves wallpapers and posters you create to Photos when you ask.
         NSFaceIDUsageDescription: Assay can lock itself with Face ID.
     settings:

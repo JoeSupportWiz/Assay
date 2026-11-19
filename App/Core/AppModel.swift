@@ -55,6 +55,7 @@ final class AppModel {
         rebuildEngine()
         if let i = args.firstIndex(of: "-route"), i + 1 < args.count {
             let r = args[i + 1]
+            if r == "signet" { selectedTab = .studio; studioPath = [.module(.signet)]; return }
             if r == "gild" || r == "gild-staged" || r.hasPrefix("tweak:") {
                 selectedTab = .studio
                 if r == "gild" { studioPath = [.module(.gild)] }
@@ -70,6 +71,8 @@ final class AppModel {
             selectedTab = .lab
             if r == "diagnose" { labPath = [.diagnose] }
             else if r == "history" { labPath = [.history] }
+            else if r == "bluetooth" { labPath = [.bluetooth] }
+            else if r == "network" { labPath = [.network] }
             else if r.hasPrefix("symptom:") { labPath = [.diagnose, .symptom(String(r.dropFirst(8)))] }
             else if r.hasPrefix("fix:"), let s = Knowledge.symptoms.first(where: { $0.id == String(r.dropFirst(4)) }) { activePlan = s.plan(current: s.culpritValue) }
         }
@@ -163,7 +166,7 @@ enum StudioRoute: Hashable {
 
 /// Screens pushed inside the Lab tab.
 enum LabRoute: Hashable {
-    case diagnose, history
+    case diagnose, history, bluetooth, network
     case symptom(String)
     case receipt(Int)
 }

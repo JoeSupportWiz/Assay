@@ -42,6 +42,8 @@ struct LabView: View {
                         Text("\(model.receipts.receipts.count)").foregroundStyle(t.ink3).monospacedDigit()
                     }
                 }
+                NavigationLink(value: LabRoute.bluetooth) { Label("Bluetooth notebook", systemImage: "dot.radiowaves.left.and.right") }
+                NavigationLink(value: LabRoute.network) { Label("Local network", systemImage: "network") }
                 ForEach(LabTool.upcoming) { tool in
                     HStack {
                         Label(tool.title, systemImage: tool.symbol).foregroundStyle(t.ink2)
@@ -69,7 +71,5 @@ struct LabTool: Identifiable {
     let id: String, title: String, symbol: String, phase: String
     static let upcoming: [LabTool] = [
         .init(id: "vault", title: "Backups", symbol: "tray.full", phase: "Phase 3"),
-        .init(id: "ble", title: "Bluetooth notebook", symbol: "dot.radiowaves.left.and.right", phase: "Phase 7"),
-        .init(id: "net", title: "Local network", symbol: "network", phase: "Phase 7"),
     ]
 }

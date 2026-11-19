@@ -45,6 +45,9 @@ for look in light dark; do
   shot "09-gild-$look"        "$look" -uiDemo -route gild
   shot "10-tweak-$look"       "$look" -uiDemo -route tweak:SBShowStatusBarOverridesForRecording
   shot "11-staged-$look"      "$look" -uiDemo -route gild-staged
+  shot "12-bluetooth-$look"   "$look" -uiDemo -route bluetooth
+  shot "13-network-$look"     "$look" -uiDemo -route network
+  shot "14-signet-$look"      "$look" -uiDemo -route signet
 done
 shot "01-home-millennium" light -uiDemo -tab home -theme millennium
 shot "01-home-pinstripe"  light -uiDemo -tab home -theme pinstripe

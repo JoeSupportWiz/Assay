@@ -36,6 +36,7 @@ struct NetworkRootView: View {
         }
         .themedList()
         .navigationTitle("Local network")
+        .onAppear { if ProcessInfo.processInfo.arguments.contains("-uiDemo") { bonjour.setDemo(true) } }
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: NetRoute.self) { route in
             switch route {
