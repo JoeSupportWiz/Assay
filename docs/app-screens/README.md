@@ -65,4 +65,12 @@ Rendered by CI in the iOS Simulator (demo engine, 9:41 status bar).
 <td align="center"><img src="27-supporter-dark.png" width="200"><br><sub>27-supporter-dark</sub></td>
 <td align="center"><img src="27-supporter-light.png" width="200"><br><sub>27-supporter-light</sub></td>
 <td align="center"><img src="28-build-library-dark.png" width="200"><br><sub>28-build-library-dark</sub></td>
-<td align="center"><img src="28-build-library-light.png" width="200"><br><sub>28-build-library-light</sub></td></tr><tr></tr></table>
+<td align="center"><img src="28-build-library-light.png" width="200"><br><sub>28-build-library-light</sub></td></tr><tr>
+<td align="center"><img src="29-layout-dark.png" width="200"><br><sub>29-layout-dark</sub></td>
+<td align="center"><img src="29-layout-light.png" width="200"><br><sub>29-layout-light</sub></td>
+<td align="center"><img src="30-scene-transfer-dark.png" width="200"><br><sub>30-scene-transfer-dark</sub></td>
+<td align="center"><img src="30-scene-transfer-light.png" width="200"><br><sub>30-scene-transfer-light</sub></td></tr><tr>
+<td align="center"><img src="31-crash-review-dark.png" width="200"><br><sub>31-crash-review-dark</sub></td>
+<td align="center"><img src="31-crash-review-light.png" width="200"><br><sub>31-crash-review-light</sub></td>
+<td align="center"><img src="32-studio-accessibility.png" width="200"><br><sub>32-studio-accessibility</sub></td>
+<td align="center"><img src="33-onboarding-accessibility.png" width="200"><br><sub>33-onboarding-accessibility</sub></td></tr><tr></tr></table>
