@@ -57,4 +57,10 @@ Rendered by CI in the iOS Simulator (demo engine, 9:41 status bar).
 <td align="center"><img src="23-canvas-dark.png" width="200"><br><sub>23-canvas-dark</sub></td>
 <td align="center"><img src="23-canvas-light.png" width="200"><br><sub>23-canvas-light</sub></td>
 <td align="center"><img src="24-cards-dark.png" width="200"><br><sub>24-cards-dark</sub></td>
-<td align="center"><img src="24-cards-light.png" width="200"><br><sub>24-cards-light</sub></td></tr><tr></tr></table>
+<td align="center"><img src="24-cards-light.png" width="200"><br><sub>24-cards-light</sub></td></tr><tr>
+<td align="center"><img src="25-preset-files-dark.png" width="200"><br><sub>25-preset-files-dark</sub></td>
+<td align="center"><img src="25-preset-files-light.png" width="200"><br><sub>25-preset-files-light</sub></td>
+<td align="center"><img src="26-privacy-lock-dark.png" width="200"><br><sub>26-privacy-lock-dark</sub></td>
+<td align="center"><img src="26-privacy-lock-light.png" width="200"><br><sub>26-privacy-lock-light</sub></td></tr><tr>
+<td align="center"><img src="27-supporter-dark.png" width="200"><br><sub>27-supporter-dark</sub></td>
+<td align="center"><img src="27-supporter-light.png" width="200"><br><sub>27-supporter-light</sub></td></tr></table>
