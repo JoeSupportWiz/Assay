@@ -1,9 +1,13 @@
 # Credits & acknowledgements
 
-Assay is an independently implemented project. It is not a direct fork of GoldenNugget Mobile.
+Assay is an independently implemented, proprietary project. It is **not** a fork of GoldenNugget Mobile.
 
-We thank **GoldensHQ and the GoldenNugget Mobile contributors** for their work in the iOS customization ecosystem, which informed this product's problem space and feature research. No GoldenNugget source code or branding is included in this initial scaffold. If any source code or assets are incorporated in the future, their licence and attribution requirements must be reviewed and met before inclusion.
+## Thanks
+- **GoldensHQ and the GoldenNugget Mobile contributors**, and the wider Nugget community, whose work in iOS customisation informed this product's research. No GoldenNugget source code or branding is included.
+- The iOS customisation and developer-tools community — including the authors of Erosion, StikDebug, SideStore/LocalDevVPN, Camlo and Airship — for showing what people want from their devices. Assay uses none of their names, logos, code or assets.
 
-Assay is unofficial and is not affiliated with or endorsed by Apple Inc. Apple, iPhone, iOS, Wallet, Apple Pay, Live Activities and Dynamic Island are trademarks of Apple Inc.
+## Third-party components
+None yet. Each dependency will be listed here with its version, licence and source link before it is added.
 
-Third-party libraries, artwork and research will be listed here with versions, licences and source links as the implementation matures.
+## Trademarks
+Apple, iPhone, iOS, Wallet, Apple Pay, Live Activities and Dynamic Island are trademarks of Apple Inc. Windows is a trademark of Microsoft Corporation. The Millennium and Pinstripe themes are original homages and contain no third-party logos or assets. Assay is not affiliated with or endorsed by Apple Inc.
