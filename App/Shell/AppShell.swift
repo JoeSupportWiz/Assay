@@ -55,8 +55,8 @@ extension Theme {
     /// Selected tab tint, chosen to read on that theme's tab bar.
     var tabTint: Color {
         switch id {
-        case .millennium: Color(hex: 0xA6F59A)
-        case .pinstripe: Color(hex: 0x6FB8FF)
+        case .millennium: Color(hex: 0x205A31)
+        case .pinstripe: Color(hex: 0x204F85)
         default: accentColor
         }
     }
@@ -134,6 +134,7 @@ struct LabRoot: View {
                     case .history: HistoryView()
                     case .displayCheck: DisplayCheckView()
                     case .fileVault: FileVaultView()
+                    case .bench: BenchView()
                     case .crashReview: CrashReviewView()
                     case .minis: MinisReviewView()
                     case .bluetooth: BluetoothRootView()

@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 
 // MARK: - Values and targets
 
@@ -70,6 +71,7 @@ struct OperationPlan: Identifiable, Hashable {
     var userCheck: String? = nil
     /// Receipts this plan reverses (undo / restore all).
     var undoOf: [Int] = []
+    var undoEngine: EngineMode? = nil
     var tier: Tier { changes.map(\.tier).max() ?? .reversible }
 }
 
@@ -98,6 +100,7 @@ struct Receipt: Identifiable, Codable, Hashable {
     var status: Status {
         if dryRun { return .simulated }
         if rolledBack { return .rolledBack }
+        if items.isEmpty { return .failed }
         let failed = items.filter { $0.outcome == .failed }.count
         if !items.isEmpty && failed == items.count { return .failed }
         if failed > 0 || items.contains(where: { $0.outcome == .unverified }) { return .partial }
@@ -106,7 +109,7 @@ struct Receipt: Identifiable, Codable, Hashable {
 
     var undoable: Bool {
         !dryRun && !rolledBack && kind != .undo && kind != .restoreAll
-            && items.contains(where: { $0.outcome != .failed && $0.change.beforeKnown })
+            && !items.isEmpty && items.allSatisfy { $0.outcome == .verified && $0.change.beforeKnown }
     }
 
     var reversibleCount: Int { items.filter { $0.outcome != .failed && $0.change.beforeKnown }.count }
@@ -142,8 +145,11 @@ final class ReceiptStore {
 
     func add(_ r: Receipt) { receipts.insert(r, at: 0); save() }
 
-    func markRolledBack(_ ids: [Int]) {
-        for id in ids { if let i = receipts.firstIndex(where: { $0.id == id }) { receipts[i].rolledBack = true } }
+    func acknowledgeUndo(_ plan: OperationPlan, result: Receipt) {
+        guard !plan.undoOf.isEmpty, plan.undoEngine == result.engine, !result.dryRun, result.status == .complete,
+              result.kind == plan.kind, result.items.count == plan.changes.count,
+              zip(result.items,plan.changes).allSatisfy({ item, change in item.outcome == .verified && item.change.target == change.target && item.change.after == change.after }) else { return }
+        for i in receipts.indices where plan.undoOf.contains(receipts[i].id) && receipts[i].engine == result.engine && receipts[i].undoable { receipts[i].rolledBack = true }
         save()
     }
 
@@ -151,29 +157,39 @@ final class ReceiptStore {
         if let i = receipts.firstIndex(where: { $0.id == id }) { receipts[i].userConfirmed = ok; save() }
     }
 
-    func undoPlan(for r: Receipt) -> OperationPlan {
-        let changes = r.items.filter { $0.outcome != .failed && $0.change.beforeKnown }.map { $0.change.inverted }
+    func undoPlan(for r: Receipt, engine: EngineMode) -> OperationPlan? {
+        guard r.engine == engine, r.undoable, let position = receipts.firstIndex(where: { $0.id == r.id && $0.engine == engine }), receipts[position] == r else { return nil }
+        let keys = Set(r.items.map(\.change.target))
+        guard !receipts.prefix(position).contains(where: { other in
+            other.engine == engine && !other.dryRun && !other.rolledBack && other.kind != .undo && other.kind != .restoreAll && other.items.contains { keys.contains($0.change.target) && $0.outcome != .failed }
+        }) else { return nil }
+        let changes = r.items.reversed().map { $0.change.inverted }
         return OperationPlan(title: "Undo #\(r.id) · \(r.title)", kind: .undo, changes: changes,
-                             needsRespring: true, userCheck: "Is everything back to how it was?", undoOf: [r.id])
+                             needsRespring: true, userCheck: "Is everything back to how it was?", undoOf: [r.id], undoEngine: engine)
     }
 
     /// Reverse every undoable receipt, newest first; for keys touched more than once the oldest "before" wins.
-    func restoreAllPlan() -> OperationPlan? {
-        let targets = receipts.filter(\.undoable).sorted { $0.date > $1.date }
+    func restoreAllPlan(engine: EngineMode) -> OperationPlan? {
+        let relevant = receipts.filter { $0.engine == engine && !$0.dryRun && !$0.rolledBack && $0.kind != .undo && $0.kind != .restoreAll }
+        guard !relevant.contains(where: { !$0.undoable && $0.items.contains { $0.outcome == .verified || $0.outcome == .unverified } }) else {return nil}
+        let targets = relevant.filter(\.undoable).sorted { $0.date == $1.date ? $0.id > $1.id : $0.date > $1.date }
         guard !targets.isEmpty else { return nil }
         var order: [PrefKey] = []
         var byKey: [PrefKey: Change] = [:]
         for r in targets {
-            for item in r.items where item.outcome != .failed && item.change.beforeKnown {
-                let inv = item.change.inverted
-                if byKey[inv.target] == nil { order.append(inv.target) }
+            for item in r.items.reversed() {
+                var inv = item.change.inverted
+                if let newest = byKey[inv.target] {
+                    guard newest.after == inv.before else { return nil } // discontinuous history
+                    inv.before = newest.before
+                } else { order.append(inv.target) }
                 byKey[inv.target] = inv
             }
         }
         let changes = order.compactMap { byKey[$0] }
         return OperationPlan(title: "Restore to before Assay", kind: .restoreAll, changes: changes,
                              needsRespring: true, userCheck: "Is your iPhone back to how it was before Assay?",
-                             undoOf: targets.map(\.id))
+                             undoOf: targets.map(\.id), undoEngine: engine)
     }
 
     var needsYouCount: Int {

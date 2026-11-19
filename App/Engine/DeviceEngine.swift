@@ -32,7 +32,7 @@ extension DeviceEngine {
             if canRead {
                 let v = await read(key)
                 if let v, v == s.culpritValue {
-                    findings.append(Finding(id: s.id, title: s.title, reason: s.cause, severity: .attention,
+                    findings.append(Finding(id: s.id, title: s.title, reason: "The selected device reports \(key.key) = \(v.display). This can explain the symptom; appearance is not measured.", severity: .attention,
                         evidence: [Fact(label: "\(key.domain) › \(key.key)", value: v.display, evidence: .observed, source: displayName)],
                         fix: s.plan(current: v), symptomID: s.id, confidence: nil))
                 }
@@ -73,18 +73,24 @@ struct OperationRunner {
         await progress(.snapshot)
         // Re-read every "before" right now so undo reflects reality, not the plan.
         var changes = plan.changes
+        if plan.kind == .undo || plan.kind == .restoreAll {
+            var safe = engine.canRead && plan.undoEngine == engine.mode && !changes.isEmpty
+            if safe { for change in changes { if await engine.read(change.target) != change.before { safe=false; break } } }
+            if !safe {
+                await progress(.done)
+                return Receipt(id:receiptID,date:Date(),title:plan.title,kind:plan.kind,engine:engine.mode,dryRun:dryRun,items:changes.map { .init(change:$0,outcome:.failed,note:"Rollback refused: engine or current values no longer match. Nothing was written.") })
+            }
+        }
         if engine.canRead {
             for i in changes.indices {
                 changes[i].before = await engine.read(changes[i].target)
                 changes[i].beforeKnown = true
             }
         }
-        try? await Task.sleep(for: .milliseconds(500))
         var items: [Receipt.Item] = []
         for (i, c) in changes.enumerated() {
             await progress(.writing(i + 1, changes.count))
             if dryRun {
-                try? await Task.sleep(for: .milliseconds(450))
                 items.append(.init(change: c, outcome: .simulated, note: "Nothing was written"))
             } else {
                 let r = await engine.write(c.target, c.after)
@@ -92,7 +98,6 @@ struct OperationRunner {
             }
         }
         await progress(.verifying)
-        try? await Task.sleep(for: .milliseconds(500))
         await progress(.done)
         return Receipt(id: receiptID, date: Date(), title: plan.title, kind: plan.kind, engine: engine.mode, dryRun: dryRun, items: items)
     }

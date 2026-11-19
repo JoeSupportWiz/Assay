@@ -174,14 +174,14 @@ private struct ThemedBars: ViewModifier {
         switch t.id {
         case .millennium:
             content
-                .toolbarBackground(Color(hex: 0x245EDB), for: .tabBar)
+                .toolbarBackground(Color(hex: 0xE3EACE), for: .tabBar)
                 .toolbarBackground(.visible, for: .tabBar)
-                .toolbarColorScheme(.dark, for: .tabBar)
+                .toolbarColorScheme(.light, for: .tabBar)
         case .pinstripe:
             content
-                .toolbarBackground(Color(hex: 0x1B1B1D), for: .tabBar)
+                .toolbarBackground(Color(hex: 0xDCE2EC), for: .tabBar)
                 .toolbarBackground(.visible, for: .tabBar)
-                .toolbarColorScheme(.dark, for: .tabBar)
+                .toolbarColorScheme(.light, for: .tabBar)
         case .wallpaper:
             content
                 .toolbarBackground(.ultraThinMaterial, for: .tabBar)

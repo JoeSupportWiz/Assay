@@ -398,8 +398,8 @@ struct FixSheet: View {
                     if r.dryRun && model.engine.mode == .demo {
                         Button("Apply in Demo") { receipt = nil; dryRun = false; phase = .review }.buttonStyle(PrimaryButtonStyle())
                             .listRowBackground(Color.clear).listRowInsets(.init())
-                    } else if r.undoable {
-                        Button("Undo this") { model.activePlan = model.receipts.undoPlan(for: r) }.buttonStyle(SecondaryButtonStyle())
+                    } else if let plan = model.receipts.undoPlan(for:r,engine:model.engine.mode) {
+                        Button("Undo this") { model.activePlan = plan }.buttonStyle(SecondaryButtonStyle())
                             .listRowBackground(Color.clear).listRowInsets(.init())
                     }
                 }

@@ -110,6 +110,7 @@ import SwiftUI
                 LabeledContent("Scene", value: sceneLabel)
             }
             LayoutPreviewSections(recipe: snapshot.recipe)
+            NavigationLink { PlacementWalkthrough(snapshot:snapshot) } label: { Label("Placement checklist",systemImage:"checklist") }
             Button("Restore as draft", systemImage: "arrow.uturn.backward") { confirming = true }
                 .confirmationDialog("Replace the current draft?", isPresented: $confirming, titleVisibility: .visible) {
                     Button("Replace draft") { restore(); dismiss() }

@@ -7,6 +7,12 @@
 - Signet matches a public signing certificate to profiles for specified bundle IDs without requesting a private key.
 - Failed receipt items no longer count as verified changes. Old engine readings are cleared when you switch engines.
 
+## Unreleased · Build 7 audit
+- Applied the supplied Fold masters, reduced decorative copy, strengthened caption contrast and removed ambiguous evidence abbreviations.
+- Added Home Screen layout recipes with a manual placement checklist, Palette Lab, scene exchange, local crash review and a saved test bench.
+- Tightened undo: only verified changes from the selected engine, with newer overlapping edits and uncertain history refused.
+- Added `docs/audit/REQUESTS.md`, a request-to-code audit that distinguishes source, fixture, simulator and device evidence.
+
 ## Unreleased · Build 6 review
 - Signet reads bounded per-target entitlement evidence from executables, with explicit Unknown states for unsupported or malformed binaries.
 - Added a verified Assay build library, preset import/export review, optional Assay-only privacy lock and supporter purchase client. No App Store, TestFlight or signed-device verification yet.

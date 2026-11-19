@@ -58,6 +58,7 @@ final class AppModel {
         if let i = args.firstIndex(of: "-route"), i + 1 < args.count {
             let r = args[i + 1]
             if r == "scene-transfer" { selectedTab = .scenes; scenePath = [.transfer]; return }
+            if r == "bench" { selectedTab = .lab; labPath = [.bench]; return }
             if r == "crash-review" { selectedTab = .lab; labPath = [.crashReview]; return }
             if r == "layout-planner" { selectedTab = .scenes; scenePath = [.layout]; return }
             if r == "alchemy" { selectedTab = .studio; studioPath = [.module(.alchemy)]; return }
@@ -144,7 +145,7 @@ final class AppModel {
     @MainActor func execute(_ plan: OperationPlan, dryRun: Bool, progress: @escaping @MainActor (OperationRunner.Stage) -> Void) async -> Receipt {
         let r = await OperationRunner.run(plan, engine: engine, dryRun: dryRun, receiptID: receipts.nextID, progress: progress)
         receipts.add(r)
-        if !dryRun && !plan.undoOf.isEmpty && r.status != .failed { receipts.markRolledBack(plan.undoOf) }
+        receipts.acknowledgeUndo(plan, result: r)
         if !dryRun { tweaks.discard(); await tweaks.load(engine: engine); await runCheck() }
         return r
     }
@@ -188,7 +189,7 @@ enum StudioRoute: Hashable {
 
 /// Screens pushed inside the Lab tab.
 enum LabRoute: Hashable {
-    case diagnose, history, bluetooth, network, minis, displayCheck, fileVault, crashReview
+    case diagnose, history, bluetooth, network, minis, displayCheck, fileVault, crashReview, bench
     case symptom(String)
     case receipt(Int)
 }

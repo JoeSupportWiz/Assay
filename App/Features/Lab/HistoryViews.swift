@@ -9,19 +9,19 @@ struct HistoryView: View {
             if model.receipts.receipts.isEmpty {
                 Section {
                     ContentUnavailableView("Nothing yet", systemImage: "clock.arrow.circlepath",
-                        description: Text("Every change Assay makes leaves a receipt here, with a way to undo it."))
+                        description: Text("Completed checks and changes leave receipts here. An undo is offered only for verified reversible changes."))
                 }.listRowBackground(Color.clear)
             } else {
                 Section {
                     LabeledContent("Changes made") { Text("\(model.receipts.changeCount)").monospacedDigit() }
                     LabeledContent("Can't be undone") { Text("\(model.receipts.needsYouCount)").monospacedDigit() }
-                    if let plan = model.receipts.restoreAllPlan() {
+                    if let plan = model.receipts.restoreAllPlan(engine:model.engine.mode) {
                         Button { model.activePlan = plan } label: { Text("Restore to before Assay") }
                             .buttonStyle(SecondaryButtonStyle())
                             .listRowBackground(Color.clear).listRowInsets(.init())
                     }
                 } footer: {
-                    Text("Restore reverses every change that was saved first, newest to oldest. Anything marked unverified is left alone and listed.")
+                    Text("Undo is limited to verified changes from the selected engine. If a value or its history is uncertain, Assay leaves it alone.")
                 }.rowCard()
 
                 ForEach(grouped, id: \.0) { day, items in
@@ -104,9 +104,9 @@ struct ReceiptView: View {
                     }
                 }.rowCard()
 
-                if r.undoable {
+                if let plan = model.receipts.undoPlan(for:r,engine:model.engine.mode) {
                     Section {
-                        Button { model.activePlan = model.receipts.undoPlan(for: r) } label: { Text("Undo \(r.reversibleCount) change\(r.reversibleCount == 1 ? "" : "s")") }
+                        Button { model.activePlan = plan } label: { Text("Undo \(r.reversibleCount) change\(r.reversibleCount == 1 ? "" : "s")") }
                             .buttonStyle(SecondaryButtonStyle()).listRowBackground(Color.clear).listRowInsets(.init())
                     }
                 }

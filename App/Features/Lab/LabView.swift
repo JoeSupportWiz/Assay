@@ -37,6 +37,7 @@ struct LabView: View {
                 NavigationLink(value: LabRoute.displayCheck) { Label("Clock & Lock Screen", systemImage: "clock") }
                 NavigationLink(value: LabRoute.minis) { Label("Analyse with Minis", systemImage: "doc.text.magnifyingglass") }
                 NavigationLink(value: LabRoute.diagnose) { Label("Diagnose a problem", systemImage: "text.magnifyingglass") }
+                NavigationLink(value: LabRoute.bench) { Label("Test bench", systemImage: "checklist") }
                 NavigationLink(value: LabRoute.crashReview) { Label("Read a crash report", systemImage: "doc.text.magnifyingglass") }
                 NavigationLink(value: LabRoute.history) {
                     HStack {

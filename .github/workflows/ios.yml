@@ -44,6 +44,10 @@ jobs:
           swiftc -parse-as-library App/Core/Catalog.swift App/Features/PresetFiles/PortableEdits.swift tests/preset-files/Fixture.swift -o "$RUNNER_TEMP/preset-test"
           "$RUNNER_TEMP/preset-test"
           sh tests/build-library/run.sh
+          swiftc -parse-as-library App/Core/Operations.swift tests/rollback-review/Fixture.swift -o "$RUNNER_TEMP/rollback-test"
+          "$RUNNER_TEMP/rollback-test"
+          swiftc -parse-as-library App/Features/TestBench/BenchArchive.swift tests/test-bench/Fixture.swift -o "$RUNNER_TEMP/bench-test"
+          "$RUNNER_TEMP/bench-test"
           bash tests/layout-studio/smoke.sh
           bash tests/scene-transfer/smoke.sh
           bash tests/palette-lab/smoke.sh

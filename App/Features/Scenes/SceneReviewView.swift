@@ -8,6 +8,9 @@ import SwiftUI
     @State private var editing: SavedScene?
     @State private var confirmDelete = false
     @State private var problem = ""
+    @State private var linked: LayoutSnapshot?
+    @State private var showLinked = false
+    @State private var offerLinked = false
 
     var body: some View {
         if let scene = library.state.scene(sceneID) {
@@ -21,7 +24,7 @@ import SwiftUI
                         Label("Active in Assay", systemImage: "checkmark.circle")
                     } else {
                         Button("Activate scene", systemImage: "checkmark.circle") {
-                            do { try library.activate(scene, reviewedFrom: before, on: model); dismiss() }
+                            do { try library.activate(scene, reviewedFrom: before, on: model); if linked != nil { offerLinked = true } else { dismiss() } }
                             catch { problem = error.localizedDescription }
                         }
                     }
@@ -39,6 +42,7 @@ import SwiftUI
                 } header: { Text("Manual placement") } footer: {
                     Text("Nothing here is applied to your wallpaper, icons or widgets.")
                 }
+                if let linked { Section("Linked Home Screen plan") { NavigationLink {PlacementWalkthrough(snapshot:linked)} label: {Label(linked.recipe.title,systemImage:"square.grid.3x3")} } }
                 Section("Wallpaper artwork") { SceneWallpaperOutput(palette: scene.appearance.palette) }
                 Section {
                     Button("Edit scene", systemImage: "pencil") { editing = scene }
@@ -55,6 +59,9 @@ import SwiftUI
             .navigationTitle(scene.name)
             .navigationBarTitleDisplayMode(.inline)
             .sheet(item: $editing) { SceneEditorView(initial: $0, creating: false) }
+            .task(id:sceneID) { do { linked=try LayoutArchive.local().load().first { $0.recipe.sceneID==sceneID } } catch { problem="Saved layout history could not be read." } }
+            .confirmationDialog("Review this scene’s Home Screen plan?",isPresented:$offerLinked,titleVisibility:.visible){Button("Review placement guide"){showLinked=true};Button("Not now",role:.cancel){}} message:{Text("The Assay appearance changed. Your icons and widgets have not moved.")}
+            .sheet(isPresented:$showLinked){if let linked {NavigationStack {PlacementWalkthrough(snapshot:linked).toolbar{ToolbarItem(placement:.confirmationAction){Button("Done"){showLinked=false}}}}}}
             .sceneProblem($problem)
         } else {
             ContentUnavailableView("Scene unavailable", systemImage: "square.2.layers.3d")

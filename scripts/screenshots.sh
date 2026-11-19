@@ -40,6 +40,7 @@ for look in light dark; do
     shot "02-lab-$look" "$look" -uiDemo -tab lab
     shot "29-layout-$look" "$look" -uiDemo -route layout-planner -layoutSample
     shot "30-scene-transfer-$look" "$look" -uiDemo -route scene-transfer
+    shot "34-bench-$look" "$look" -uiDemo -route bench
     shot "31-crash-review-$look" "$look" -uiDemo -route crash-review
     continue
   fi
@@ -95,8 +96,8 @@ if [[ "${ASSAY_CAPTURE_SET:-all}" == "brand-audit" ]]; then
   shot "01-home-millennium" light -uiDemo -tab home -theme millennium
   shot "01-home-pinstripe" light -uiDemo -tab home -theme pinstripe
   xcrun simctl ui "$UDID" content_size accessibility-extra-extra-extra-large
-  shot "32-studio-accessibility" light -uiDemo -tab studio
-  shot "33-onboarding-accessibility" dark -onboarding
+  shot "32-studio-accessibility" light -uiDemo -tab studio -theme light
+  shot "33-onboarding-accessibility" dark -onboarding -theme dark
   xcrun simctl ui "$UDID" content_size large
 fi
 # Contact sheet for quick review

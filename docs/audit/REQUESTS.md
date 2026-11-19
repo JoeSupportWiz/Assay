@@ -1,8 +1,8 @@
-# Assay request audit · 0.3.0 (6)
+# Assay request audit · 0.3.0 (7)
 
 **The two problems that started this project are not fixed on a real iPhone by this build.** Assay can compare a reported 09:41 with the live clock and inspect a selected log for the green-line setting. Only Demo can change those settings. Nor does File Vault create the protective device backup needed for that repair. Signing an IPA, installing it and authorising protected device operations are three separate gates.
 
-**Basis:** maker's private-chat requests as relayed for this audit (paraphrase, not a transcript); `Assay-Design-Bundle.zip` → `bundle/PRODUCT_BRIEF.md` §§4–8 and `DESIGN_SPEC.md` §8.0; `Assay-Feature-Expansion.zip` → `feature-expansion/screens/x01…x20` and corresponding prototypes; [roadmap](../ROADMAP.md), [build 6 verification](../features/build6.md), feature notes, code and fixtures at `0fe6df8`. This audit did not inspect chat sessions, run CI, install an IPA, use credentials or change an account. A bundle image establishes intent, not delivery.
+**Basis:** maker's private-chat requests as relayed for this audit (paraphrase, not a transcript); `Assay-Design-Bundle.zip` → `bundle/PRODUCT_BRIEF.md` §§4–8 and `DESIGN_SPEC.md` §8.0; `Assay-Feature-Expansion.zip` → `feature-expansion/screens/x01…x20` and corresponding prototypes; [roadmap](../ROADMAP.md), [build 6 verification](../features/build6.md), feature notes, code and fixtures at `0fe6df8` for the original findings. Build 7 changes are listed in “Closed in build 7”. This audit did not inspect chat sessions, run CI, install an IPA, use credentials or change an account. A bundle image establishes intent, not delivery.
 
 **Reading the tables:** **Built** = implementation of the narrowly named workflow; **Partial** = only some of the requested outcome; **Missing** = no implementation found; **Blocked** = end-to-end result needs an unavailable authority, transport or platform capability. Evidence after the status: **source**, **fixture** (synthetic/offline), **sim** (documented Simulator build/preview), **demo** (synthetic device). No physical, live-provider, live-store or live-account acceptance is credited. File paths are repo-relative; short feature names below are under `App/Features/`.
 
@@ -93,6 +93,18 @@ IDs follow the archive's `xNN-…` filenames (x20 uses `prototype/mac.html`). Li
 | X19 | Assay Pro | **Built (optional supporter client) · fixture/sim.** `Supporter/`, `tests/supporter/`. Latest free-core decision replaces proposed paywalls/hosted credits. Local entitlement tests do not establish real SKUs or storefront success. |
 | X20 | Mac companion | **Blocked · adjacent fixture.** The standalone `Mac/usb-backup/` CLI is not a GUI or an integrated device/signing/logs dashboard. `MacCompanionEngine` is unavailable. Start with a mutually approved read-only status handshake; keep iPhone-only mode independent. |
 
+## Closed in build 7 (source + simulator or fixture only)
+
+| Audited ID | Change | Evidence | Still not proven |
+|---|---|---|---|
+| C2, C6 | Seven editable layout recipes and a resumable manual placement checklist. Activating a scene can offer its linked plan without moving anything. | `LayoutStudio/`, `Scenes/SceneReviewView.swift`, `tests/layout-studio` | No Home Screen read-back, system placement or wallpaper-change trigger. |
+| C4, X06 | Palette Lab extracts five swatches from a selected image and warns about contrast for the selected swatch. | `PaletteLab/`, `tests/palette-lab` | Not a whole-photo subject-overlap analysis. |
+| X09 | Scene export/import creates a new inert local scene after a reviewed, bounded JSON preview. | `SceneTransfer/`, `tests/scene-transfer` | No signed asset package, licence manifest or sender provenance. |
+| T04, X13 | Local `.ips` crash review shows an allowlisted explanation and shares only reviewed text. | `CrashReview/`, `tests/crash-review` | No sysdiagnose archive parser or root-cause claim. |
+| T16, X02 (local) | Saved diagnostic checklists record selected facts, keep source-specific history and show OS version differences. Missing checks are not passes. | `TestBench/`, `tests/test-bench` | No automatic post-update monitor, community radar or unique-device identity. |
+| X01 | Rollback is limited to verified same-engine changes, refuses newer overlapping edits and disconnected chains, and acknowledges only verified completion. | `Core/Operations.swift`, `Engine/DeviceEngine.swift`, `tests/rollback-review` | Demo preferences remain the only writable backend. |
+| R13 | Supplied Fold masters now provide the app icon, two alternate icons, five tab glyphs and nine tool glyphs; CI compares their hashes. Home, Studio and Fix copy was reduced and made evidence-first. | `docs/audit/identity-assets.json`, `scripts/check-fold-assets.py`, `docs/audit/fold-*.jpg` | Real-device launch icon behaviour, Reduce Motion and VoiceOver have not been tested. |
+
 ## First actionable gaps, in order
 
 1. **Repair evidence before repair claims:** exercise 09:41 and green-line reporting separately; preserve prior values and distinguish unknown live state, preview, verified readback and the person's visual confirmation. Until an authorised engine exists, don't label a phone fixed.
@@ -101,4 +113,4 @@ IDs follow the archive's `xNN-…` filenames (x20 uses `prototype/mac.html`). Li
 4. **Deliver the first wallpaper-linked layout without privileged access:** editable, local layout recipe → before/after preview → guided placements → user-confirmed result and restoration. Then add portability and Focus/Shortcuts. Never silently move icons.
 5. **Separate remaining acceptance lanes:** fixtures first; simulator screenshots for UI review; then, only when approved, signed-device checks for controls/widgets/Live Activity, lock, Files, BLE/LAN and provider consent. StoreKit local/sandbox and any real developer-team operation are separate from those lanes.
 
-**Coverage:** 14 maker/decision groups, 7 creative workflow rows (plus the 7 named recipe examples), 20 technical ideas and 20 expansion concepts. These are **61 traceability rows**, not 61 distinct features: for example the same iPhone target inspector is appropriately cited under the installer, the signing matrix and x04. The brief's separate entries for target signing, operation receipts, baseline reuse and loopback are covered in R02–R05/T03, not silently dropped from the technical twenty.
+**Coverage after build 7:** the original 61 rows are unchanged as an audit baseline. This section lists what moved; it does not erase the earlier gaps. The next real acceptance lane is a signed-device test, not additional screenshots. **Original coverage:** 14 maker/decision groups, 7 creative workflow rows (plus the 7 named recipe examples), 20 technical ideas and 20 expansion concepts. These are **61 traceability rows**, not 61 distinct features: for example the same iPhone target inspector is appropriately cited under the installer, the signing matrix and x04. The brief's separate entries for target signing, operation receipts, baseline reuse and loopback are covered in R02–R05/T03, not silently dropped from the technical twenty.
