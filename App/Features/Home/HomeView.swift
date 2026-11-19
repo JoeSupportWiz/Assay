@@ -87,7 +87,7 @@ struct SearchPill: View {
         Button(action: action) {
             HStack(spacing: 12) {
                 Image(systemName: "magnifyingglass").font(.system(size: 18, weight: .medium))
-                Text("Search tweaks, profiles, assets…").font(.system(size: 15))
+                Text("Search tweaks, profiles, assets…").font(.system(size: 15)).lineLimit(1).minimumScaleFactor(0.85)
                 Spacer()
                 Image(systemName: "sparkles").font(.system(size: 16, weight: .semibold)).foregroundStyle(t.ink)
                     .frame(width: 38, height: 38).background(t.soft, in: Circle())
@@ -111,7 +111,7 @@ struct HealthCard: View {
                 HStack(alignment: .bottom) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(snapshot?.healthScore.map(String.init) ?? "—").font(Typo.display(44, .bold, t)).monospacedDigit().foregroundStyle(t.heroInk)
-                        Text(snapshot?.healthScore == nil ? "Run a check" : "All checks passed").font(.system(size: 12)).foregroundStyle(t.heroInk.opacity(0.65))
+                        Text(snapshot?.healthScore == nil ? "Run a check" : "All passed").font(.system(size: 12)).lineLimit(1).foregroundStyle(t.heroInk.opacity(0.65))
                     }
                     Spacer()
                     Ring(progress: Double(snapshot?.healthScore ?? 0) / 100, lineWidth: 7, tint: Palette.mint).frame(width: 52, height: 52)

@@ -66,6 +66,8 @@ Built in order, one shippable slice at a time. Each slice ends with simulator sc
 | 6.3 | App Store Connect API key: certificates, profiles, devices, expiry | ○ 🔒 |
 | 6.4 | Per-target sign & verify, build receipts | ○ 🔒 |
 | 6.5 | Expiry calendar (x12) + renewal assistant | ○ |
+| 6.6 | **In-app installer/signer** — pulls the build, reads every target's entitlements, creates bundle IDs, capabilities and per-target profiles, signs each part, verifies, installs | ○ 🔒 |
+| 6.7 | Sign-in: App Store Connect API key (default, official) · Apple ID login (opt-in, labelled risky, free accounts) · or import your own .p12 + profiles and Assay checks their entitlements against each target | ○ |
 
 ## Phase 7 — Lab & Tools
 | # | Slice | Status |
