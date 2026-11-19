@@ -47,3 +47,6 @@ Folders: `App/Features/Alchemy/` and `App/Core/AI*.swift`. Root view: `AlchemyRo
 - Local-network Ollama needs the iOS Local Network permission (already declared in `project.yml`). Plain `http://` to a LAN address may be blocked by App Transport Security unless the lead adds `NSAppTransportSecurity > NSAllowsLocalNetworking = YES` to Info.plist (see the hand-off note).
 - A custom host name that resolves to a private address but is not `.local` is treated as hosted (the safe assumption), so it asks for consent.
 - Consent is stored in `UserDefaults` as provider ids only (no keys).
+
+## Integration safeguards
+Hosted-provider keys are used only at the fixed provider endpoint. Custom keys and saved consent are scoped to the configured URL; changing a custom URL does not reuse its old key. Key-bearing requests require HTTPS, including on a LAN. Keyless Ollama may use local HTTP. Redirects are refused. Test with a sample key or Demo first; no real paid requests are part of simulator CI.

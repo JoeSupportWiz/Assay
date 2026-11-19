@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased · Studio and Lab integration
+- Added [four feature test cards](docs/features/README.md): Bluetooth notebook, local network inventory, Signet IPA inspection and Alchemy chat. Simulator coverage is not live hardware or provider verification.
+- Added an explicit, advice-only AI second opinion in Diagnose; keyword matching still works offline.
+- Scoped custom AI credentials and hosted consent to their configured endpoints; credentials are never sent over HTTP.
+
 ## 0.2.0 — Phase 1 · Safety core
 - **New** Every change goes through one pipeline: current value re-read, exact diff shown, written, read back, receipt kept.
 - **New** Undo history: per-change undo, and Restore to before Assay. Changes that couldn't be read first are listed as not undoable.

@@ -6,11 +6,12 @@
 <p align="center">
   <img alt="iOS 17+" src="https://img.shields.io/badge/iOS-17%2B-111113?style=for-the-badge&logo=apple&logoColor=white">
   <img alt="SwiftUI" src="https://img.shields.io/badge/SwiftUI-7C5CFF?style=for-the-badge&logo=swift&logoColor=white">
-  <img alt="Phase 0" src="https://img.shields.io/badge/phase-0%20%C2%B7%20foundation-FFE58A?style=for-the-badge&labelColor=111113">
+  <img alt="Simulator preview" src="https://img.shields.io/badge/build-simulator%20preview-FFE58A?style=for-the-badge&labelColor=111113">
   <img alt="Proprietary" src="https://img.shields.io/badge/licence-proprietary-FF7A3D?style=for-the-badge&labelColor=111113">
 </p>
 
 <p align="center">
+  <a href="docs/features/README.md"><b>Test the four new tools</b></a>&nbsp;&nbsp;·&nbsp;&nbsp;
   <a href="docs/ROADMAP.md"><b>Roadmap</b></a>&nbsp;&nbsp;·&nbsp;&nbsp;
   <a href="docs/app-screens/README.md"><b>App screenshots</b></a>&nbsp;&nbsp;·&nbsp;&nbsp;
   <a href="docs/GALLERY.md"><b>Design gallery</b></a>&nbsp;&nbsp;·&nbsp;&nbsp;
@@ -92,14 +93,14 @@ Switch any time in **More › Engine**. A **Demo** engine lets you explore with 
 | Module | | What it does | Status |
 |:--|:--|:--|:--|
 | **Scenes** | ◧ | Wallpaper, layout, widgets, Shortcuts and Focus, saved together · guided apply · snapshots | 🔨 landing |
-| **Gild** | ☰ | Tweak catalogue with safety tiers, presets, compatibility, custom builder | ○ Phase 2 |
+| **Gild** | ☰ | Tweak catalogue with safety tiers, presets, compatibility, custom builder | Catalogue and staged review · demo writes |
 | **Canvas** | ✦ | `.tendies` / Poster projects — layers, timeline, validate, export | ○ Phase 4 |
 | **Cards** | ▭ | Wallet card visuals. Visual only — never payment data | ○ Phase 4 |
-| **Alchemy** | ✧ | AI assets with Minis, hosted providers or local Ollama | ○ Phase 5 |
-| **Signet** | ◎ | In-app installer & signer: per-target profiles, entitlements, expiry | ○ Phase 6 |
+| **Alchemy** | ✧ | AI assets with Minis, hosted providers or local Ollama | Chat · demo and provider configuration |
+| **Signet** | ◎ | In-app installer & signer: per-target profiles, entitlements, expiry | Inspector only · no signing |
 | **Lab** | ⊙ | Device check, passport, diagnose, fix flow with receipts | ✅ passport |
 | **Vault** | ⬓ | Resumable backups, baseline reuse, honest Live Activity, undo | ○ Phase 3 |
-| **Tools** | ⌁ | BLE notebook, Bonjour inventory, TLS certificate check | ○ Phase 7 |
+| **Tools** | ⌁ | BLE notebook, Bonjour inventory, TLS certificate check | Simulator preview · hardware tests pending |
 
 ## ◎ Design → built
 
