@@ -99,7 +99,8 @@ struct StudioRoot: View {
                         case .gild: GildView()
                         case .alchemy: AlchemyRootView()
                         case .signet: SignetRootView()
-                        default: ModuleComingView(module: m)
+                        case .canvas: CanvasRootView()
+                        case .cards: CardArtRootView()
                         }
                     case .appleTeam: AppleTeamView()
                     case .signerPreflight: SignerPreflightView()

@@ -33,7 +33,12 @@ shot() { # name, appearance, args...
 }
 
 for look in light dark; do
+  if [[ "${ASSAY_CAPTURE_SET:-all}" != "four-utilities" ]]; then
+    shot "23-canvas-$look" "$look" -uiDemo -route canvas -canvasSample
+    shot "24-cards-$look" "$look" -uiDemo -route cards
+  fi
   shot "22-apple-team-$look" "$look" -uiDemo -route apple-team
+  if [[ "${ASSAY_CAPTURE_SET:-all}" == "studio" ]]; then continue; fi
   shot "18-clock-evidence-$look" "$look" -route display-check -uiDemo
   shot "19-file-vault-$look" "$look" -route file-vault -uiDemo
   shot "20-scenes-library-$look" "$look" -tab scenes -uiDemo
@@ -58,7 +63,7 @@ for look in light dark; do
   shot "16-minis-$look"       "$look" -uiDemo -route minis-report
   shot "17-minis-review-$look" "$look" -uiDemo -route minis-report -minisReportPreview
 done
-if [[ "${ASSAY_CAPTURE_SET:-all}" != "four-utilities" ]]; then
+if [[ "${ASSAY_CAPTURE_SET:-all}" == "all" ]]; then
 shot "01-home-millennium" light -uiDemo -tab home -theme millennium
 shot "01-home-pinstripe"  light -uiDemo -tab home -theme pinstripe
 shot "01-home-wallpaper"  dark  -uiDemo -tab home -theme wallpaper

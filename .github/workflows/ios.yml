@@ -10,7 +10,7 @@ on:
       capture_set:
         description: "Full gallery or the four new utility screens"
         type: choice
-        options: [all, four-utilities]
+        options: [all, four-utilities, studio]
         default: all
       commit_screens:
         description: "Commit screenshots to docs/app-screens"
@@ -42,6 +42,8 @@ jobs:
           swiftc -parse-as-library App/Features/AppleTeam/TeamPortal.swift tests/apple-team/TeamFixture.swift -o "$RUNNER_TEMP/team-test"
           "$RUNNER_TEMP/team-test"
           bash tests/file-vault/run.sh
+          swiftc -parse-as-library App/Features/Canvas/CanvasArchive.swift App/Features/Signet/SignetZip.swift tests/canvas/Fixture.swift -o "$RUNNER_TEMP/canvas-test"
+          "$RUNNER_TEMP/canvas-test" App/ArtResources/AssayCanvasSample.zip
           bash tests/scenes/smoke.sh
           swiftc -parse-as-library App/Features/DisplayCheck/DisplayEvidence.swift tests/display-check/Smoke.swift -o "$RUNNER_TEMP/clock-fixture"
           "$RUNNER_TEMP/clock-fixture"

@@ -8,9 +8,21 @@ private struct TeamProfileDocument: FileDocument {
     func fileWrapper(configuration:WriteConfiguration)throws->FileWrapper{FileWrapper(regularFileWithContents:data)}
 }
 @MainActor struct AppleTeamView: View {
-    @State private var issuer="", keyID="", name="", bundle="", certificate="", phone="", message=""
-    @State private var credential:TeamCredential?, inventory:TeamInventory?, review:TeamGrant?, exported:TeamProfileDocument?
-    @State private var pick=false, busy=false, confirm=false, save=false
+    @State private var issuer=""
+    @State private var keyID=""
+    @State private var name=""
+    @State private var bundle=""
+    @State private var certificate=""
+    @State private var phone=""
+    @State private var message=""
+    @State private var credential: TeamCredential?
+    @State private var inventory: TeamInventory?
+    @State private var review: TeamGrant?
+    @State private var exported: TeamProfileDocument?
+    @State private var pick=false
+    @State private var busy=false
+    @State private var confirm=false
+    @State private var save=false
     @State private var generation=UUID()
     var body:some View {
         List {
