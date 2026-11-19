@@ -27,12 +27,15 @@ shot() { # name, appearance, args...
 }
 
 for look in light dark; do
-  shot "00-onboarding-$look" "$look" -onboarding
-  shot "01-home-$look"       "$look" -uiDemo -tab home
-  shot "02-scenes-$look"     "$look" -uiDemo -tab scenes
-  shot "03-studio-$look"     "$look" -uiDemo -tab studio
-  shot "04-lab-$look"        "$look" -uiDemo -tab lab
-  shot "05-more-$look"       "$look" -uiDemo -tab more
+  shot "00-onboarding-$look"  "$look" -onboarding
+  shot "01-home-$look"        "$look" -uiDemo -tab home
+  shot "02-lab-$look"         "$look" -uiDemo -tab lab
+  shot "03-diagnose-$look"    "$look" -uiDemo -route diagnose
+  shot "04-symptom-$look"     "$look" -uiDemo -route symptom:clock-941
+  shot "05-fix-review-$look"  "$look" -uiDemo -route fix:clock-941
+  shot "06-history-$look"     "$look" -uiDemo -route history
+  shot "07-studio-$look"      "$look" -uiDemo -tab studio
+  shot "08-more-$look"        "$look" -uiDemo -tab more
 done
 shot "01-home-millennium" light -uiDemo -tab home -theme millennium
 shot "01-home-pinstripe"  light -uiDemo -tab home -theme pinstripe

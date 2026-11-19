@@ -1,0 +1,18 @@
+<!-- tab:lab -->
+<div class="top rise" style="--d:0"><span class="circ back"><svg width="11" height="18" viewBox="0 0 11 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2 2 9l7 7"/></svg></span><span class="tag neutral" style="height:34px;padding:0 14px;font-size:13px">Opened from Files</span></div>
+<div class="rise" style="--d:0;display:flex;gap:14px;align-items:center;padding:14px 20px 0">
+  <div class="tile3d" style="width:64px;height:64px;border-radius:16px;background:var(--g2);display:flex;align-items:center;justify-content:center;color:#fff;flex:none"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg></div>
+  <div><div class="disp" style="font-size:24px;font-weight:700">Assay.ipa</div><div class="mono" style="font-size:12px;color:var(--ink-2);margin-top:2px">com.joe.assay · 1.4 (212) · 38.2 MB</div></div>
+</div>
+<div class="rise" style="--d:1;margin-top:14px;overflow:hidden"><div class="scroll-x"><span class="fchip on">Summary</span><span class="fchip">Entitlements</span><span class="fchip">Info.plist</span><span class="fchip">Frameworks</span><span class="fchip">Privacy</span></div></div>
+<div class="rise" style="--d:2;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 20px 0">
+  <div class="card" style="padding:14px"><div style="font-size:12px;color:var(--ink-2)">Signature</div><div style="font-weight:700;font-size:16px;margin-top:4px">Unsigned</div><span class="tag neutral" style="margin-top:8px">Ready for Signet</span></div>
+  <div class="card" style="padding:14px"><div style="font-size:12px;color:var(--ink-2)">Targets</div><div style="font-weight:700;font-size:16px;margin-top:4px">1 app · 3 appex</div><span class="tag obs" style="margin-top:8px">Read from bundle</span></div>
+</div>
+<div class="h2 rise" style="--d:3"><b>Checks</b><span>7 of 9 passed</span></div>
+<div class="rise card list" style="--d:4">
+  <div class="row"><div class="ic" style="background:#BDF3D7;color:#0D5C37"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></div><div class="rt"><b>Privacy manifest present</b><small>PrivacyInfo.xcprivacy · 4 required-reason APIs declared</small></div></div>
+  <div class="row"><div class="ic" style="background:#FFE58A;color:#5A4300"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 8v5M12 16.5v.5"/></svg></div><div class="rt"><b>Widget appex has no manifest</b><small>Required for UserDefaults access</small></div><span class="tag cau">Fix</span></div>
+  <div class="row"><div class="ic" style="background:#FFD6BF;color:#8A3300"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12a7 7 0 0 1 14 0"/></svg></div><div class="rt"><b>Tunnel requests packet-tunnel-provider</b><small>Not in your profile · see entitlement diff</small></div><span class="tag exp">Mismatch</span></div>
+</div>
+<div class="rise diff mono" style="--d:5;margin:12px 20px 0"><span class="c"># Tunnel.appex entitlements</span><br><span class="p">+ com.apple.developer.networking.networkextension</span><br><span class="m">  profile: not authorised</span></div>

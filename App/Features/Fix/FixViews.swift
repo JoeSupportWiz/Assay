@@ -1,0 +1,339 @@
+import SwiftUI
+
+// MARK: - Diagnose
+
+struct DiagnoseView: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.theme) private var t
+    @State private var text = ""
+    @State private var showAll = false
+    @FocusState private var focused: Bool
+
+    private var matches: [(Symptom, Int)] { Knowledge.match(text) }
+
+    var body: some View {
+        List {
+            Section {
+                TextField("Describe it, e.g. clock stuck at 9:41", text: $text, axis: .vertical)
+                    .focused($focused)
+                    .submitLabel(.search)
+            } footer: { Text("Matches your words against known problems. Nothing is sent anywhere.") }.rowCard()
+
+            if !text.trimmingCharacters(in: .whitespaces).isEmpty {
+                Section(matches.isEmpty ? "No match" : "Best matches") {
+                    if matches.isEmpty {
+                        Text("Nothing in the catalogue matches that yet. Try different words, or pick from the list below. Once an AI provider is connected, Assay can reason about problems that aren't listed.")
+                            .font(.system(size: 14)).foregroundStyle(t.ink2)
+                    }
+                    ForEach(matches.prefix(4), id: \.0.id) { s, _ in row(s) }
+                }.rowCard()
+            }
+
+            Section(text.isEmpty ? "Common problems" : "All problems") {
+                ForEach(Knowledge.symptoms) { s in row(s) }
+            }.rowCard()
+        }
+        .themedList()
+        .navigationTitle("Diagnose")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func row(_ s: Symptom) -> some View {
+        NavigationLink(value: LabRoute.symptom(s.id)) {
+            HStack(spacing: 12) {
+                IconTile(symbol: s.symbol, hue: .lilac)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(s.title).font(.system(size: 16, weight: .medium)).foregroundStyle(t.ink)
+                    Text(s.detail).font(.system(size: 13)).foregroundStyle(t.ink2).lineLimit(2)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Symptom: what we found and what we'd do
+
+struct SymptomView: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.theme) private var t
+    let id: String
+    @State private var current: PlistValue?
+    @State private var loaded = false
+
+    private var symptom: Symptom? { Knowledge.symptoms.first { $0.id == id } }
+
+    var body: some View {
+        if let s = symptom {
+            List {
+                Section {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(s.title).font(.system(size: 22, weight: .bold)).foregroundStyle(t.ink)
+                        Text(s.detail).foregroundStyle(t.ink2)
+                    }
+                }.rowCard()
+
+                Section("What we think is happening") {
+                    Text(s.cause).foregroundStyle(t.ink)
+                    HStack { Tag(style: .inferred(s.confidence)); Text("Matches reports, not proof for your phone").font(.system(size: 12.5)).foregroundStyle(t.ink3) }
+                }.rowCard()
+
+                if let key = s.culprit {
+                    Section("On your device") {
+                        LabeledContent("Setting") { Text(key.key).font(.system(size: 12.5, design: .monospaced)).multilineTextAlignment(.trailing) }
+                        LabeledContent("Domain") { Text(key.domain).font(.system(size: 12.5, design: .monospaced)).multilineTextAlignment(.trailing) }
+                        if !loaded {
+                            HStack { Text("Current value"); Spacer(); ProgressView() }
+                        } else if model.engine.canRead {
+                            LabeledContent("Current value") {
+                                HStack(spacing: 6) {
+                                    Text(current?.display ?? "not set")
+                                    Tag(style: .observed)
+                                }
+                            }
+                        } else {
+                            LabeledContent("Current value") { HStack(spacing: 6) { Text("Can't read yet"); Tag(style: .unknown) } }
+                        }
+                    }.rowCard()
+
+                    Section {
+                        Button { model.activePlan = s.plan(current: current) } label: { Text("Review the fix") }
+                            .buttonStyle(PrimaryButtonStyle())
+                            .disabled(model.engine.canRead && loaded && current != s.culpritValue)
+                            .listRowBackground(Color.clear).listRowInsets(.init())
+                    } footer: {
+                        if model.engine.canRead && loaded && current != s.culpritValue {
+                            Text("This setting isn't on, so it isn't the cause here.")
+                        } else if !model.engine.canRead {
+                            Text("This engine can't read or write yet. You can still review exactly what would change.")
+                        } else {
+                            Text("You'll see exactly what changes, and can do a dry run first.")
+                        }
+                    }
+                } else {
+                    Section("What helps") {
+                        Text("Backups run through an on-device tunnel that can lose packets. Keep Assay open with the screen on, turn Low Power Mode off, and choose the Mac companion engine for the fastest, most reliable backups.")
+                            .foregroundStyle(t.ink)
+                    }.rowCard()
+                }
+            }
+            .themedList()
+            .navigationTitle("Problem")
+            .navigationBarTitleDisplayMode(.inline)
+            .task(id: model.findings.count) {
+                if let key = s.culprit { current = await model.engine.read(key) }
+                loaded = true
+            }
+        } else {
+            ContentUnavailableView("Unknown problem", systemImage: "questionmark.circle")
+        }
+    }
+}
+
+// MARK: - Fix sheet: review → run → result
+
+struct FixSheet: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.theme) private var t
+    @Environment(\.dismiss) private var dismiss
+    let plan: OperationPlan
+
+    enum Phase: Equatable { case review, running(OperationRunner.Stage), result(Int) }
+    @State private var phase: Phase = .review
+    @State private var dryRun = false
+    @State private var understood = false
+    @State private var receipt: Receipt?
+
+    var body: some View {
+        NavigationStack {
+            Group {
+                switch phase {
+                case .review: review
+                case .running(let s): running(s)
+                case .result: result
+                }
+            }
+            .themedList()
+            .navigationTitle(plan.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    if case .running = phase { EmptyView() } else { Button(receipt == nil ? "Cancel" : "Done") { dismiss() } }
+                }
+            }
+        }
+        .interactiveDismissDisabled({ if case .running = phase { return true } else { return false } }())
+    }
+
+    // MARK: Review
+
+    private var review: some View {
+        List {
+            Section("What will change") {
+                ForEach(plan.changes) { c in
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack { Text(c.label).font(.system(size: 16, weight: .semibold)).foregroundStyle(t.ink); Spacer(); Tag(style: c.tier.tag) }
+                        diff(c)
+                        Text("\(c.target.domain) › \(c.target.key)").font(.system(size: 11.5, design: .monospaced)).foregroundStyle(t.ink3)
+                    }.padding(.vertical, 2)
+                }
+            }.rowCard()
+
+            Section("Safety") {
+                Label("Current values are read again right before writing.", systemImage: "arrow.triangle.2.circlepath")
+                Label(plan.changes.allSatisfy(\.beforeKnown) ? "Every change can be undone from Undo history." : "Some values can't be read first, so those can't be undone.",
+                      systemImage: plan.changes.allSatisfy(\.beforeKnown) ? "arrow.uturn.backward.circle" : "exclamationmark.triangle")
+                if plan.needsRespring { Label("SpringBoard restarts so it takes effect. The screen flashes for a second.", systemImage: "arrow.clockwise") }
+                Label(model.engine.displayName + (model.engine.mode == .demo ? " — nothing real is touched" : ""), systemImage: "iphone")
+            }.font(.system(size: 14)).foregroundStyle(t.ink).rowCard()
+
+            Section {
+                Toggle("Dry run (write nothing)", isOn: $dryRun)
+                if plan.tier >= .caution && !dryRun {
+                    Toggle("I understand the risk", isOn: $understood)
+                }
+            } footer: { Text(plan.tier.explanation) }.rowCard()
+
+            Section {
+                Button { Task { await run() } } label: { Text(dryRun ? "Run dry run" : "Apply") }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(!dryRun && plan.tier >= .caution && !understood)
+                    .listRowBackground(Color.clear).listRowInsets(.init())
+            }
+        }
+    }
+
+    private func diff(_ c: Change) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            diffLine("−", c.beforeKnown ? (c.before?.display ?? "not set") : "unknown (can't read yet)", added: false)
+            diffLine("+", c.after?.display ?? "removed — iOS uses its default", added: true)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+    }
+
+    private func diffLine(_ sign: String, _ text: String, added: Bool) -> some View {
+        HStack(spacing: 8) {
+            Text(sign).bold()
+            Text(text).lineLimit(2)
+            Spacer(minLength: 0)
+        }
+        .font(.system(size: 13.5, design: .monospaced))
+        .foregroundStyle(added ? (t.isDark ? Color(hex: 0x7BE8B5) : Color(hex: 0x0D5C37)) : (t.isDark ? Color(hex: 0xFFA47A) : Color(hex: 0x8A3300)))
+        .padding(.horizontal, 10).padding(.vertical, 7)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(added ? Palette.mintDeep.opacity(0.16) : Palette.peachDeep.opacity(0.16))
+    }
+
+    // MARK: Running
+
+    private func running(_ s: OperationRunner.Stage) -> some View {
+        List {
+            Section {
+                VStack(spacing: 14) {
+                    ProgressView().controlSize(.large)
+                    Text(stageText(s)).font(.system(size: 17, weight: .semibold)).foregroundStyle(t.ink).multilineTextAlignment(.center)
+                    Text("Please keep Assay open.").font(.system(size: 13.5)).foregroundStyle(t.ink2)
+                }.frame(maxWidth: .infinity).padding(.vertical, 24)
+            }.rowCard()
+            Section("Steps") {
+                step("Read current values", done: s != .snapshot)
+                step("Write", done: { if case .writing = s { return false } else { return s == .verifying || s == .done } }(), active: { if case .writing = s { return true } else { return false } }())
+                step("Read back to verify", done: s == .done, active: s == .verifying)
+            }.rowCard()
+        }
+    }
+
+    private func stageText(_ s: OperationRunner.Stage) -> String {
+        switch s {
+        case .snapshot: "Saving current values…"
+        case .writing(let i, let n): "Writing \(i) of \(n)…"
+        case .verifying: "Reading back to check…"
+        case .done: "Done"
+        }
+    }
+
+    private func step(_ title: String, done: Bool, active: Bool = false) -> some View {
+        HStack {
+            Image(systemName: done ? "checkmark.circle.fill" : (active ? "circle.dotted" : "circle")).foregroundStyle(done ? Palette.mintDeep : t.ink3)
+            Text(title).foregroundStyle(done || active ? t.ink : t.ink3)
+        }
+    }
+
+    // MARK: Result
+
+    @ViewBuilder private var result: some View {
+        if let r = receipt {
+            List {
+                Section {
+                    VStack(spacing: 10) {
+                        Image(systemName: icon(r)).font(.system(size: 44)).foregroundStyle(color(r))
+                        Text(headline(r)).font(.system(size: 20, weight: .bold)).foregroundStyle(t.ink)
+                        Text("Receipt #\(r.id)").font(.system(size: 13)).foregroundStyle(t.ink3)
+                    }.frame(maxWidth: .infinity).padding(.vertical, 16)
+                }.rowCard()
+
+                Section("Result") {
+                    ForEach(Array(r.items.enumerated()), id: \.offset) { _, item in
+                        VStack(alignment: .leading, spacing: 3) {
+                            HStack { Text(item.change.label).foregroundStyle(t.ink); Spacer(); outcomeTag(item.outcome) }
+                            if let n = item.note { Text(n).font(.system(size: 13)).foregroundStyle(t.ink2) }
+                        }
+                    }
+                }.rowCard()
+
+                if !r.dryRun, let q = plan.userCheck, r.status != .failed, model.receipts.receipts.first(where: { $0.id == r.id })?.userConfirmed == nil {
+                    Section {
+                        Text(q).foregroundStyle(t.ink)
+                        Button("Yes, that's fixed") { model.receipts.confirm(r.id, ok: true); Haptics.success() }
+                        Button("No, still wrong") { model.receipts.confirm(r.id, ok: false) }
+                    } header: { Text("Check it yourself") } footer: {
+                        Text("Assay can read the setting back, but only you can see whether the screen looks right.")
+                    }.rowCard()
+                } else if let c = model.receipts.receipts.first(where: { $0.id == r.id })?.userConfirmed {
+                    Section { Label(c ? "You confirmed it's fixed." : "You said it's still wrong. Try the next step in Lab.", systemImage: c ? "checkmark.circle" : "exclamationmark.circle").foregroundStyle(t.ink) }.rowCard()
+                }
+
+                Section {
+                    if r.dryRun {
+                        Button("Apply for real") { receipt = nil; dryRun = false; phase = .review }.buttonStyle(PrimaryButtonStyle())
+                            .listRowBackground(Color.clear).listRowInsets(.init())
+                    } else if r.undoable {
+                        Button("Undo this") { model.activePlan = model.receipts.undoPlan(for: r) }.buttonStyle(SecondaryButtonStyle())
+                            .listRowBackground(Color.clear).listRowInsets(.init())
+                    }
+                }
+            }
+        }
+    }
+
+    private func headline(_ r: Receipt) -> String {
+        switch r.status {
+        case .complete: "Applied and read back"
+        case .partial: "Applied, partly verified"
+        case .failed: "Nothing was changed"
+        case .simulated: "Dry run — nothing written"
+        case .rolledBack: "Rolled back"
+        }
+    }
+    private func icon(_ r: Receipt) -> String {
+        switch r.status { case .complete: "checkmark.circle.fill"; case .partial: "exclamationmark.circle.fill"; case .failed: "xmark.circle.fill"; default: "doc.text.magnifyingglass" }
+    }
+    private func color(_ r: Receipt) -> Color {
+        switch r.status { case .complete: Palette.mintDeep; case .partial: Palette.butterDeep; case .failed: Palette.peachDeep; default: t.ink2 }
+    }
+    @ViewBuilder private func outcomeTag(_ o: Receipt.Outcome) -> some View {
+        switch o {
+        case .verified: Tag(style: .reversible, text: "Read back OK")
+        case .unverified: Tag(style: .caution, text: "Unverified")
+        case .failed: Tag(style: .experimental, text: "Failed")
+        case .simulated: Tag(style: .unknown, text: "Dry run")
+        }
+    }
+
+    private func run() async {
+        phase = .running(.snapshot)
+        let r = await model.execute(plan, dryRun: dryRun) { stage in phase = .running(stage) }
+        receipt = r
+        phase = .result(r.id)
+        if r.status == .complete { Haptics.success() } else if r.status == .failed { Haptics.error() }
+    }
+}

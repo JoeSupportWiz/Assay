@@ -1,40 +1,10 @@
 import Foundation
 import UIKit
 
-/// Where a fact came from (§3.3). Every value Assay shows carries one.
-enum Evidence: Equatable, Hashable {
-    case observed            // read directly from the device or OS
-    case inferred(Int)       // our reasoning, with confidence %
-    case unknown             // iOS doesn't expose it
-}
-
-struct Fact: Identifiable, Hashable {
-    var id: String { label }
-    let label: String
-    let value: String
-    let evidence: Evidence
-    var source: String = ""
-}
-
-/// A point-in-time view of the device. Used by Home, Device check and the passport.
-struct DeviceSnapshot: Equatable {
-    var name: String
-    var model: String
-    var osVersion: String
-    var build: String?
-    var connected: Bool
-    var isDemo: Bool
-    var facts: [Fact]
-    var healthScore: Int?          // nil until a device check has run
-    var backup: BackupStatus?
-    var takenAt = Date()
-}
-
-struct BackupStatus: Equatable {
-    enum Phase: Equatable { case none, running(Double), paused, done(Date) }
-    var phase: Phase
-    var reusedBytes: Int64 = 0
-    var totalBytes: Int64 = 0
+/// Result of one write, read back.
+struct WriteResult {
+    var outcome: Receipt.Outcome
+    var note: String?
 }
 
 /// Engines do the device work. The UI never talks to transport directly.
@@ -44,12 +14,88 @@ protocol DeviceEngine {
     /// Whether the engine can currently reach the device for writes/backups.
     func availability() async -> EngineAvailability
     func snapshot() async -> DeviceSnapshot
+    /// Read a preference. `nil` = key absent (or unreadable — see `canRead`).
+    func read(_ key: PrefKey) async -> PlistValue?
+    var canRead: Bool { get }
+    /// Write (or remove, when `value == nil`) and read back.
+    func write(_ key: PrefKey, _ value: PlistValue?) async -> WriteResult
+    /// Run checks and return findings. Read-only.
+    func check() async -> [Finding]
+}
+
+extension DeviceEngine {
+    /// Shared check logic: snapshot facts + every known culprit read from the device.
+    func standardCheck(snapshot: DeviceSnapshot) async -> [Finding] {
+        var findings: [Finding] = []
+        for s in Knowledge.symptoms {
+            guard let key = s.culprit else { continue }
+            if canRead {
+                let v = await read(key)
+                if let v, v == s.culpritValue {
+                    findings.append(Finding(id: s.id, title: s.title, reason: s.cause, severity: .attention,
+                        evidence: [Fact(label: "\(key.domain) › \(key.key)", value: v.display, evidence: .observed, source: displayName)],
+                        fix: s.plan(current: v), symptomID: s.id, confidence: nil))
+                }
+            }
+        }
+        if !canRead {
+            findings.append(Finding(id: "prefs-unreadable", title: "System preferences not readable yet",
+                reason: "This engine can't read SpringBoard preferences until setup is finished, so tweak-related problems can't be ruled out.",
+                severity: .info, evidence: [Fact(label: "Preference access", value: "Needs engine setup", evidence: .unknown, source: displayName)],
+                fix: nil, symptomID: nil, confidence: nil))
+        }
+        for f in snapshot.facts {
+            if f.label == "Thermal state", f.value == "Serious" || f.value == "Critical" {
+                findings.append(Finding(id: "thermal", title: "iPhone is running hot", reason: "Thermal state is \(f.value). Long backups may slow or pause.",
+                    severity: .attention, evidence: [f], fix: nil, symptomID: nil, confidence: nil))
+            }
+            if f.label == "Low Power Mode", f.value == "On" {
+                findings.append(Finding(id: "lowpower", title: "Low Power Mode is on", reason: "iOS throttles background work and networking, which slows on-device backups.",
+                    severity: .info, evidence: [f], fix: nil, symptomID: nil, confidence: nil))
+            }
+        }
+        return findings.sorted { $0.severity > $1.severity }
+    }
 }
 
 enum EngineAvailability: Equatable {
     case ready
     case needsSetup(String)    // plain-English next step
     case unavailable(String)
+}
+
+/// Runs an OperationPlan through any engine: snapshot → write → read back → receipt.
+struct OperationRunner {
+    enum Stage: Equatable { case snapshot, writing(Int, Int), verifying, done }
+
+    static func run(_ plan: OperationPlan, engine: any DeviceEngine, dryRun: Bool, receiptID: Int,
+                    progress: @escaping @MainActor (Stage) -> Void) async -> Receipt {
+        await progress(.snapshot)
+        // Re-read every "before" right now so undo reflects reality, not the plan.
+        var changes = plan.changes
+        if engine.canRead {
+            for i in changes.indices {
+                changes[i].before = await engine.read(changes[i].target)
+                changes[i].beforeKnown = true
+            }
+        }
+        try? await Task.sleep(for: .milliseconds(500))
+        var items: [Receipt.Item] = []
+        for (i, c) in changes.enumerated() {
+            await progress(.writing(i + 1, changes.count))
+            if dryRun {
+                try? await Task.sleep(for: .milliseconds(450))
+                items.append(.init(change: c, outcome: .simulated, note: "Nothing was written"))
+            } else {
+                let r = await engine.write(c.target, c.after)
+                items.append(.init(change: c, outcome: r.outcome, note: r.note))
+            }
+        }
+        await progress(.verifying)
+        try? await Task.sleep(for: .milliseconds(500))
+        await progress(.done)
+        return Receipt(id: receiptID, date: Date(), title: plan.title, kind: plan.kind, engine: engine.mode, dryRun: dryRun, items: items)
+    }
 }
 
 // MARK: - On-device facts any engine can use (public APIs only; always Observed)
@@ -85,7 +131,8 @@ enum LocalFacts {
 
     private static func thermal() -> String {
         switch ProcessInfo.processInfo.thermalState {
-        case .nominal: "Nominal"; case .fair: "Fair"; case .serious: "Serious"; case .critical: "Critical"; @unknown default: "Unknown"
+        case .nominal: return "Nominal"; case .fair: return "Fair"; case .serious: return "Serious"; case .critical: return "Critical"
+        @unknown default: return "Unknown"
         }
     }
 

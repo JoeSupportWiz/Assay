@@ -22,12 +22,22 @@ final class AppModel {
 
     // Live state
     var selectedTab: AppTab = .home
-    var showSearch = false
+    var labPath: [LabRoute] = []
     var toast: Toast?
     private(set) var engine: any DeviceEngine = DemoEngine()
     var snapshot: DeviceSnapshot?
+    var findings: [Finding] = []
+    var lastCheck: Date?
+    var checking = false
+    /// Operation being reviewed in the fix sheet.
+    var activePlan: OperationPlan?
+    var receipts: ReceiptStore
+    private let uiDemo: Bool
 
     init() {
+        let args = ProcessInfo.processInfo.arguments
+        uiDemo = args.contains("-uiDemo")
+        receipts = uiDemo ? ReceiptStore(persist: false, seed: ReceiptStore.demoSeed()) : ReceiptStore()
         let d = UserDefaults.standard
         themeID = ThemeID(rawValue: d.string(forKey: "themeID") ?? "") ?? .auto
         wallpaperPalette = (d.data(forKey: "wallpaperPalette")).flatMap { try? JSONDecoder().decode(WallpaperPalette.self, from: $0) } ?? .dusk
@@ -36,12 +46,19 @@ final class AppModel {
         expertMode = d.bool(forKey: "expertMode")
         userName = d.string(forKey: "userName") ?? ""
         // Screenshot / UI-test hooks (CI renders every screen with deterministic state).
-        let args = ProcessInfo.processInfo.arguments
-        if args.contains("-uiDemo") { hasOnboarded = true; engineMode = .demo; userName = "Joe" }
+        if uiDemo { hasOnboarded = true; engineMode = .demo; userName = "Joe" }
         if let i = args.firstIndex(of: "-theme"), i + 1 < args.count, let id = ThemeID(rawValue: args[i + 1]) { themeID = id }
         if let i = args.firstIndex(of: "-tab"), i + 1 < args.count, let tab = AppTab(rawValue: args[i + 1]) { selectedTab = tab }
         if args.contains("-onboarding") { hasOnboarded = false }
         rebuildEngine()
+        if let i = args.firstIndex(of: "-route"), i + 1 < args.count {
+            let r = args[i + 1]
+            selectedTab = .lab
+            if r == "diagnose" { labPath = [.diagnose] }
+            else if r == "history" { labPath = [.history] }
+            else if r.hasPrefix("symptom:") { labPath = [.diagnose, .symptom(String(r.dropFirst(8)))] }
+            else if r.hasPrefix("fix:"), let s = Knowledge.symptoms.first(where: { $0.id == String(r.dropFirst(4)) }) { activePlan = s.plan(current: s.culpritValue) }
+        }
     }
 
     private func save() {
@@ -77,6 +94,25 @@ final class AppModel {
         snapshot = await engine.snapshot()
     }
 
+    /// Read-only device check: snapshot + findings.
+    @MainActor func runCheck() async {
+        guard !checking else { return }
+        checking = true
+        snapshot = await engine.snapshot()
+        let f = await engine.check()
+        try? await Task.sleep(for: .milliseconds(500))
+        withAnimation(Motion.spring) { findings = f; lastCheck = Date(); checking = false }
+    }
+
+    /// Run a reviewed plan through the current engine and record a receipt.
+    @MainActor func execute(_ plan: OperationPlan, dryRun: Bool, progress: @escaping @MainActor (OperationRunner.Stage) -> Void) async -> Receipt {
+        let r = await OperationRunner.run(plan, engine: engine, dryRun: dryRun, receiptID: receipts.nextID, progress: progress)
+        receipts.add(r)
+        if !dryRun && !plan.undoOf.isEmpty && r.status != .failed { receipts.markRolledBack(plan.undoOf) }
+        if !dryRun { await runCheck() }
+        return r
+    }
+
     @MainActor func show(_ toast: Toast) {
         withAnimation(Motion.bouncy) { self.toast = toast }
         if toast.kind == .success { Haptics.success() } else if toast.kind == .warning { Haptics.warning() }
@@ -87,12 +123,6 @@ enum AppTab: String, CaseIterable, Identifiable {
     case home, scenes, studio, lab, more
     var id: String { rawValue }
     var title: String { rawValue.capitalized }
-    var activeSymbol: String {
-        switch self {
-        case .home: "house.fill"; case .scenes: "square.2.layers.3d.fill"; case .studio: "wand.and.stars.inverse"
-        case .lab: "flask.fill"; case .more: "ellipsis"
-        }
-    }
     var symbol: String {
         switch self {
         case .home: "house"; case .scenes: "square.2.layers.3d"; case .studio: "wand.and.stars"
@@ -108,4 +138,12 @@ struct Toast: Identifiable, Equatable {
     var title: String
     var subtitle: String? = nil
     var symbol: String = "checkmark"
+}
+
+
+/// Screens pushed inside the Lab tab.
+enum LabRoute: Hashable {
+    case diagnose, history
+    case symptom(String)
+    case receipt(Int)
 }

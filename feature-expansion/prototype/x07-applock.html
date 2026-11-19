@@ -1,0 +1,21 @@
+<!-- tab:none -->
+<style>
+body{background:radial-gradient(60% 40% at 25% 15%,#FFE58A,transparent 70%),radial-gradient(55% 40% at 90% 35%,#FF9E6B,transparent 70%),radial-gradient(80% 55% at 35% 90%,#8B6CFF,transparent 70%),linear-gradient(170deg,#FFB27A,#4A2BB8)!important;color:#fff}
+.status{color:#fff}.home-ind{background:#fff!important}
+.kp{display:grid;grid-template-columns:repeat(3,72px);gap:14px 22px;justify-content:center;margin-top:22px}
+.kp i{width:72px;height:72px;border-radius:36px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-style:normal;background:rgba(255,255,255,.2);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.35);font:500 28px 'Inter Display';opacity:0;transform:scale(.5);animation:pop .5s var(--spring) forwards}
+.kp i small{font:700 8.5px Inter;letter-spacing:.14em;opacity:.85}
+.kp i.hit{background:#FFE58A;color:#2A1650}
+.dots{display:flex;gap:14px;justify-content:center;margin-top:16px}.dots b{width:12px;height:12px;border-radius:6px;border:1.5px solid #fff}.dots b.f{background:#fff}
+.chips{display:flex;gap:8px;justify-content:center;margin-top:16px}.chips span{height:30px;padding:0 12px;border-radius:15px;background:rgba(255,255,255,.18);display:flex;align-items:center;font-size:12px;font-weight:600}.chips .on{background:#fff;color:#2A1650}
+</style>
+<div class="rise" style="--d:0;text-align:center;margin-top:30px">{{MARKL}}<div class="disp" style="font-size:22px;font-weight:700;margin-top:8px">Unlock Assay</div><div style="font-size:13px;opacity:.8;margin-top:4px">Signing and Lab need your passcode</div></div>
+<div class="dots rise" style="--d:1"><b class="f"></b><b class="f"></b><b></b><b></b><b></b><b></b></div>
+<div class="kp">
+ <i style="animation-delay:.25s">1<small>&nbsp;</small></i><i style="animation-delay:.29s">2<small>ABC</small></i><i style="animation-delay:.33s">3<small>DEF</small></i>
+ <i style="animation-delay:.37s">4<small>GHI</small></i><i class="hit" style="animation-delay:.41s">5<small>JKL</small></i><i style="animation-delay:.45s">6<small>MNO</small></i>
+ <i style="animation-delay:.49s">7<small>PQRS</small></i><i style="animation-delay:.53s">8<small>TUV</small></i><i style="animation-delay:.57s">9<small>WXYZ</small></i>
+ <span></span><i style="animation-delay:.61s">0</i><span style="display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600">Face ID</span>
+</div>
+<div class="chips rise" style="--d:6"><span class="on">Glass</span><span>Pastel</span><span>Pinstripe</span><span>Millennium</span></div>
+<div class="rise" style="--d:7;text-align:center;font-size:11.5px;opacity:.75;margin-top:10px;padding:0 40px">Keypad theme for Assay's own lock. It follows your Scene's palette.</div>
