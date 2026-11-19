@@ -1,113 +1,177 @@
 <!-- Working name "Assay". Trademark/App Store/domain availability still to be confirmed. -->
-<p align="center"><img src="docs/brand/readme-hero.gif" alt="Assay — customise, sign and inspect your iPhone" width="100%"></p>
-
 <p align="center">
-  <b>Customise, sign and inspect your iPhone — in one workbench that shows its work.</b>
+  <img src="docs/brand/hero-app.png" alt="Assay — customise, sign and inspect your iPhone" width="100%">
 </p>
 
 <p align="center">
-  <img alt="Platform" src="https://img.shields.io/badge/iOS-17%2B-111113?style=flat-square">
-  <img alt="Swift" src="https://img.shields.io/badge/SwiftUI-5-7C5CFF?style=flat-square">
-  <img alt="Status" src="https://img.shields.io/badge/status-in%20development-FFE58A?style=flat-square&labelColor=111113">
-  <img alt="Licence" src="https://img.shields.io/badge/licence-proprietary-FF7A3D?style=flat-square&labelColor=111113">
+  <img alt="iOS 17+" src="https://img.shields.io/badge/iOS-17%2B-111113?style=for-the-badge&logo=apple&logoColor=white">
+  <img alt="SwiftUI" src="https://img.shields.io/badge/SwiftUI-7C5CFF?style=for-the-badge&logo=swift&logoColor=white">
+  <img alt="Phase 0" src="https://img.shields.io/badge/phase-0%20%C2%B7%20foundation-FFE58A?style=for-the-badge&labelColor=111113">
+  <img alt="Proprietary" src="https://img.shields.io/badge/licence-proprietary-FF7A3D?style=for-the-badge&labelColor=111113">
 </p>
 
 <p align="center">
-  <a href="docs/GALLERY.md"><b>Design gallery</b></a> ·
-  <a href="docs/ROADMAP.md"><b>Roadmap</b></a> ·
-  <a href="docs/PRODUCT_BRIEF.md">Product brief</a> ·
-  <a href="docs/DESIGN_SPEC.md">Design spec</a> ·
+  <a href="docs/ROADMAP.md"><b>Roadmap</b></a>&nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="docs/app-screens/README.md"><b>App screenshots</b></a>&nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="docs/GALLERY.md"><b>Design gallery</b></a>&nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="docs/DESIGN_SPEC.md">Design spec</a>&nbsp;&nbsp;·&nbsp;&nbsp;
   <a href="docs/TESTING.md">Testing</a>
 </p>
 
+<br>
+
+> **Assay** brings tweaks, Scenes, wallpapers, Wallet card art, app signing, diagnostics, Bluetooth and network tools, and AI-assisted creation into one calm iPhone app.
+> Every change is **previewed, explained, applied one step at a time, verified where iOS allows it, and reversible.**
+
+<br>
+
+## ✦ Shows its work
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+Every fact Assay shows carries where it came from:
+
+| | Means |
+|:--|:--|
+| ![Observed](https://img.shields.io/badge/Observed-C4E6FF?style=flat-square) | Read straight from iOS |
+| ![Inferred](https://img.shields.io/badge/Inferred%20·%2082%25-DCD1FF?style=flat-square) | Our reasoning, with confidence |
+| ![Unknown](https://img.shields.io/badge/Unknown-FFFFFF?style=flat-square) | iOS doesn't say — we won't guess |
+
+And every change carries a risk tier:
+
+| | Means |
+|:--|:--|
+| ![Reversible](https://img.shields.io/badge/Reversible-BDF3D7?style=flat-square) | Old value saved; read-back verified |
+| ![Caution](https://img.shields.io/badge/Caution-FFE58A?style=flat-square) | Version-sensitive; preflight + recovery notes |
+| ![Experimental](https://img.shields.io/badge/Experimental-FFD6BF?style=flat-square) | Opt-in only, never auto-applied |
+
+</td>
+<td width="50%" align="center">
+<img src="docs/app-screens/04-lab-light.png" width="270" alt="Lab: device passport with evidence tags">
+<br><sub><b>Lab</b> — the device passport, every value tagged</sub>
+</td>
+</tr>
+</table>
+
+## ◧ Five themes, one system
+
+<img src="docs/brand/themes-app.png" alt="Light, Dark, Millennium, Pinstripe and Wallpaper match themes" width="100%">
+
+Auto follows iOS. **Millennium** and **Pinstripe** are original homages; **Wallpaper match** turns the whole app to glass over your own palette.
+
+## ⌁ Your engine, your call
+
+<table>
+<tr>
+<td width="50%" align="center">
+<img src="docs/app-screens/00-onboarding-light.png" width="270" alt="Onboarding">
+</td>
+<td width="50%" valign="top">
+
+First run asks how Assay should reach the device:
+
+| | 💻 **Mac companion** | 📱 **iPhone only** |
+|:--|:--|:--|
+| Speed | **Fastest** — USB, no tunnel stalls | Slower — on-device loopback |
+| While locked | Keeps going | iOS pauses it |
+| Privacy | Via your own Mac | **Nothing leaves the phone** |
+| Needs | Assay for Mac | Paid team for the loopback |
+
+Switch any time in **More › Engine**. A **Demo** engine lets you explore with nothing connected — and every demo value says so.
+
+</td>
+</tr>
+</table>
+
+## ⊞ The app
+
+<img src="docs/brand/screens-app.png" alt="Onboarding, Home, Lab, Studio and More" width="100%">
+
+| Module | | What it does | Status |
+|:--|:--|:--|:--|
+| **Scenes** | ◧ | Wallpaper, layout, widgets, Shortcuts and Focus, saved together · guided apply · snapshots | 🔨 landing |
+| **Gild** | ☰ | Tweak catalogue with safety tiers, presets, compatibility, custom builder | ○ Phase 2 |
+| **Canvas** | ✦ | `.tendies` / Poster projects — layers, timeline, validate, export | ○ Phase 4 |
+| **Cards** | ▭ | Wallet card visuals. Visual only — never payment data | ○ Phase 4 |
+| **Alchemy** | ✧ | AI assets with Minis, hosted providers or local Ollama | ○ Phase 5 |
+| **Signet** | ◎ | In-app installer & signer: per-target profiles, entitlements, expiry | ○ Phase 6 |
+| **Lab** | ⊙ | Device check, passport, diagnose, fix flow with receipts | ✅ passport |
+| **Vault** | ⬓ | Resumable backups, baseline reuse, honest Live Activity, undo | ○ Phase 3 |
+| **Tools** | ⌁ | BLE notebook, Bonjour inventory, TLS certificate check | ○ Phase 7 |
+
+## ◎ Design → built
+
+<table>
+<tr>
+<td width="45%" align="center"><img src="docs/brand/design-vs-built.png" width="100%" alt="Design render beside the real app"></td>
+<td width="55%" valign="top">
+
+Every screen is built from the **[Fold design system](docs/DESIGN_SPEC.md)**:
+
+- **Type** — Inter Display headlines, two-tone greetings, tabular numbers
+- **Colour** — paper & ink, five pastels, semantic tags that never rely on colour alone
+- **Shape** — 28 pt cards, full pills, a floating tab bar that morphs
+- **Motion** — springs everywhere, 90 ms staggers, Reduce Motion cross-fades
+- **Honesty** — no fake progress, no "Success!" without a read-back
+
+Renders of the real app are regenerated by CI into **[docs/app-screens](docs/app-screens/README.md)**.
+
+</td>
+</tr>
+</table>
+
+## ⚙ Build
+
+Builds run on GitHub Actions (macOS) and are **manual only**.
+
+| Mode | What you get |
+|:--|:--|
+| `screenshots` | Every screen rendered in the iOS Simulator, light & dark, committed to `docs/app-screens` |
+| `ipa` | `Assay-unsigned.ipa` — sign with your own certificate (or with Signet, once it lands) |
+
+**Actions › Assay iOS CI › Run workflow.** Locally: `brew install xcodegen && xcodegen generate && open Assay.xcodeproj`.
+
+<details>
+<summary><b>Repository layout</b></summary>
+
+```
+App/
+  DesignSystem/   Theme, motion, components (Fold system)
+  Shell/          Root, floating tab bar, toasts
+  Core/           App state and settings
+  Engine/         DeviceEngine protocol · Demo · iPhone · Mac companion
+  Features/       Home · Onboarding · Lab · Studio · Scenes · More
+docs/
+  app-screens/    Real app, rendered by CI
+  screens/        Design renders (5 themes)
+  brand/          Hero art, lockups, icons
+  ROADMAP.md · DESIGN_SPEC.md · PRODUCT_BRIEF.md · TESTING.md
+brand/            Fold identity source (SVG, icons)
+prototype/        HTML/CSS prototypes
+scripts/          screenshots.sh · readme_art.py · typecheck.sh · ci-watch.sh
+```
+
+</details>
+
+## ♡ Promises
+
+- **No fake keep-alives.** If iOS pauses a backup, the Live Activity says *Paused by iOS*.
+- **No implied entitlements.** Signet shows what Apple needs; it never pretends.
+- **No silent changes.** Toggles stage changes; nothing applies until you review.
+- **Your keys stay yours.** API keys, pairing records and signing identities live in the Keychain — never in logs, exports or prompts.
+- **Authorised scanning only.** Bluetooth and network tools are visible, bounded and stop when you leave.
+
+<br>
+
 ---
 
-<p>
-<img src="docs/screens/01-home-light.png" width="19%"> <img src="docs/screens/02-scenes-light.png" width="19%"> <img src="docs/screens/04-device-check-dark.png" width="19%"> <img src="docs/screens/05-fix-review-light.png" width="19%"> <img src="docs/screens/11-vault-dark.png" width="19%">
+<p align="center">
+  <img src="brand/svg/symbol.svg" width="28" alt=""><br>
+  <sub>
+    Assay is an independent project. Thanks to GoldensHQ and the GoldenNugget Mobile contributors, whose work in the iOS customisation community informed this one — see <a href="CREDITS.md">credits</a>.<br>
+    Apple, iPhone, iOS, Wallet, Apple Pay, Live Activities and Dynamic Island are trademarks of Apple Inc. Assay is not affiliated with or endorsed by Apple.<br>
+    © 2026 Joe Kane · Proprietary — all rights reserved · <a href="LICENSE">LICENSE</a>
+  </sub>
 </p>
-<sub>Design renders from the brand bundle. Screenshots of the real app are added under <code>docs/app-screens/</code> as features land.</sub>
-
-## What it is
-
-Assay brings device tweaks, Scenes, wallpapers and `.tendies`, Wallet card visuals, app signing, diagnostics, Bluetooth and local-network tools and AI-assisted creation into one calm, native-feeling iPhone app.
-
-Every change is **previewed, explained, applied one step at a time, verified where iOS allows it, and reversible**.
-
-| Promise | What it means |
-|---|---|
-| **Shows its work** | Every finding is labelled **Observed**, **Inferred** or **Unknown**. |
-| **Preview before change** | The exact diff, the risk tier and the recovery plan come before anything is applied. |
-| **Reversible by default** | Snapshots, receipts and one-tap rollback. If something can't be undone, Assay says so first. |
-| **Version-aware** | Every tweak is checked against your exact iOS build and device. |
-| **Honest about iOS** | No fake keep-alives, no implied entitlements, no jailbreak-level promises. |
-| **You own the AI** | Minis, a hosted provider or local Ollama. AI drafts; you approve. |
-
-## Modules
-
-| | Module | What it does |
-|---|---|---|
-| ◧ | **Scenes** | Wallpaper, Home Screen layout, widgets, Shortcuts and Focus as one set — recipes, consistency check, guided apply, restore. |
-| ☰ | **Gild** · Customise | Tweak catalogue with safety tiers (Reversible · Caution · Experimental), presets, compatibility and a custom builder. |
-| ✦ | **Canvas** · Wallpapers | `.tendies` / Poster projects: layers, timeline, validation, preview, export. |
-| ▭ | **Cards** · Wallet visuals | Card art editor and previews. Visual only — never payment data. |
-| ✧ | **Alchemy** · AI | Provider-neutral asset creation and editing with before/after. |
-| ◎ | **Signet** · Signing | Developer account, per-target bundle IDs, entitlements, profiles, expiry and renewal. |
-| ⊙ | **Lab** · Device check | One-tap diagnosis, evidence, fix flow with receipts, passport, timeline, crash explainer. |
-| ⬓ | **Vault** · Backups | Resumable backups, baseline reuse, honest progress, Live Activity, rollback. |
-| ⌁ | **Tools** | BLE notebook and authorised local-network inventory. |
-
-## Engine: your choice
-
-On first run Assay asks how it should reach the device:
-
-| | **Mac companion** | **iPhone only** |
-|---|---|---|
-| Speed | Fast — USB, no tunnel stalls | Slower — on-device loopback |
-| Runs while locked | Yes, the Mac does the work | No, iOS suspends the app |
-| Privacy | Data passes through your Mac | Nothing leaves the phone |
-| Needs | A Mac with Assay for Mac | A paid developer team for the tunnel |
-
-You can switch any time in **More › Engine**.
-
-## Build
-
-Builds run on GitHub Actions (macOS) and are **manual only** — nothing builds on push.
-
-1. **Actions › Assay iOS CI › Run workflow**.
-2. `screenshots` mode renders every screen in the iOS Simulator and uploads them for review.
-3. `ipa` mode produces `Assay-unsigned.ipa`; sign it with your own certificate.
-
-Local:
-
-```sh
-brew install xcodegen
-xcodegen generate
-open Assay.xcodeproj
-```
-
-## Repository layout
-
-```
-App/            SwiftUI app (design system, features, engine, services)
-Widgets/        WidgetKit, Live Activity and Control Centre extension   (planned)
-Mac/            Assay for Mac companion                                  (planned)
-docs/           Brand, design spec, gallery, roadmap, test notes
-prototype/      HTML/CSS design prototypes
-brand/          Fold identity source (SVG, icons)
-design/         Design tokens
-scripts/        Typecheck and tooling
-```
-
-## Status
-
-Built feature by feature — see the **[roadmap](docs/ROADMAP.md)** for what's live, what's stubbed and how to test each piece.
-
-## Credits
-
-Assay is an independent project. Thanks to GoldensHQ and the GoldenNugget Mobile contributors, whose work in the iOS customisation community informed this one. No GoldenNugget code or branding is included. See [CREDITS.md](CREDITS.md).
-
-Apple, iPhone, iOS, Wallet, Apple Pay, Live Activities and Dynamic Island are trademarks of Apple Inc. Assay is not affiliated with or endorsed by Apple.
-
-## Licence
-
-Proprietary — all rights reserved. See [LICENSE](LICENSE).

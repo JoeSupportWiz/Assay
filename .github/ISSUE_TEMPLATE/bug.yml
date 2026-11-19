@@ -1,0 +1,21 @@
+name: Bug
+description: Something in Assay isn't working
+labels: [bug]
+body:
+  - type: input
+    id: where
+    attributes: { label: Where, description: "Screen or module (e.g. Lab › Device check)" }
+    validations: { required: true }
+  - type: textarea
+    id: what
+    attributes: { label: What happened, description: "What you did, what you expected, what you saw" }
+    validations: { required: true }
+  - type: input
+    id: device
+    attributes: { label: Device & iOS, placeholder: "iPhone 18 Pro Max · iOS 27.3 (24C5037i)" }
+  - type: dropdown
+    id: engine
+    attributes: { label: Engine, options: [Mac companion, iPhone only, Demo] }
+  - type: textarea
+    id: receipt
+    attributes: { label: Receipt or log, description: "Paste a receipt or redacted diagnostic. Never paste UDIDs, keys or pairing files.", render: text }

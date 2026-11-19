@@ -8,15 +8,15 @@ Built in order, one shippable slice at a time. Each slice ends with simulator sc
 | # | Slice | Status | Test it |
 |---|---|---|---|
 | 0.1 | Repo: proprietary licence, README, gallery, docs, manual-only CI | ✅ | Browse the repo |
-| 0.2 | Design system: tokens, 5 themes, type, components, motion, haptics | 🔨 | Appearance screen |
-| 0.3 | App shell: floating tab bar, Home, search launcher, toasts, sheets | 🔨 | Launch the app |
-| 0.4 | Onboarding: welcome, engine choice (Mac vs iPhone), permissions primer | 🔨 | Fresh install |
-| 0.5 | CI: simulator screenshot mode + unsigned IPA mode | 🔨 | Actions › Run workflow |
+| 0.2 | Design system: tokens, 5 themes, type, components, motion, haptics | ✅ | Appearance screen |
+| 0.3 | App shell: floating tab bar, Home, search launcher, toasts, sheets | ✅ | Launch the app |
+| 0.4 | Onboarding: welcome, engine choice (Mac vs iPhone), permissions primer | ✅ | Fresh install |
+| 0.5 | CI: simulator screenshot mode + unsigned IPA mode | ✅ | Actions › Run workflow |
 
 ## Phase 1 — The safety core
 | # | Slice | Status |
 |---|---|---|
-| 1.1 | Operation pipeline: preflight → snapshot → diff → confirm → apply → verify → receipt → rollback | ○ |
+| 1.1 ⏳ | Operation pipeline: preflight → snapshot → diff → confirm → apply → verify → receipt → rollback | ○ |
 | 1.2 | Receipts store + Undo history (x01) | ○ |
 | 1.3 | Device check: on-device facts (model, OS, storage, battery, thermal) labelled Observed/Inferred/Unknown | ○ |
 | 1.4 | Diagnose: symptom picker + plain-English describe → matched findings (e.g. clock stuck at 09:41, green line) | ○ |

@@ -1,0 +1,14 @@
+name: Feature
+description: An idea for Assay
+labels: [feature]
+body:
+  - type: dropdown
+    id: module
+    attributes: { label: Module, options: [Scenes, Gild, Canvas, Cards, Alchemy, Signet, Lab, Vault, Tools, System surfaces, Other] }
+  - type: textarea
+    id: idea
+    attributes: { label: The idea, description: "What should it do, and why?" }
+    validations: { required: true }
+  - type: textarea
+    id: limits
+    attributes: { label: iOS limits, description: "Anything iOS might not allow? Assay stays honest about it." }
