@@ -73,4 +73,6 @@ Rendered by CI in the iOS Simulator (demo engine, 9:41 status bar).
 <td align="center"><img src="31-crash-review-dark.png" width="200"><br><sub>31-crash-review-dark</sub></td>
 <td align="center"><img src="31-crash-review-light.png" width="200"><br><sub>31-crash-review-light</sub></td>
 <td align="center"><img src="32-studio-accessibility.png" width="200"><br><sub>32-studio-accessibility</sub></td>
-<td align="center"><img src="33-onboarding-accessibility.png" width="200"><br><sub>33-onboarding-accessibility</sub></td></tr><tr></tr></table>
+<td align="center"><img src="33-onboarding-accessibility.png" width="200"><br><sub>33-onboarding-accessibility</sub></td></tr><tr>
+<td align="center"><img src="34-bench-dark.png" width="200"><br><sub>34-bench-dark</sub></td>
+<td align="center"><img src="34-bench-light.png" width="200"><br><sub>34-bench-light</sub></td></tr></table>
