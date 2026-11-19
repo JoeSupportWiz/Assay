@@ -43,4 +43,12 @@ Rendered by CI in the iOS Simulator (demo engine, 9:41 status bar).
 <td align="center"><img src="16-minis-dark.png" width="200"><br><sub>16-minis-dark</sub></td>
 <td align="center"><img src="16-minis-light.png" width="200"><br><sub>16-minis-light</sub></td></tr><tr>
 <td align="center"><img src="17-minis-review-dark.png" width="200"><br><sub>17-minis-review-dark</sub></td>
-<td align="center"><img src="17-minis-review-light.png" width="200"><br><sub>17-minis-review-light</sub></td></tr></table>
+<td align="center"><img src="17-minis-review-light.png" width="200"><br><sub>17-minis-review-light</sub></td>
+<td align="center"><img src="18-clock-evidence-dark.png" width="200"><br><sub>18-clock-evidence-dark</sub></td>
+<td align="center"><img src="18-clock-evidence-light.png" width="200"><br><sub>18-clock-evidence-light</sub></td></tr><tr>
+<td align="center"><img src="19-file-vault-dark.png" width="200"><br><sub>19-file-vault-dark</sub></td>
+<td align="center"><img src="19-file-vault-light.png" width="200"><br><sub>19-file-vault-light</sub></td>
+<td align="center"><img src="20-scenes-library-dark.png" width="200"><br><sub>20-scenes-library-dark</sub></td>
+<td align="center"><img src="20-scenes-library-light.png" width="200"><br><sub>20-scenes-library-light</sub></td></tr><tr>
+<td align="center"><img src="21-signer-preflight-dark.png" width="200"><br><sub>21-signer-preflight-dark</sub></td>
+<td align="center"><img src="21-signer-preflight-light.png" width="200"><br><sub>21-signer-preflight-light</sub></td></tr></table>
