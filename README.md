@@ -10,13 +10,15 @@ Assay is a new project, **not a direct fork** of GoldenNugget Mobile. It is inde
 
 ## Design foundation
 
+**[Browse the design gallery →](docs/GALLERY.md)**
+
 The included Fold identity and UI references are supplied by the project owner in the Assay Design Bundle. The visual direction is light/dark, pastel, premium, playful-but-precise; five floating destinations (Home, Scenes, Studio, Lab, More); high-contrast black/white pill controls; spring motion with Reduce Motion fallbacks. Theme previews include Millennium, Pinstripe and Wallpaper Match. The name and identity remain subject to clearance.
 
 ## Current status
 
 **Foundation prototype only.** The native app currently contains the home/navigation design shell and sample UI states explicitly labelled as previews. It does not yet connect to a device, run tweaks, create backups, sign apps, scan BLE/LAN, or call an AI provider. Those capabilities require separate implementation, capability audits and real-device validation. No simulated device state should be presented as live data.
 
-The full product vision and platform constraints are documented in `Docs/PRODUCT_BRIEF.md`; design sources and screen references are in `design/`, `prototype/`, `docs/` and `brand/`.
+The full product vision and platform constraints are documented in `docs/PRODUCT_BRIEF.md`; design sources and screen references are in `design/`, `prototype/`, `docs/` and `brand/`.
 
 ## Build
 
