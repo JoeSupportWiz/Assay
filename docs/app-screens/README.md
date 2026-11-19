@@ -63,4 +63,6 @@ Rendered by CI in the iOS Simulator (demo engine, 9:41 status bar).
 <td align="center"><img src="26-privacy-lock-dark.png" width="200"><br><sub>26-privacy-lock-dark</sub></td>
 <td align="center"><img src="26-privacy-lock-light.png" width="200"><br><sub>26-privacy-lock-light</sub></td></tr><tr>
 <td align="center"><img src="27-supporter-dark.png" width="200"><br><sub>27-supporter-dark</sub></td>
-<td align="center"><img src="27-supporter-light.png" width="200"><br><sub>27-supporter-light</sub></td></tr></table>
+<td align="center"><img src="27-supporter-light.png" width="200"><br><sub>27-supporter-light</sub></td>
+<td align="center"><img src="28-build-library-dark.png" width="200"><br><sub>28-build-library-dark</sub></td>
+<td align="center"><img src="28-build-library-light.png" width="200"><br><sub>28-build-library-light</sub></td></tr><tr></tr></table>
