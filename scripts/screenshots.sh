@@ -14,7 +14,13 @@ trap 'xcrun simctl shutdown "$UDID" >/dev/null 2>&1 || true; xcrun simctl delete
 xcrun simctl boot "$UDID"
 xcrun simctl bootstatus "$UDID" -b
 xcrun simctl status_bar "$UDID" override --time "9:41" --batteryState charged --batteryLevel 100 --cellularBars 4 --wifiBars 3
-xcrun simctl install "$UDID" "$APP"
+for attempt in 1 2 3 4; do
+  if xcrun simctl install "$UDID" "$APP"; then break; fi
+  echo "install attempt $attempt failed; rebooting simulator"
+  xcrun simctl shutdown "$UDID" >/dev/null 2>&1 || true; sleep 8
+  xcrun simctl boot "$UDID"; xcrun simctl bootstatus "$UDID" -b; sleep 5
+  [ "$attempt" = 4 ] && { echo "install failed 4 times"; exit 1; }
+done
 
 shot() { # name, appearance, args...
   local name="$1" look="$2"; shift 2
