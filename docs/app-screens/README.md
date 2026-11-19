@@ -51,4 +51,10 @@ Rendered by CI in the iOS Simulator (demo engine, 9:41 status bar).
 <td align="center"><img src="20-scenes-library-dark.png" width="200"><br><sub>20-scenes-library-dark</sub></td>
 <td align="center"><img src="20-scenes-library-light.png" width="200"><br><sub>20-scenes-library-light</sub></td></tr><tr>
 <td align="center"><img src="21-signer-preflight-dark.png" width="200"><br><sub>21-signer-preflight-dark</sub></td>
-<td align="center"><img src="21-signer-preflight-light.png" width="200"><br><sub>21-signer-preflight-light</sub></td></tr></table>
+<td align="center"><img src="21-signer-preflight-light.png" width="200"><br><sub>21-signer-preflight-light</sub></td>
+<td align="center"><img src="22-apple-team-dark.png" width="200"><br><sub>22-apple-team-dark</sub></td>
+<td align="center"><img src="22-apple-team-light.png" width="200"><br><sub>22-apple-team-light</sub></td></tr><tr>
+<td align="center"><img src="23-canvas-dark.png" width="200"><br><sub>23-canvas-dark</sub></td>
+<td align="center"><img src="23-canvas-light.png" width="200"><br><sub>23-canvas-light</sub></td>
+<td align="center"><img src="24-cards-dark.png" width="200"><br><sub>24-cards-dark</sub></td>
+<td align="center"><img src="24-cards-light.png" width="200"><br><sub>24-cards-light</sub></td></tr><tr></tr></table>
