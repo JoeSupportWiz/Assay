@@ -112,6 +112,7 @@ struct StudioRoot: View {
                         }
                     case .appleTeam: AppleTeamView()
                     case .presetFiles: GildPresetFilesView()
+                    case .buildLibrary: SignetBuildLibrary()
                     case .signerPreflight: SignerPreflightView()
                     case .gild(let g): switch g { case .tweak(let id): TweakDetailView(id: id); case .preset(let id): PresetView(id: id) }
                     }

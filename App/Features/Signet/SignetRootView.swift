@@ -125,6 +125,7 @@ struct SignetRootView: View {
     var body: some View {
         List {
             sourceSection
+            Section { NavigationLink(value: StudioRoute.buildLibrary) { Label("Get an Assay build",systemImage:"arrow.down.doc") } } footer: { Text("Fetch a compiled unsigned IPA from the private repository, verify its digest, then save it to Files.") }.rowCard()
             Section { NavigationLink(value: StudioRoute.appleTeam) { Label("Apple developer team", systemImage: "person.badge.key") } } footer: { Text("Read your registered targets and request a development profile for one target. No account changes are made without your confirmation.") }.rowCard()
             Section { NavigationLink(value: StudioRoute.signerPreflight) { Label("Check certificate & profiles", systemImage: "checkmark.seal") } } footer: { Text("Check your own public signing certificate and target profiles locally. No private key or Apple login needed.") }.rowCard()
             if store.loading {

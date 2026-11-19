@@ -43,6 +43,7 @@ jobs:
           "$RUNNER_TEMP/team-test"
           swiftc -parse-as-library App/Core/Catalog.swift App/Features/PresetFiles/PortableEdits.swift tests/preset-files/Fixture.swift -o "$RUNNER_TEMP/preset-test"
           "$RUNNER_TEMP/preset-test"
+          sh tests/build-library/run.sh
           sh tests/supporter/run.sh
           swiftc -parse-as-library App/Features/Signet/SignetBinaryEvidence.swift tests/macho/Fixture.swift -o "$RUNNER_TEMP/mach-check"
           "$RUNNER_TEMP/mach-check"

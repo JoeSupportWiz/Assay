@@ -36,6 +36,7 @@ for look in light dark; do
   if [[ "${ASSAY_CAPTURE_SET:-all}" == "all" || "${ASSAY_CAPTURE_SET:-all}" == "acceptance" ]]; then
     shot "25-preset-files-$look" "$look" -uiDemo -route preset-files
     shot "26-privacy-lock-$look" "$look" -uiDemo -route privacy-lock
+    shot "28-build-library-$look" "$look" -uiDemo -route build-library
     shot "27-supporter-$look" "$look" -uiDemo -route supporter
   fi
   if [[ "${ASSAY_CAPTURE_SET:-all}" == "acceptance" ]]; then continue; fi

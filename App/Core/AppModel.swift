@@ -61,6 +61,7 @@ final class AppModel {
             if r == "privacy-lock" || r == "supporter" { selectedTab = .more; morePath = [r == "privacy-lock" ? .lock:.supporter]; return }
             if r == "preset-files" { selectedTab = .studio; studioPath = [.module(.gild), .presetFiles]; return }
             if r == "apple-team" { selectedTab = .studio; studioPath = [.module(.signet), .appleTeam]; return }
+            if r == "build-library" { selectedTab = .studio; studioPath = [.module(.signet), .buildLibrary]; return }
             if r == "signer-preflight" { selectedTab = .studio; studioPath = [.module(.signet), .signerPreflight]; return }
             if r == "signet" { selectedTab = .studio; studioPath = [.module(.signet)]; return }
             if r == "gild" || r == "gild-staged" || r.hasPrefix("tweak:") {
@@ -177,7 +178,7 @@ enum MoreRoute: Hashable { case lock, supporter }
 enum StudioRoute: Hashable {
     case module(StudioModule)
     case gild(GildRoute)
-    case signerPreflight, appleTeam, presetFiles
+    case signerPreflight, appleTeam, presetFiles, buildLibrary
 }
 
 /// Screens pushed inside the Lab tab.
