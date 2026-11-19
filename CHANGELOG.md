@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 (3) — Device utilities
+- Compare a reported status clock to actual system time, and check a local preset log for the two exact display settings; this does not reset SpringBoard.
+- Create and undo Assay scenes; export new palette artwork at the display’s native resolution.
+- File Vault checkpoints selected documents and verifies restored copies without overwriting originals.
+- Signet matches a public signing certificate to profiles for specified bundle IDs without requesting a private key.
+- Failed receipt items no longer count as verified changes. Old engine readings are cleared when you switch engines.
+
 ## Unreleased · Studio and Lab integration
 - **Analyse with Minis**: review an allowlisted snapshot, optionally add receipt summaries or counts from an imported backup log, then share or export. A local read-only MCP server compares user-approved exports. No pairing file or model key required.
 - **Engine status** now distinguishes public iPhone checks from unimplemented system writes. The review sheet allows previews, not live writes, on real-device engines.

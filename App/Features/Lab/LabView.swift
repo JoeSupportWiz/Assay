@@ -34,6 +34,7 @@ struct LabView: View {
             }
 
             Section("Tools") {
+                NavigationLink(value: LabRoute.displayCheck) { Label("Clock & Lock Screen", systemImage: "clock") }
                 NavigationLink(value: LabRoute.minis) { Label("Analyse with Minis", systemImage: "doc.text.magnifyingglass") }
                 NavigationLink(value: LabRoute.diagnose) { Label("Diagnose a problem", systemImage: "text.magnifyingglass") }
                 NavigationLink(value: LabRoute.history) {
@@ -45,12 +46,7 @@ struct LabView: View {
                 }
                 NavigationLink(value: LabRoute.bluetooth) { Label("Bluetooth notebook", systemImage: "dot.radiowaves.left.and.right") }
                 NavigationLink(value: LabRoute.network) { Label("Local network", systemImage: "network") }
-                ForEach(LabTool.upcoming) { tool in
-                    HStack {
-                        Label(tool.title, systemImage: tool.symbol).foregroundStyle(t.ink2)
-                        Spacer(); Tag(style: .neutral, text: tool.phase)
-                    }
-                }
+                NavigationLink(value: LabRoute.fileVault) { Label("File Vault", systemImage: "tray.full") }
             }.rowCard()
 
             if let snap = model.snapshot {

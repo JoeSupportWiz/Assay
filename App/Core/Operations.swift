@@ -134,7 +134,11 @@ final class ReceiptStore {
     }
 
     var nextID: Int { (receipts.map(\.id).max() ?? 200) + 1 }
-    var changeCount: Int { receipts.filter { !$0.dryRun && !$0.rolledBack }.reduce(0) { $0 + $1.items.count } }
+    var changeCount: Int { verifiedChangeCount(engine: nil) }
+    func verifiedChangeCount(engine: EngineMode?) -> Int {
+        receipts.filter { !$0.dryRun && !$0.rolledBack && (engine == nil || $0.engine == engine) }
+            .reduce(0) { $0 + $1.items.filter { $0.outcome == .verified }.count }
+    }
 
     func add(_ r: Receipt) { receipts.insert(r, at: 0); save() }
 

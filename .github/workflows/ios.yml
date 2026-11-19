@@ -7,6 +7,11 @@ on:
         type: choice
         options: [screenshots, ipa]
         default: screenshots
+      capture_set:
+        description: "Full gallery or the four new utility screens"
+        type: choice
+        options: [all, four-utilities]
+        default: all
       commit_screens:
         description: "Commit screenshots to docs/app-screens"
         type: boolean
@@ -31,6 +36,16 @@ jobs:
       - name: Toolchain
         run: xcodebuild -version && xcrun simctl list runtimes | tail -5
 
+      - name: Verify real utilities on local fixtures
+        run: |
+          set -eu
+          bash tests/file-vault/run.sh
+          bash tests/scenes/smoke.sh
+          swiftc -parse-as-library App/Features/DisplayCheck/DisplayEvidence.swift tests/display-check/Smoke.swift -o "$RUNNER_TEMP/clock-fixture"
+          "$RUNNER_TEMP/clock-fixture"
+          swiftc App/Features/Signet/SignerPreflightRules.swift App/Features/Signet/SignerPreflightEnvelope.swift tests/signer-preflight/main.swift -o "$RUNNER_TEMP/signet-fixture"
+          "$RUNNER_TEMP/signet-fixture"
+
       # ---------- Screenshots ----------
       - name: Build for simulator
         if: inputs.mode == 'screenshots'
@@ -43,6 +58,8 @@ jobs:
           grep -q 'BUILD SUCCEEDED' build/build.log || { echo '::group::compile errors'; grep -E 'error:' build/build.log | sort -u | head -80; echo '::endgroup::'; exit 1; }
 
       - name: Render screens
+        env:
+          ASSAY_CAPTURE_SET: ${{ inputs.capture_set }}
         if: inputs.mode == 'screenshots'
         run: bash scripts/screenshots.sh build/dd/Build/Products/Debug-iphonesimulator/Assay.app docs/app-screens
 

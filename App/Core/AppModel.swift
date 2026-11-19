@@ -56,6 +56,7 @@ final class AppModel {
         if let i = args.firstIndex(of: "-route"), i + 1 < args.count {
             let r = args[i + 1]
             if r == "alchemy" { selectedTab = .studio; studioPath = [.module(.alchemy)]; return }
+            if r == "signer-preflight" { selectedTab = .studio; studioPath = [.module(.signet), .signerPreflight]; return }
             if r == "signet" { selectedTab = .studio; studioPath = [.module(.signet)]; return }
             if r == "gild" || r == "gild-staged" || r.hasPrefix("tweak:") {
                 selectedTab = .studio
@@ -70,7 +71,9 @@ final class AppModel {
                 return
             }
             selectedTab = .lab
-            if r == "minis-report" { labPath = [.minis] }
+            if r == "display-check" { labPath = [.displayCheck] }
+            else if r == "file-vault" { labPath = [.fileVault] }
+            else if r == "minis-report" { labPath = [.minis] }
             else if r == "diagnose" { labPath = [.diagnose] }
             else if r == "history" { labPath = [.history] }
             else if r == "bluetooth" { labPath = [.bluetooth] }
@@ -90,7 +93,9 @@ final class AppModel {
         d.set(userName, forKey: "userName")
     }
 
+    private(set) var engineGeneration = UUID()
     private func rebuildEngine() {
+        engineGeneration = UUID(); snapshot = nil; findings = []; lastCheck = nil; checking = false; activePlan = nil; tweaks = TweakState()
         switch engineMode {
         case .iphone: engine = OnDeviceEngine()
         case .mac: engine = MacCompanionEngine()
@@ -110,17 +115,19 @@ final class AppModel {
     }
 
     @MainActor func refresh() async {
-        snapshot = await engine.snapshot()
+        let g = engineGeneration, snap = await engine.snapshot()
+        if g == engineGeneration { snapshot = snap }
     }
 
     /// Read-only device check: snapshot + findings.
     @MainActor func runCheck() async {
         guard !checking else { return }
         checking = true
-        snapshot = await engine.snapshot()
-        let f = await engine.check()
-        try? await Task.sleep(for: .milliseconds(500))
-        withAnimation(Motion.spring) { findings = f; lastCheck = Date(); checking = false }
+        let g = engineGeneration, selected = engine
+        let snap = await selected.snapshot()
+        let f = await selected.standardCheck(snapshot: snap)
+        guard g == engineGeneration else { return }
+        withAnimation(Motion.spring) { snapshot = snap; findings = f; lastCheck = Date(); checking = false }
     }
 
     /// Run a reviewed plan through the current engine and record a receipt.
@@ -164,11 +171,12 @@ struct Toast: Identifiable, Equatable {
 enum StudioRoute: Hashable {
     case module(StudioModule)
     case gild(GildRoute)
+    case signerPreflight
 }
 
 /// Screens pushed inside the Lab tab.
 enum LabRoute: Hashable {
-    case diagnose, history, bluetooth, network, minis
+    case diagnose, history, bluetooth, network, minis, displayCheck, fileVault
     case symptom(String)
     case receipt(Int)
 }

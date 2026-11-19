@@ -28,7 +28,7 @@ struct HomeView: View {
                     LabeledContent("Health") { Text("Run a check").foregroundStyle(t.ink3) }
                 }
                 if let b = model.snapshot?.backup { backupRow(b) }
-                LabeledContent("Changes made") { Text("\(model.receipts.changeCount)").monospacedDigit() }
+                LabeledContent("Verified preference changes") { Text("\(model.receipts.verifiedChangeCount(engine: model.engine.mode))").monospacedDigit() }
             }.rowCard()
 
             Section("Shortcuts") {

@@ -155,6 +155,9 @@ struct SymptomView: View {
                     }
                 }.rowCard()
 
+                if id == "clock-941" || id == "green-line" {
+                    Section { NavigationLink(value: LabRoute.displayCheck) { Label("Check the clock and preset evidence", systemImage: "clock") } }.rowCard()
+                }
                 Section("What we think is happening") {
                     Text(s.cause).foregroundStyle(t.ink)
                     HStack { Tag(style: .inferred(s.confidence)); Text("Matches reports, not proof for your phone").font(.system(size: 12.5)).foregroundStyle(t.ink3) }
@@ -196,7 +199,7 @@ struct SymptomView: View {
                     }
                 } else {
                     Section("What helps") {
-                        Text("Backups run through an on-device tunnel that can lose packets. Keep Assay open with the screen on, turn Low Power Mode off, and choose the Mac companion engine for the fastest, most reliable backups.")
+                        Text("For a whole-iPhone backup today, use Finder on a trusted Mac over USB. File Vault backs up only files you select. A reset in a log is evidence of an interrupted connection, not proof of what caused it.")
                             .foregroundStyle(t.ink)
                     }.rowCard()
                 }

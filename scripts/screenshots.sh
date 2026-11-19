@@ -33,6 +33,11 @@ shot() { # name, appearance, args...
 }
 
 for look in light dark; do
+  shot "18-clock-evidence-$look" "$look" -route display-check -uiDemo
+  shot "19-file-vault-$look" "$look" -route file-vault -uiDemo
+  shot "20-scenes-library-$look" "$look" -tab scenes -uiDemo
+  shot "21-signer-preflight-$look" "$look" -route signer-preflight -uiDemo
+  if [[ "${ASSAY_CAPTURE_SET:-all}" == "four-utilities" ]]; then continue; fi
   shot "00-onboarding-$look"  "$look" -onboarding
   shot "01-home-$look"        "$look" -uiDemo -tab home
   shot "02-lab-$look"         "$look" -uiDemo -tab lab
@@ -52,12 +57,15 @@ for look in light dark; do
   shot "16-minis-$look"       "$look" -uiDemo -route minis-report
   shot "17-minis-review-$look" "$look" -uiDemo -route minis-report -minisReportPreview
 done
+if [[ "${ASSAY_CAPTURE_SET:-all}" != "four-utilities" ]]; then
 shot "01-home-millennium" light -uiDemo -tab home -theme millennium
 shot "01-home-pinstripe"  light -uiDemo -tab home -theme pinstripe
 shot "01-home-wallpaper"  dark  -uiDemo -tab home -theme wallpaper
 shot "09-gild-millennium" light -uiDemo -route gild -theme millennium
 shot "09-gild-pinstripe"  light -uiDemo -route gild -theme pinstripe
 shot "09-gild-wallpaper"  dark  -uiDemo -route gild -theme wallpaper
+
+fi
 
 # Contact sheet for quick review
 python3 - "$OUT" <<'PY'

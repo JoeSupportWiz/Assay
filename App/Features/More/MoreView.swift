@@ -21,8 +21,8 @@ struct MoreView: View {
             }.rowCard()
 
             Section {
-                LabeledContent("Version") { Text("0.1.0 (1)") }
-                LabeledContent("Build") { Text("Phase 1 · safety core") }
+                LabeledContent("Version") { Text("\(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—") (\(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"))") }
+                LabeledContent("Build") { Text("Device utilities preview") }
             } footer: { Text("Assay is a working name · not affiliated with Apple.") }.rowCard()
         }
         .themedList()

@@ -24,6 +24,9 @@ Built in order, one shippable slice at a time. Each slice ends with simulator sc
 | 1.4 | Diagnose: describe or pick a problem → cause, confidence, current value, fix (9:41 clock, green line, touch dots…) | ✅ keyword match · AI reasoning arrives with 5.x |
 | 1.5 | Fix sheet: review diff → dry run → applying → result → "is it fixed?" check | ✅ |
 
+## Device utilities · version 0.3.0 (3)
+Real [file checkpoints and verified export](features/file-vault.md), [scene activation and undo](features/scenes.md), [certificate/profile preflight](features/signer-preflight.md), and a live clock/preset-log check. No system preference writes, automatic device layout changes or signing implied.
+
 ## Phase 2 — Gild (tweaks)
 | # | Slice | Status |
 |---|---|---|
@@ -45,7 +48,7 @@ Built in order, one shippable slice at a time. Each slice ends with simulator sc
 ## Phase 4 — Scenes & Studio
 | # | Slice | Status |
 |---|---|---|
-| 4.1 | Scenes: recipes, composer, preview, consistency check, guided apply, snapshots (x10) | ○ |
+| 4.1 | Scene library, activation, wallpaper PNG export, undo | Local scene CRUD/appearance; system layout, widget automation and snapshots pending |
 | 4.2 | Palette Lab (x06) + Wallpaper-match theme | ○ |
 | 4.3 | Canvas / Poster Studio: `.tendies` import, inspect, layers, timeline, validate, export (x11) | ○ |
 | 4.4 | Cards: Wallet visual editor | ○ |

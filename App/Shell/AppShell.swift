@@ -21,7 +21,7 @@ struct RootView: View {
         .environment(\.theme, theme)
         .tint(theme.accentColor)
         .preferredColorScheme(preferredScheme)
-        .task { await model.refresh() }
+        .task(id: model.engineGeneration) { await model.refresh() }
     }
 
     private var preferredScheme: ColorScheme? {
@@ -64,7 +64,7 @@ struct MainShell: View {
                 Group {
                     switch tab {
                     case .home: NavigationStack { HomeView() }
-                    case .scenes: NavigationStack { ScenesView() }
+                    case .scenes: NavigationStack { SceneLibraryView() }
                     case .studio: StudioRoot()
                     case .lab: LabRoot()
                     case .more: NavigationStack { MoreView() }
@@ -100,6 +100,7 @@ struct StudioRoot: View {
                         case .signet: SignetRootView()
                         default: ModuleComingView(module: m)
                         }
+                    case .signerPreflight: SignerPreflightView()
                     case .gild(let g): switch g { case .tweak(let id): TweakDetailView(id: id); case .preset(let id): PresetView(id: id) }
                     }
                 }
@@ -118,6 +119,8 @@ struct LabRoot: View {
                     switch route {
                     case .diagnose: DiagnoseView()
                     case .history: HistoryView()
+                    case .displayCheck: DisplayCheckView()
+                    case .fileVault: FileVaultView()
                     case .minis: MinisReviewView()
                     case .bluetooth: BluetoothRootView()
                     case .network: NetworkRootView()

@@ -125,6 +125,7 @@ struct SignetRootView: View {
     var body: some View {
         List {
             sourceSection
+            Section { NavigationLink(value: StudioRoute.signerPreflight) { Label("Check certificate & profiles", systemImage: "checkmark.seal") } } footer: { Text("Check your own public signing certificate and target profiles locally. No private key or Apple login needed.") }.rowCard()
             if store.loading {
                 Section {
                     HStack(spacing: 12) {
