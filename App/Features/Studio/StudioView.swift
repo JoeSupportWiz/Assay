@@ -20,7 +20,7 @@ enum StudioModule: String, CaseIterable, Identifiable, Hashable {
         case .signet: "Developer account, per-target profiles and entitlements, expiry and guided renewal."
         }
     }
-    var phase: String { switch self { case .gild: "Phase 2"; case .canvas: "Phase 4"; case .cards: "Phase 4"; case .alchemy: "Phase 5"; case .signet: "Phase 6" } }
+    var phase: String { switch self { case .gild: "Live"; case .canvas: "Phase 4"; case .cards: "Phase 4"; case .alchemy: "Phase 5"; case .signet: "Phase 6" } }
 }
 
 struct StudioView: View {
@@ -29,7 +29,7 @@ struct StudioView: View {
         List {
             Section {
                 ForEach(StudioModule.allCases) { m in
-                    NavigationLink(value: m) {
+                    NavigationLink(value: StudioRoute.module(m)) {
                         HStack(spacing: 12) {
                             IconTile(symbol: m.symbol, hue: m.hue, size: 34)
                             VStack(alignment: .leading, spacing: 1) {
@@ -44,7 +44,7 @@ struct StudioView: View {
         }
         .themedList()
         .navigationTitle("Studio")
-        .navigationDestination(for: StudioModule.self) { ModuleComingView(module: $0) }
+
     }
 }
 

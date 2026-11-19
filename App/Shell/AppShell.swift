@@ -43,6 +43,14 @@ extension Theme {
         default: isDark ? Color(hex: 0xF5F4F0) : Palette.ink
         }
     }
+    /// Selected tab tint, chosen to read on that theme's tab bar.
+    var tabTint: Color {
+        switch id {
+        case .millennium: Color(hex: 0xA6F59A)
+        case .pinstripe: Color(hex: 0x6FB8FF)
+        default: accentColor
+        }
+    }
 }
 
 struct MainShell: View {
@@ -57,7 +65,7 @@ struct MainShell: View {
                     switch tab {
                     case .home: NavigationStack { HomeView() }
                     case .scenes: NavigationStack { ScenesView() }
-                    case .studio: NavigationStack { StudioView() }
+                    case .studio: StudioRoot()
                     case .lab: LabRoot()
                     case .more: NavigationStack { MoreView() }
                     }
@@ -66,10 +74,29 @@ struct MainShell: View {
                 .tag(tab)
             }
         }
+        .tint(t.tabTint)
+        .themedBars()
         .sheet(item: $model.activePlan) { plan in
             FixSheet(plan: plan)
                 .presentationDetents([.large])
                 .environment(\.theme, t)
+        }
+    }
+}
+
+/// Studio owns a path so Diagnose and Home can deep-link into Gild.
+struct StudioRoot: View {
+    @Environment(AppModel.self) private var model
+    var body: some View {
+        @Bindable var model = model
+        NavigationStack(path: $model.studioPath) {
+            StudioView()
+                .navigationDestination(for: StudioRoute.self) { r in
+                    switch r {
+                    case .module(let m): if m == .gild { GildView() } else { ModuleComingView(module: m) }
+                    case .gild(let g): switch g { case .tweak(let id): TweakDetailView(id: id); case .preset(let id): PresetView(id: id) }
+                    }
+                }
         }
     }
 }

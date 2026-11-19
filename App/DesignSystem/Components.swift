@@ -124,15 +124,30 @@ struct ThemedBackground: View {
     var body: some View {
         if t.id == .wallpaper, t.wallpaperColors.count == 5 {
             LinearGradient(colors: [t.wallpaperColors[1], t.wallpaperColors[4]], startPoint: .top, endPoint: .bottom).ignoresSafeArea()
+        } else if t.id == .pinstripe {
+            Image(uiImage: PinstripeTile.image).resizable(resizingMode: .tile).ignoresSafeArea()
         } else {
             t.bg.ignoresSafeArea()
         }
     }
 }
 
+/// 7 pt tile (5 pt base + 2 pt stripe), rendered once at device scale and tiled. Cheap and sharp.
+enum PinstripeTile {
+    static let image: UIImage = {
+        let size = CGSize(width: 7, height: 7)
+        return UIGraphicsImageRenderer(size: size, format: { let f = UIGraphicsImageRendererFormat(); f.scale = UIScreen.main.scale; f.opaque = true; return f }()).image { ctx in
+            UIColor(red: 0xC5/255, green: 0xCC/255, blue: 0xD4/255, alpha: 1).setFill(); ctx.fill(CGRect(origin: .zero, size: size))
+            UIColor(red: 0xCB/255, green: 0xD2/255, blue: 0xD8/255, alpha: 1).setFill(); ctx.fill(CGRect(x: 5, y: 0, width: 2, height: 7))
+        }
+    }()
+}
+
 extension View {
     /// Native grouped list on the theme's background and card colour.
     func themedList() -> some View { modifier(ThemedListStyle()) }
+    /// Applies the theme's native bar styling (tab bar and navigation bar).
+    func themedBars() -> some View { modifier(ThemedBars()) }
     func rowCard() -> some View { modifier(RowCard()) }
 }
 
@@ -144,7 +159,38 @@ private struct ThemedListStyle: ViewModifier {
 
 private struct RowCard: ViewModifier {
     @Environment(\.theme) private var t
-    func body(content: Content) -> some View { content.listRowBackground(t.card) }
+    func body(content: Content) -> some View {
+        if t.glass {
+            content.listRowBackground(Rectangle().fill(.ultraThinMaterial).overlay(Color.white.opacity(0.05)))
+        } else {
+            content.listRowBackground(t.card)
+        }
+    }
+}
+
+private struct ThemedBars: ViewModifier {
+    @Environment(\.theme) private var t
+    func body(content: Content) -> some View {
+        switch t.id {
+        case .millennium:
+            content
+                .toolbarBackground(Color(hex: 0x245EDB), for: .tabBar)
+                .toolbarBackground(.visible, for: .tabBar)
+                .toolbarColorScheme(.dark, for: .tabBar)
+        case .pinstripe:
+            content
+                .toolbarBackground(Color(hex: 0x1B1B1D), for: .tabBar)
+                .toolbarBackground(.visible, for: .tabBar)
+                .toolbarColorScheme(.dark, for: .tabBar)
+        case .wallpaper:
+            content
+                .toolbarBackground(.ultraThinMaterial, for: .tabBar)
+                .toolbarBackground(.visible, for: .tabBar)
+                .toolbarColorScheme(.dark, for: .tabBar)
+        default:
+            content
+        }
+    }
 }
 
 struct PrimaryButtonStyle: ButtonStyle {

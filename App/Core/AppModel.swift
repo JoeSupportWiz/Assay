@@ -23,6 +23,7 @@ final class AppModel {
     // Live state
     var selectedTab: AppTab = .home
     var labPath: [LabRoute] = []
+    var studioPath: [StudioRoute] = []
     var toast: Toast?
     private(set) var engine: any DeviceEngine = DemoEngine()
     var snapshot: DeviceSnapshot?
@@ -32,6 +33,7 @@ final class AppModel {
     /// Operation being reviewed in the fix sheet.
     var activePlan: OperationPlan?
     var receipts: ReceiptStore
+    var tweaks = TweakState()
     private let uiDemo: Bool
 
     init() {
@@ -53,6 +55,18 @@ final class AppModel {
         rebuildEngine()
         if let i = args.firstIndex(of: "-route"), i + 1 < args.count {
             let r = args[i + 1]
+            if r == "gild" || r == "gild-staged" || r.hasPrefix("tweak:") {
+                selectedTab = .studio
+                if r == "gild" { studioPath = [.module(.gild)] }
+                else if r == "gild-staged" {
+                    studioPath = [.module(.gild)]
+                    for id in ["SBShowStatusBarOverridesForRecording", "SBShowAuthenticationEngineeringUI", "SBDontDimOrLockOnAC"] {
+                        if let t = TweakCatalog.tweak(id) { tweaks.stage(t, value: nil) }
+                    }
+                    if let t = TweakCatalog.tweak("SBHideLowPowerAlerts") { tweaks.stage(t, value: nil) }
+                } else { studioPath = [.module(.gild), .gild(.tweak(String(r.dropFirst(6))))] }
+                return
+            }
             selectedTab = .lab
             if r == "diagnose" { labPath = [.diagnose] }
             else if r == "history" { labPath = [.history] }
@@ -109,7 +123,7 @@ final class AppModel {
         let r = await OperationRunner.run(plan, engine: engine, dryRun: dryRun, receiptID: receipts.nextID, progress: progress)
         receipts.add(r)
         if !dryRun && !plan.undoOf.isEmpty && r.status != .failed { receipts.markRolledBack(plan.undoOf) }
-        if !dryRun { await runCheck() }
+        if !dryRun { tweaks.discard(); await tweaks.load(engine: engine); await runCheck() }
         return r
     }
 
@@ -140,6 +154,12 @@ struct Toast: Identifiable, Equatable {
     var symbol: String = "checkmark"
 }
 
+
+/// Screens pushed inside the Studio tab.
+enum StudioRoute: Hashable {
+    case module(StudioModule)
+    case gild(GildRoute)
+}
 
 /// Screens pushed inside the Lab tab.
 enum LabRoute: Hashable {

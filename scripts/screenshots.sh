@@ -36,10 +36,16 @@ for look in light dark; do
   shot "06-history-$look"     "$look" -uiDemo -route history
   shot "07-studio-$look"      "$look" -uiDemo -tab studio
   shot "08-more-$look"        "$look" -uiDemo -tab more
+  shot "09-gild-$look"        "$look" -uiDemo -route gild
+  shot "10-tweak-$look"       "$look" -uiDemo -route tweak:SBShowStatusBarOverridesForRecording
+  shot "11-staged-$look"      "$look" -uiDemo -route gild-staged
 done
 shot "01-home-millennium" light -uiDemo -tab home -theme millennium
 shot "01-home-pinstripe"  light -uiDemo -tab home -theme pinstripe
 shot "01-home-wallpaper"  dark  -uiDemo -tab home -theme wallpaper
+shot "09-gild-millennium" light -uiDemo -route gild -theme millennium
+shot "09-gild-pinstripe"  light -uiDemo -route gild -theme pinstripe
+shot "09-gild-wallpaper"  dark  -uiDemo -route gild -theme wallpaper
 
 # Contact sheet for quick review
 python3 - "$OUT" <<'PY'

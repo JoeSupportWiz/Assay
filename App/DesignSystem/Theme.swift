@@ -74,6 +74,8 @@ struct Theme {
     var tabBar: AnyShapeStyle, tabActive: AnyShapeStyle, tabActiveInk: Color, tabInk: Color
     var cardRadius: CGFloat, tileRadius: CGFloat, pillRadius: CGFloat
     var titleFont: Font.Design = .default
+    var fontName: String? = nil
+    var listCorner: CGFloat = 12
     var glossy = false
     var glass = false
     var isDark = false
@@ -116,7 +118,7 @@ extension Theme {
         accent: S(Color(hex: 0xFFF6C9)), accentInk: .black,
         tabBar: G([(0x3C81F3, 0), (0x245EDB, 0.08), (0x2A68E8, 0.45), (0x1C4FC4, 1)]),
         tabActive: G([(0x4BB140, 0), (0x36A02C, 0.5), (0x2A8422, 1)]), tabActiveInk: .white, tabInk: .white.opacity(0.85),
-        cardRadius: 8, tileRadius: 4, pillRadius: 4)
+        cardRadius: 8, tileRadius: 4, pillRadius: 4, fontName: "Tahoma", listCorner: 4)
 
     static let pinstripe = Theme(id: .pinstripe, bg: Color(hex: 0xC5CCD4), card: .white, cardBorder: Color(hex: 0xA7ABB2),
         ink: .black, ink2: Color(hex: 0x4C566C), ink3: Color(hex: 0x7A8394), soft: Color(hex: 0xE3E6EA),
@@ -124,7 +126,7 @@ extension Theme {
         hero: gloss(0x5A5A5E, 0x2E2E31, 0x141416, 0x0A0A0B), heroInk: .white,
         accent: gloss(0xFFF3A8, 0xFBE25C, 0xF5D338, 0xF2C925), accentInk: Color(hex: 0x3A2A00),
         tabBar: gloss(0x4A4A4D, 0x262628, 0x0E0E0F, 0x050505), tabActive: S(.white.opacity(0.14)), tabActiveInk: .white, tabInk: .white.opacity(0.7),
-        cardRadius: 11, tileRadius: 13, pillRadius: 9, glossy: true)
+        cardRadius: 11, tileRadius: 13, pillRadius: 9, glossy: true, fontName: "HelveticaNeue", listCorner: 10)
 
     /// Glass over a wallpaper palette (lightest → primary, darkest → onPrimary).
     static func wallpaper(_ palette: WallpaperPalette) -> Theme {

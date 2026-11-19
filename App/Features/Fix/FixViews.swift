@@ -79,6 +79,11 @@ struct SymptomView: View {
 
                 if let key = s.culprit {
                     Section("On your device") {
+                        if let tw = TweakCatalog.all.first(where: { $0.target == key }) {
+                            Button { model.selectedTab = .studio; model.studioPath = [.module(.gild), .gild(.tweak(tw.id))] } label: {
+                                Label("Open in Gild", systemImage: "slider.horizontal.3")
+                            }
+                        }
                         LabeledContent("Setting") { Text(key.key).font(.system(size: 12.5, design: .monospaced)).multilineTextAlignment(.trailing) }
                         LabeledContent("Domain") { Text(key.domain).font(.system(size: 12.5, design: .monospaced)).multilineTextAlignment(.trailing) }
                         if !loaded {
