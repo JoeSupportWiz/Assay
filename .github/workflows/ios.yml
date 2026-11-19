@@ -39,6 +39,8 @@ jobs:
       - name: Verify real utilities on local fixtures
         run: |
           set -eu
+          swiftc -parse-as-library App/Features/AppleTeam/TeamPortal.swift tests/apple-team/TeamFixture.swift -o "$RUNNER_TEMP/team-test"
+          "$RUNNER_TEMP/team-test"
           bash tests/file-vault/run.sh
           bash tests/scenes/smoke.sh
           swiftc -parse-as-library App/Features/DisplayCheck/DisplayEvidence.swift tests/display-check/Smoke.swift -o "$RUNNER_TEMP/clock-fixture"

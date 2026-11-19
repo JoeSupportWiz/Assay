@@ -33,6 +33,7 @@ shot() { # name, appearance, args...
 }
 
 for look in light dark; do
+  shot "22-apple-team-$look" "$look" -uiDemo -route apple-team
   shot "18-clock-evidence-$look" "$look" -route display-check -uiDemo
   shot "19-file-vault-$look" "$look" -route file-vault -uiDemo
   shot "20-scenes-library-$look" "$look" -tab scenes -uiDemo

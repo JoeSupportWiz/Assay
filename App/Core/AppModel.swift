@@ -56,6 +56,7 @@ final class AppModel {
         if let i = args.firstIndex(of: "-route"), i + 1 < args.count {
             let r = args[i + 1]
             if r == "alchemy" { selectedTab = .studio; studioPath = [.module(.alchemy)]; return }
+            if r == "apple-team" { selectedTab = .studio; studioPath = [.module(.signet), .appleTeam]; return }
             if r == "signer-preflight" { selectedTab = .studio; studioPath = [.module(.signet), .signerPreflight]; return }
             if r == "signet" { selectedTab = .studio; studioPath = [.module(.signet)]; return }
             if r == "gild" || r == "gild-staged" || r.hasPrefix("tweak:") {
@@ -171,7 +172,7 @@ struct Toast: Identifiable, Equatable {
 enum StudioRoute: Hashable {
     case module(StudioModule)
     case gild(GildRoute)
-    case signerPreflight
+    case signerPreflight, appleTeam
 }
 
 /// Screens pushed inside the Lab tab.

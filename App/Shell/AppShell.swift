@@ -21,6 +21,7 @@ struct RootView: View {
         .environment(\.theme, theme)
         .tint(theme.accentColor)
         .preferredColorScheme(preferredScheme)
+        .onAppear { SceneLibraryStore.shared.attach(to: model) }
         .task(id: model.engineGeneration) { await model.refresh() }
     }
 
@@ -100,6 +101,7 @@ struct StudioRoot: View {
                         case .signet: SignetRootView()
                         default: ModuleComingView(module: m)
                         }
+                    case .appleTeam: AppleTeamView()
                     case .signerPreflight: SignerPreflightView()
                     case .gild(let g): switch g { case .tweak(let id): TweakDetailView(id: id); case .preset(let id): PresetView(id: id) }
                     }
