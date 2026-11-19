@@ -192,14 +192,15 @@ struct SymptomView: View {
                         if model.engine.canRead && loaded && current != s.culpritValue {
                             Text("This setting isn't on, so it isn't the cause here.")
                         } else if !model.engine.canRead {
-                            Text("This engine can't read or write yet. You can still review exactly what would change.")
+                            Text("Assay cannot read or reset that system preference. Editing a copy of the original preset can prevent that copy from selecting it again.")
                         } else {
                             Text("You'll see exactly what changes, and can do a dry run first.")
                         }
                     }
                 } else {
                     Section("What helps") {
-                        Text("For a whole-iPhone backup today, use Finder on a trusted Mac over USB. File Vault backs up only files you select. A reset in a log is evidence of an interrupted connection, not proof of what caused it.")
+                        if model.engine.mode != .demo { NavigationLink(value: LabRoute.usbHandoff) { Label("USB backup with a Mac", systemImage: "externaldrive") } }
+                        Text("File Vault backs up selected files. For a standard device backup, use the Mac handoff or Finder over USB. Neither can establish why an earlier transfer stopped.")
                             .foregroundStyle(t.ink)
                     }.rowCard()
                 }
@@ -208,7 +209,9 @@ struct SymptomView: View {
             .navigationTitle("Problem")
             .navigationBarTitleDisplayMode(.inline)
             .safeAreaInset(edge: .bottom) {
-                if s.culprit != nil {
+                if model.engine.mode != .demo && (id == "clock-941" || id == "green-line") {
+                    NavigationLink(value: LabRoute.displayPreset) { Text("Review the exported preset") }.buttonStyle(PrimaryButtonStyle()).padding(.horizontal,20).padding(.vertical,10).background(.bar)
+                } else if s.culprit != nil {
                     Button { model.activePlan = s.plan(current: current) } label: { Text("Review the fix") }
                         .buttonStyle(PrimaryButtonStyle())
                         .disabled(model.engine.canRead && loaded && current != s.culpritValue)

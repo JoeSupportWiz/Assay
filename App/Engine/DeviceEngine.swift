@@ -118,6 +118,9 @@ enum LocalFacts {
         } else {
             f.append(Fact(label: "Battery", value: "Not reported", evidence: .unknown, source: "Simulator or unavailable"))
         }
+        let charge: String
+        switch d.batteryState { case .unplugged: charge = "Unplugged"; case .charging: charge = "Charging"; case .full: charge = "Full"; default: charge = "Not reported" }
+        f.append(Fact(label: "Charging state", value: charge, evidence: charge == "Not reported" ? .unknown : .observed, source: "UIDevice"))
         f.append(Fact(label: "Low Power Mode", value: ProcessInfo.processInfo.isLowPowerModeEnabled ? "On" : "Off", evidence: .observed, source: "ProcessInfo"))
         f.append(Fact(label: "Thermal state", value: thermal(), evidence: .observed, source: "ProcessInfo"))
         if let free = freeStorage() {

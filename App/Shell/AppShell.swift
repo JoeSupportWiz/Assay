@@ -133,6 +133,8 @@ struct LabRoot: View {
                     case .diagnose: DiagnoseView()
                     case .history: HistoryView()
                     case .displayCheck: DisplayCheckView()
+                    case .displayPreset: DisplayPresetCopyView()
+                    case .usbHandoff: USBBackupHandoffView()
                     case .fileVault: FileVaultView()
                     case .bench: BenchView()
                     case .crashReview: CrashReviewView()

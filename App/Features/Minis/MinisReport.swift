@@ -72,6 +72,7 @@ struct MinisReport: Encodable, Sendable {
                 guard (2...4).contains(value.utf8.count), value.last == "%", let n = Int(value.dropLast()),
                       (0...100).contains(n), value == "\(n)%" else { return nil }
             }
+        case "Charging state": guard ["Charging", "Unplugged", "Full", "Not reported"].contains(value) else { return nil }
         case "Low Power Mode": guard ["On", "Off"].contains(value) else { return nil }
         case "Thermal state": guard ["Nominal", "Fair", "Serious", "Critical", "Unknown"].contains(value) else { return nil }
         case "Status bar override": guard ["Present", "None"].contains(value) else { return nil }

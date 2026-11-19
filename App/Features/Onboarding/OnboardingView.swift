@@ -48,8 +48,8 @@ struct OnboardingView: View {
             Spacer().frame(height: 40)
             Text("How should Assay reach your iPhone?").font(.title.bold()).foregroundStyle(t.ink)
             Text("You can change this later in More › Engine.").foregroundStyle(t.ink2)
-            option(.mac, "Mac companion", "Not connected. Use Finder on your Mac for a USB device backup.")
-            option(.iphone, "iPhone only", "Checks this iPhone. System preferences are read-only here.")
+            option(.mac, "Mac companion", "Hand off a standard USB backup to your Mac and import its result.")
+            option(.iphone, "iPhone only", "Check the clock, inspect logs, or save a corrected copy of a display preset.")
         }
     }
 
@@ -65,7 +65,7 @@ struct OnboardingView: View {
             }
             .padding(14).background(t.card, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(choice == m ? t.accentColor : .clear, lineWidth: 2))
-        }.buttonStyle(.plain).disabled(m == .mac)
+        }.buttonStyle(.plain)
     }
 
     private func advance() {

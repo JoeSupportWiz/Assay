@@ -10,7 +10,7 @@ on:
       capture_set:
         description: "Full gallery or the four new utility screens"
         type: choice
-        options: [all, four-utilities, studio, acceptance, brand-audit]
+        options: [all, four-utilities, studio, acceptance, brand-audit, device-workflows]
         default: all
       commit_screens:
         description: "Commit screenshots to docs/app-screens"
@@ -43,6 +43,12 @@ jobs:
           "$RUNNER_TEMP/team-test"
           swiftc -parse-as-library App/Core/Catalog.swift App/Features/PresetFiles/PortableEdits.swift tests/preset-files/Fixture.swift -o "$RUNNER_TEMP/preset-test"
           "$RUNNER_TEMP/preset-test"
+          swiftc -parse-as-library App/Features/DisplayPreset/DisplayPresetCopy.swift tests/display-preset/Fixture.swift -o "$RUNNER_TEMP/display-preset-test"
+          "$RUNNER_TEMP/display-preset-test"
+          python3 scripts/package-mac-helper.py --check
+          python3 -m unittest discover -s integrations/minis/tests
+          sh tests/usb-handoff/run.sh
+          python3 -m unittest discover -s Mac/usb-backup -p 'test_*.py'
           sh tests/build-library/run.sh
           swiftc -parse-as-library App/Core/Operations.swift tests/rollback-review/Fixture.swift -o "$RUNNER_TEMP/rollback-test"
           "$RUNNER_TEMP/rollback-test"
@@ -61,8 +67,7 @@ jobs:
           swiftc -parse-as-library App/Features/Canvas/CanvasArchive.swift App/Features/Signet/SignetZip.swift tests/canvas/Fixture.swift -o "$RUNNER_TEMP/canvas-test"
           "$RUNNER_TEMP/canvas-test" App/ArtResources/AssayCanvasSample.zip
           bash tests/scenes/smoke.sh
-          swiftc -parse-as-library App/Features/DisplayCheck/DisplayEvidence.swift tests/display-check/Smoke.swift -o "$RUNNER_TEMP/clock-fixture"
-          "$RUNNER_TEMP/clock-fixture"
+          sh tests/display-check/run.sh
           swiftc App/Features/Signet/SignerPreflightRules.swift App/Features/Signet/SignerPreflightEnvelope.swift tests/signer-preflight/main.swift -o "$RUNNER_TEMP/signet-fixture"
           "$RUNNER_TEMP/signet-fixture"
 

@@ -35,6 +35,10 @@ struct LabView: View {
 
             Section("Tools") {
                 NavigationLink(value: LabRoute.displayCheck) { Label("Clock & Lock Screen", systemImage: "clock") }
+                if model.engine.mode != .demo {
+                    NavigationLink(value: LabRoute.displayPreset) { Label("Edit a display preset copy", systemImage: "doc.on.doc") }
+                    NavigationLink(value: LabRoute.usbHandoff) { Label("USB backup with a Mac", systemImage: "externaldrive") }
+                }
                 NavigationLink(value: LabRoute.minis) { Label("Analyse with Minis", systemImage: "doc.text.magnifyingglass") }
                 NavigationLink(value: LabRoute.diagnose) { Label("Diagnose a problem", systemImage: "text.magnifyingglass") }
                 NavigationLink(value: LabRoute.bench) { Label("Test bench", systemImage: "checklist") }

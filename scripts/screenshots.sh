@@ -33,6 +33,12 @@ shot() { # name, appearance, args...
 }
 
 for look in light dark; do
+  if [[ "${ASSAY_CAPTURE_SET:-all}" == "device-workflows" ]]; then
+    shot "35-display-preset-$look" "$look" -uiIPhone -route display-preset
+    shot "36-usb-handoff-$look" "$look" -uiIPhone -route usb-backup
+    shot "37-clock-check-$look" "$look" -uiIPhone -route display-check
+    continue
+  fi
   if [[ "${ASSAY_CAPTURE_SET:-all}" == "brand-audit" ]]; then
     shot "00-onboarding-$look" "$look" -onboarding
     shot "01-home-$look" "$look" -uiDemo -tab home
@@ -106,6 +112,6 @@ import sys, pathlib
 out = pathlib.Path(sys.argv[1])
 imgs = sorted(p.name for p in out.glob("*.png"))
 rows = "\n".join(f'<td align="center"><img src="{n}" width="200"><br><sub>{n[:-4]}</sub></td>' + ("</tr><tr>" if (i+1) % 4 == 0 else "") for i, n in enumerate(imgs))
-(out / "README.md").write_text(f"# App screenshots\n\nRendered by CI in the iOS Simulator (demo engine, 9:41 status bar).\n\n<table><tr>{rows}</tr></table>\n")
+(out / "README.md").write_text(f"# App screenshots\n\nRendered by CI in the iOS Simulator (9:41 status bar; device-workflow screens use iPhone mode).\n\n<table><tr>{rows}</tr></table>\n")
 PY
 echo "Done: $(ls "$OUT"/*.png | wc -l) screenshots"

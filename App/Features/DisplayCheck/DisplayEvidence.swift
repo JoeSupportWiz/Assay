@@ -30,12 +30,30 @@ enum DisplayClockComparison: Equatable {
     case matches, differs, indeterminate
     /// Comparison is local, not an internet time check. Accept 12h (no AM/PM) or 24h. A minute boundary is ambiguous.
     static func evaluate(_ visible: String, at date: Date, calendar: Calendar = .current) -> Self? {
-        let s = visible.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: ".", with: ":")
-        let a=s.split(separator: ":", omittingEmptySubsequences: false)
-        guard a.count==2, (1...2).contains(a[0].count), a[1].count==2,
-              s.utf8.allSatisfy({ (48...57).contains($0) || $0==58 }),
-              let h=Int(a[0]), (0...23).contains(h), let m=Int(a[1]), (0...59).contains(m) else { return nil }
-        func same(_ d: Date) -> Bool { let hour=calendar.component(.hour, from:d); return calendar.component(.minute,from:d)==m && (h==hour || h == (hour+11)%12+1) }
+        guard let minute = DisplayMinute(visible) else { return nil }
+        return minute.compare(at: date, calendar: calendar, allow12Hour: true)
+    }
+}
+
+struct DisplayMinute: Equatable {
+    let hour: Int, minute: Int
+    var text: String { String(format: "%02d:%02d", hour, minute) }
+
+    init?(_ input: String, strict24Hour: Bool = false) {
+        let s = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        let fields = s.replacingOccurrences(of: ".", with: ":").split(separator: ":", omittingEmptySubsequences: false)
+        guard fields.count == 2, (1...2).contains(fields[0].count), fields[1].count == 2,
+              fields.allSatisfy({ $0.utf8.allSatisfy { (48...57).contains($0) } }),
+              let h = Int(fields[0]), h < 24, let m = Int(fields[1]), m < 60,
+              !strict24Hour || (fields[0].count == 2 && s.contains(":")) else { return nil }
+        hour = h; minute = m
+    }
+
+    func compare(at date: Date, calendar: Calendar, allow12Hour: Bool) -> DisplayClockComparison {
+        func same(_ d: Date) -> Bool {
+            let h = calendar.component(.hour, from: d)
+            return minute == calendar.component(.minute, from: d) && (hour == h || (allow12Hour && hour == (h+11)%12+1))
+        }
         if same(date) { return .matches }
         if same(date.addingTimeInterval(-60)) || same(date.addingTimeInterval(60)) { return .indeterminate }
         return .differs

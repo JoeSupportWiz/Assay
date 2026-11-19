@@ -50,6 +50,7 @@ final class AppModel {
         expertMode = d.bool(forKey: "expertMode")
         userName = d.string(forKey: "userName") ?? ""
         // Screenshot / UI-test hooks (CI renders every screen with deterministic state).
+        if args.contains("-uiIPhone") { hasOnboarded = true; engineMode = .iphone }
         if uiDemo { hasOnboarded = true; engineMode = .demo; userName = "Joe" }
         if let i = args.firstIndex(of: "-theme"), i + 1 < args.count, let id = ThemeID(rawValue: args[i + 1]) { themeID = id }
         if let i = args.firstIndex(of: "-tab"), i + 1 < args.count, let tab = AppTab(rawValue: args[i + 1]) { selectedTab = tab }
@@ -83,6 +84,8 @@ final class AppModel {
             }
             selectedTab = .lab
             if r == "display-check" { labPath = [.displayCheck] }
+            else if r == "display-preset" { labPath = [.displayPreset] }
+            else if r == "usb-backup" { labPath = [.usbHandoff] }
             else if r == "file-vault" { labPath = [.fileVault] }
             else if r == "minis-report" { labPath = [.minis] }
             else if r == "diagnose" { labPath = [.diagnose] }
@@ -189,7 +192,7 @@ enum StudioRoute: Hashable {
 
 /// Screens pushed inside the Lab tab.
 enum LabRoute: Hashable {
-    case diagnose, history, bluetooth, network, minis, displayCheck, fileVault, crashReview, bench
+    case diagnose, history, bluetooth, network, minis, displayCheck, displayPreset, usbHandoff, fileVault, crashReview, bench
     case symptom(String)
     case receipt(Int)
 }

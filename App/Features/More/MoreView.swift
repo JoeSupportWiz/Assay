@@ -87,7 +87,14 @@ struct EngineView: View {
                 }
             } footer: { Text("Use iPhone only for real device checks. Choose Demo to practise reviewing and undoing changes without changing your phone.") }.rowCard()
 
-            Section("Status") {
+            if model.engine.mode != .demo {
+                Section("Available now") {
+                    NavigationLink { DisplayCheckView() } label: { Label("Clock & Lock Screen",systemImage:"clock") }
+                    NavigationLink { DisplayPresetCopyView() } label: { Label("Edit a display preset copy",systemImage:"doc.on.doc") }
+                    NavigationLink { USBBackupHandoffView() } label: { Label("USB backup with a Mac",systemImage:"externaldrive") }
+                }.rowCard()
+            }
+            Section("System preference access") {
                 switch availability {
                 case .ready: Label("Ready", systemImage: "checkmark.circle").foregroundStyle(t.ink)
                 case .needsSetup(let s): Label(s, systemImage: "exclamationmark.circle").foregroundStyle(t.ink)
@@ -104,8 +111,8 @@ struct EngineView: View {
 
     private func blurb(_ m: EngineMode) -> String {
         switch m {
-        case .mac: "Planned · not available in this build"
-        case .iphone: "Read-only · checks this iPhone"
+        case .mac: "USB backup via file handoff"
+        case .iphone: "Local checks and editable file copies"
         case .demo: "Sample device to explore the app"
         }
     }
