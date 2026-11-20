@@ -2,7 +2,7 @@
 <script>const q=new URLSearchParams(location.search);</script><style>
 .cart{position:absolute;left:20px;right:20px;bottom:110px;height:60px;border-radius:30px;background:var(--accent);color:var(--accentInk);display:flex;align-items:center;padding:0 8px 0 20px;gap:10px;z-index:41;box-shadow:0 14px 30px rgba(0,0,0,.2);opacity:0;transform:translateY(30px) scale(.9);animation:pop .7s var(--spring) 1.4s forwards}
 .t-xp .cart{border-radius:4px;border:1px solid #C9B26A;bottom:96px}.t-ios4 .cart{border-radius:10px;border:1px solid #C9A400;bottom:96px}
-</style></head><body>
+</style><link rel="stylesheet" href="craft.css"></head><body>
 <script>document.body.className="t-"+(q.get("t")||"light");if(q.get("still"))document.body.classList.add("still")</script><div class="island"></div><div class="status"><span>9:41</span><span class="r">
 <svg width="19" height="12" viewBox="0 0 19 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
 <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><path d="M8.5 2.3c2.3 0 4.4.9 6 2.4l1.2-1.2A10.2 10.2 0 0 0 8.5.6 10.2 10.2 0 0 0 1.3 3.5l1.2 1.2a8.6 8.6 0 0 1 6-2.4zm0 3.4c1.4 0 2.6.5 3.6 1.4l1.2-1.2a6.8 6.8 0 0 0-9.6 0L4.9 7.1c1-.9 2.2-1.4 3.6-1.4zm0 3.4c.5 0 1 .2 1.3.5L8.5 11 7.2 9.6c.3-.3.8-.5 1.3-.5z"/></svg>
@@ -12,7 +12,7 @@
 <div class="sub rise" style="--d:0">142 tweaks · checked for iOS 26.1</div>
 <div class="rise" style="--d:1;margin:14px 20px 0;height:48px;border-radius:var(--pill);background:var(--search);border:1px solid var(--searchBorder);display:flex;align-items:center;gap:10px;padding:0 16px;color:var(--ink-3);font-size:15px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>Search “hide widget titles”</div>
 <div class="rise" style="--d:2;margin-top:12px;overflow:hidden"><div class="scroll-x"><span class="fchip on">All</span><span class="fchip">Status bar</span><span class="fchip">Lock Screen</span><span class="fchip">Home</span><span class="fchip">Widgets</span></div></div>
-<div class="rise card" style="--d:3;margin:14px 20px 0;padding:16px;background:var(--hero);color:var(--heroInk);position:relative;overflow:hidden">
+<div class="rise card hero" style="--d:3;margin:14px 20px 0;padding:16px;background:var(--hero);color:var(--heroInk);position:relative;overflow:hidden">
   <span class="tag" style="background:rgba(255,255,255,.14);color:inherit">Preset</span>
   <div class="disp" style="font-size:22px;font-weight:700;margin-top:10px;position:relative">Quiet Home</div>
   <div style="font-size:13px;color:var(--heroSub);margin-top:3px;position:relative">Hide labels, dock and widget titles · 5 tweaks</div>
