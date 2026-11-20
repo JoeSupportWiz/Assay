@@ -1,5 +1,4 @@
 import Foundation
-import Darwin
 
 // MARK: - Service types
 
@@ -138,60 +137,34 @@ struct NetCertResult {
 
 enum NetAddressPolicy {
     struct Verdict {
-        let allowed: Bool
+        /// Exactly the host to give the transport. Never probe the unchecked input string.
+        let host: String?
         let reason: String
+        var allowed: Bool { host != nil }
     }
 
-    static let refusal = "Assay only tests devices on your own network, so it refuses public addresses. Use a private address (10.x.x.x, 172.16–31.x.x, 192.168.x.x), a link-local address (169.254.x.x or fe80::) or a .local name."
+    static let refusal = "Use a private IPv4, link-local or unique-local IPv6 address, or a .local host name. Public, shared and unrecognised addresses are not tested."
 
     static func check(_ raw: String) -> Verdict {
-        var host = raw.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        if host.hasPrefix("[") && host.hasSuffix("]") { host = String(host.dropFirst().dropLast()) }
-        if host.isEmpty { return Verdict(allowed: false, reason: "Enter a host name or IP address.") }
-        if host.contains("/") || host.contains(" ") || host.contains("@") {
-            return Verdict(allowed: false, reason: "Enter only the host name or IP address, without http://, a path or a port.")
+        let host = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        if host.isEmpty { return Verdict(host: nil, reason: "Enter a host name or IP address.") }
+        // Accept the usual bracket notation for a manually entered IPv6 literal only.
+        if host.hasPrefix("["), host.hasSuffix("]"), host.contains(":") {
+            return checkDiscovered(String(host.dropFirst().dropLast()))
         }
-        // Remove an interface scope such as fe80::1%en0.
-        if let pct = host.firstIndex(of: "%") { host = String(host[host.startIndex..<pct]) }
-
-        if host.contains(":") { return checkIPv6(host) }
-
-        let parts = host.split(separator: ".", omittingEmptySubsequences: false)
-        if parts.count == 4, parts.allSatisfy({ !$0.isEmpty && $0.allSatisfy(\.isNumber) }) {
-            let nums = parts.compactMap { Int($0) }
-            guard nums.count == 4, nums.allSatisfy({ $0 >= 0 && $0 <= 255 }) else {
-                return Verdict(allowed: false, reason: "That is not a valid IPv4 address.")
-            }
-            let a = nums[0], b = nums[1]
-            if a == 10 { return Verdict(allowed: true, reason: "Private address (10.0.0.0/8).") }
-            if a == 172 && (16...31).contains(b) { return Verdict(allowed: true, reason: "Private address (172.16.0.0/12).") }
-            if a == 192 && b == 168 { return Verdict(allowed: true, reason: "Private address (192.168.0.0/16).") }
-            if a == 169 && b == 254 { return Verdict(allowed: true, reason: "Link-local address (169.254.0.0/16).") }
-            if a == 127 { return Verdict(allowed: false, reason: "That address points at this device itself, not another device on your network.") }
-            return Verdict(allowed: false, reason: refusal)
-        }
-
-        var name = host
-        if name.hasSuffix(".") { name = String(name.dropLast()) }
-        if name.hasSuffix(".local"), name.count > ".local".count, name.count <= 253 {
-            let ok = name.unicodeScalars.allSatisfy { s in
-                (s.value >= 97 && s.value <= 122) || (s.value >= 48 && s.value <= 57) || s == "-" || s == "." || s == "_"
-            }
-            if ok { return Verdict(allowed: true, reason: "Local name (.local).") }
-        }
-        return Verdict(allowed: false, reason: refusal)
+        return checkDiscovered(host)
     }
 
-    private static func checkIPv6(_ host: String) -> Verdict {
-        var addr = in6_addr()
-        guard inet_pton(AF_INET6, host, &addr) == 1 else {
-            return Verdict(allowed: false, reason: "That is not a valid IPv6 address.")
+    /// An advertisement is not a grant of trust. A resolved bare host has the same allowlist as a typed host.
+    static func checkDiscovered(_ host: String) -> Verdict {
+        switch LocalNetworkHost.classify(host) {
+        case .privateIPv4: return Verdict(host: host, reason: "Private IPv4 address.")
+        case .linkLocal: return Verdict(host: host, reason: "Link-local address.")
+        case .uniqueLocalIPv6: return Verdict(host: host, reason: "Unique local IPv6 address.")
+        case .localName: return Verdict(host: host, reason: "Local name (.local).")
+        case .loopback: return Verdict(host: nil, reason: "That address points at this device itself, not another device on your network.")
+        case .other: return Verdict(host: nil, reason: refusal)
         }
-        let bytes: [UInt8] = withUnsafeBytes(of: &addr) { Array($0) }
-        guard bytes.count == 16 else { return Verdict(allowed: false, reason: "That is not a valid IPv6 address.") }
-        if bytes[0] == 0xfe && (bytes[1] & 0xc0) == 0x80 { return Verdict(allowed: true, reason: "Link-local address (fe80::/10).") }
-        if (bytes[0] & 0xfe) == 0xfc { return Verdict(allowed: true, reason: "Unique local address (fc00::/7).") }
-        return Verdict(allowed: false, reason: refusal)
     }
 }
 

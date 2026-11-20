@@ -126,7 +126,8 @@ final class AIChatModel {
         task = Task { [weak self] in
             do {
                 let reply = try await AIClient.shared.complete(messages: p.outgoing.messages, system: p.outgoing.system,
-                                                               provider: p.provider, model: p.model, maxTokens: 800, baseURL: p.baseURL)
+                                                               provider: p.provider, model: p.model, maxTokens: 800,
+                                                               baseURL: p.baseURL, withContext: p.withContext)
                 guard let self else { return }
                 self.messages.append(AIMessage(role: .assistant, content: reply.text))
                 self.lastReply = reply

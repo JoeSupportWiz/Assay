@@ -1,4 +1,7 @@
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 /// Refuses every redirect, so a key can never be forwarded to another host.
 private final class AINoRedirectDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
@@ -35,11 +38,11 @@ actor AIClient {
     // MARK: Public API
 
     /// Sends the conversation and returns the model's reply. `baseURL` defaults to the saved setting for the provider.
-    /// Callers must already have confirmed the privacy sheet for hosted providers.
+    /// Hosted sends recheck the saved endpoint consent, including device context when supplied.
     func complete(messages: [AIMessage], system: String?, provider: AIProviderKind, model: String,
-                  maxTokens: Int, baseURL: String? = nil) async throws -> AIReply {
+                  maxTokens: Int, baseURL: String? = nil, withContext: Bool) async throws -> AIReply {
         let reply = try await exchange(messages: messages, system: system, provider: provider, model: model,
-                                       maxTokens: maxTokens, baseURL: baseURL, timeout: AIClient.requestTimeout)
+                                       maxTokens: maxTokens, baseURL: baseURL, purpose: .conversation(withContext: withContext), timeout: AIClient.requestTimeout)
         if reply.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { throw AIError.emptyReply }
         return reply
     }
@@ -49,7 +52,7 @@ actor AIClient {
         let ping = [AIMessage(role: .user, content: "Reply with the single word OK.")]
         do {
             let r = try await exchange(messages: ping, system: nil, provider: provider, model: model, maxTokens: 16,
-                                       baseURL: baseURL, timeout: AIClient.testTimeout)
+                                       baseURL: baseURL, purpose: .connectionTest, timeout: AIClient.testTimeout)
             let ms = Int((r.latency * 1000).rounded())
             return AITestResult(ok: true, latencyMS: ms, message: "Connected in \(ms) ms.")
         } catch let e as AIError {
@@ -61,8 +64,10 @@ actor AIClient {
 
     // MARK: Core
 
+    private enum Purpose { case conversation(withContext: Bool), connectionTest }
+
     private func exchange(messages: [AIMessage], system: String?, provider: AIProviderKind, model rawModel: String,
-                          maxTokens: Int, baseURL override: String?, timeout: TimeInterval) async throws -> AIReply {
+                          maxTokens: Int, baseURL override: String?, purpose: Purpose, timeout: TimeInterval) async throws -> AIReply {
         let model = rawModel.trimmingCharacters(in: .whitespacesAndNewlines)
         let settings = AIStoredSettings.load()
 
@@ -71,11 +76,12 @@ actor AIClient {
         if provider == .minis && !settings.minisHasEndpoint() && override == nil {
             throw AIError.notAvailable("Not available from inside this app yet. Add a local OpenAI-compatible endpoint under Minis in AI settings to use it.")
         }
-        guard let baseURL = AIHost.parse(base) else { throw AIError.badAddress }
-        let label = AIHost.privacyLabel(forBaseURL: base)
-        if provider.isHostedService && base != provider.defaultBaseURL { throw AIError.badAddress }
-        if provider == .minis && label == .leavesPhone { throw AIError.badAddress }
-        if baseURL.scheme?.lowercased() == "http" && label == .leavesPhone { throw AIError.insecureEndpoint }
+        let endpoint = try AIHost.endpoint(provider: provider, base: base)
+        if case .conversation(let withContext) = purpose, endpoint.label.needsConsent {
+            guard base == settings.baseURL(for: provider), settings.hasConsent(provider, withContext: withContext) else {
+                throw AIError.consentRequired(provider.displayName)
+            }
+        }
         if model.isEmpty { throw AIError.modelMissing }
 
         // Size and content checks.
@@ -86,12 +92,12 @@ actor AIClient {
 
         // Key (read late, used only in a header).
         let key = provider.usesKeychainKey ? AIKeychain.read(for: provider, endpoint: base) : nil
-        if key != nil && baseURL.scheme?.lowercased() != "https" { throw AIError.insecureEndpoint }
+        if key != nil && endpoint.url.scheme?.lowercased() != "https" { throw AIError.insecureEndpoint }
         if provider.needsKey(baseURL: base) && key == nil { throw AIError.noKey }
 
-        let request = try AIClient.buildRequest(provider: provider, baseURL: base, model: model, messages: trimmed,
+        let request = try AIClient.buildRequest(provider: provider, baseURL: endpoint.url, model: model, messages: trimmed,
                                                 system: system, maxTokens: maxTokens, key: key, timeout: timeout)
-        let local = label != .leavesPhone
+        let local = endpoint.label != .leavesPhone
         let started = Date()
         let data: Data
         let status: Int
@@ -120,10 +126,9 @@ actor AIClient {
 
     // MARK: Request building (static, so it can be unit-tested without the network)
 
-    static func buildRequest(provider: AIProviderKind, baseURL base: String, model: String, messages: [AIMessage],
+    static func buildRequest(provider: AIProviderKind, baseURL: URL, model: String, messages: [AIMessage],
                              system: String?, maxTokens: Int, key: String?, timeout: TimeInterval) throws -> URLRequest {
-        var root = base.trimmingCharacters(in: .whitespacesAndNewlines)
-        while root.hasSuffix("/") { root.removeLast() }
+        guard var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false) else { throw AIError.badAddress }
         let cap = max(1, min(maxTokens, 8_192))
         let sys = (system ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -187,7 +192,10 @@ actor AIClient {
             body = ["model": model, "messages": msgs, "stream": false, "options": ["num_predict": cap]]
         }
 
-        guard let url = URL(string: root + path) else { throw AIError.badAddress }
+        var prefix = components.percentEncodedPath
+        while prefix.hasSuffix("/") { prefix.removeLast() }
+        components.percentEncodedPath = prefix + path
+        guard let url = components.url else { throw AIError.badAddress }
         var req = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: timeout)
         req.httpMethod = "POST"
         for (k, v) in headers { req.setValue(v, forHTTPHeaderField: k) }

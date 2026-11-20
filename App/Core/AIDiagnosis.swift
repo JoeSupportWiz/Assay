@@ -73,7 +73,7 @@ enum AIDiagnosis {
         let out = outgoing(for: trimmed)
         let model = settings.model(for: kind, task: .diagnose)
         let reply = try await AIClient.shared.complete(messages: out.messages, system: out.system, provider: kind,
-                                                       model: model, maxTokens: 300, baseURL: settings.baseURL(for: kind))
+                                                       model: model, maxTokens: 300, baseURL: settings.baseURL(for: kind), withContext: false)
         var result = interpret(reply.text)
         result.provider = kind
         result.model = reply.model

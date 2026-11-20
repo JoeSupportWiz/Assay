@@ -39,45 +39,53 @@ enum AIPrivacyLabel: String, Equatable {
     }
 }
 
-/// Address classification. A name we cannot place (anything that is not localhost, a private address or .local)
-/// is treated as hosted: the safe assumption.
+/// Unknown destinations are treated as external. Inspect the encoded host, not a forgiving,
+/// decoded DNS name: brackets and the zone delimiter have meaning only in IPv6 literals.
 enum AIHost {
     static func privacyLabel(forBaseURL base: String) -> AIPrivacyLabel {
-        guard let host = parse(base)?.host else { return .leavesPhone }
-        return classify(host: host)
+        guard let url = parse(base) else { return .leavesPhone }
+        return privacyLabel(for: url)
+    }
+
+    private static func privacyLabel(for url: URL) -> AIPrivacyLabel {
+        guard let encoded = URLComponents(url: url, resolvingAgainstBaseURL: false)?.percentEncodedHost else { return .leavesPhone }
+        if encoded.hasPrefix("["), encoded.hasSuffix("]"), encoded.contains(":") {
+            let literal = encoded.dropFirst().dropLast()
+            // RFC 6874: decode exactly the zone delimiter, no percent escapes in the zone or address.
+            if let pct = literal.firstIndex(of: "%") {
+                guard literal[pct...].hasPrefix("%25") else { return .leavesPhone }
+                return classify(host: String(literal[..<pct]) + "%" + literal[literal.index(pct, offsetBy: 3)...])
+            }
+            return classify(host: String(literal))
+        }
+        guard !encoded.contains(":"), !encoded.contains("%") else { return .leavesPhone }
+        return classify(host: encoded)
     }
 
     static func parse(_ base: String) -> URL? {
         let s = base.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !s.isEmpty, let u = URL(string: s), let scheme = u.scheme?.lowercased(),
+        guard !s.isEmpty, let u = URL(string: s, encodingInvalidCharacters: false), let scheme = u.scheme?.lowercased(),
               scheme == "http" || scheme == "https",
               let host = u.host, !host.isEmpty,
               u.user == nil, u.password == nil, u.query == nil, u.fragment == nil else { return nil }
         return u
     }
 
-    static func classify(host rawHost: String) -> AIPrivacyLabel {
-        let host = rawHost.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: "[]."))
-        if host == "localhost" || host.hasSuffix(".localhost") { return .staysOnPhone }
-        if host == "::1" { return .staysOnPhone }
-        if host.hasSuffix(".local") { return .staysOnLAN }
-        if host.contains(":") {
-            // IPv6 literal: fe80::/10 link-local, fc00::/7 unique local.
-            if host.hasPrefix("fe8") || host.hasPrefix("fe9") || host.hasPrefix("fea") || host.hasPrefix("feb") { return .staysOnLAN }
-            if host.hasPrefix("fc") || host.hasPrefix("fd") { return .staysOnLAN }
-            return .leavesPhone
+    static func classify(host: String) -> AIPrivacyLabel {
+        switch LocalNetworkHost.classify(host) {
+        case .loopback: return .staysOnPhone
+        case .privateIPv4, .linkLocal, .uniqueLocalIPv6, .localName: return .staysOnLAN
+        case .other: return .leavesPhone
         }
-        let parts = host.split(separator: ".", omittingEmptySubsequences: false).compactMap { Int($0) }
-        if parts.count == 4, parts.allSatisfy({ $0 >= 0 && $0 <= 255 }), host.split(separator: ".").count == 4 {
-            let a = parts[0], b = parts[1]
-            if a == 127 { return .staysOnPhone }
-            if a == 10 { return .staysOnLAN }
-            if a == 172 && (16...31).contains(b) { return .staysOnLAN }
-            if a == 192 && b == 168 { return .staysOnLAN }
-            if a == 169 && b == 254 { return .staysOnLAN }
-            if a == 100 && (64...127).contains(b) { return .staysOnLAN }   // private mesh (CGNAT) range
-        }
-        return .leavesPhone
+    }
+
+    /// The request is built from this URL, with the same label used in the privacy UI.
+    static func endpoint(provider: AIProviderKind, base: String) throws -> (url: URL, label: AIPrivacyLabel) {
+        guard let url = parse(base), !provider.isHostedService || base == provider.defaultBaseURL else { throw AIError.badAddress }
+        let label: AIPrivacyLabel = provider.isHostedService ? .leavesPhone : privacyLabel(for: url)
+        if provider == .minis && label == .leavesPhone { throw AIError.badAddress }
+        if url.scheme?.lowercased() == "http" && label == .leavesPhone { throw AIError.insecureEndpoint }
+        return (url, label)
     }
 }
 
