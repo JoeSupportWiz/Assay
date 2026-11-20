@@ -17,7 +17,7 @@ def tabbar(on):
         h += f'<div class="tab{" on" if k==on else ""}">{IC[k]}<span class="lbl">{NAMES[k]}</span></div>'
     return h + '</div><div class="xptray"><span>9:41</span></div>'
 HEAD = '''<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="theme.css"><link rel="stylesheet" href="ui.css">
-<script>const q=new URLSearchParams(location.search);</script>{extra}</head><body>
+<script>const q=new URLSearchParams(location.search);</script>{extra}<link rel="stylesheet" href="craft.css"></head><body>
 <script>document.body.className="t-"+(q.get("t")||"light");if(q.get("still"))document.body.classList.add("still")</script>'''
 for f in sorted((D/"frags").glob("*.html")):
     src = f.read_text()

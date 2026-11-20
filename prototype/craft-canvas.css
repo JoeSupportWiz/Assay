@@ -1,0 +1,47 @@
+/* ==========================================================================
+   Assay · craft layer for marketing canvases (flow, hero, shots)
+   Loaded after each canvas's own <style>. Turns the canvases from "phones
+   floating in space" into art-directed boards: printed paper, a cropped
+   Fold mark as the one graphic device, real-feeling depth and a caption.
+   ========================================================================== */
+
+@font-face {
+  font-family: "JBM";
+  src: url(fonts/jetbrains-mono-latin-500-normal.woff2) format("woff2");
+}
+
+:root {
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Paper, not a flat fill. */
+body { background-image: var(--grain); font-variant-numeric: tabular-nums; }
+
+/* The Fold mark, cropped off the edge, tone-on-tone. It replaces the
+   decorative orbs with the brand's own geometry, so the one large shape
+   on the board means something. */
+.foldbg { position: absolute; z-index: 0; pointer-events: none; fill: rgba(17, 17, 19, .045); }
+
+/* Device frames: contact shadow plus a long, tight ambient shadow, as if
+   the phone lies on the paper. Replaces the 100 px soft glow. */
+.phone {
+  box-shadow: 0 0 0 1.5px #55555c inset,
+              0 2px 3px rgba(40, 35, 25, .18),
+              0 40px 60px -36px rgba(40, 35, 25, .55);
+}
+
+/* Callout cards: hairline edge and a short shadow. They read as cards
+   placed on the board rather than glowing panels. */
+.fc {
+  border: 1px solid rgba(17, 17, 19, .07);
+  box-shadow: 0 1px 2px rgba(40, 35, 25, .08), 0 18px 30px -22px rgba(40, 35, 25, .45);
+}
+
+/* Caption, set like a figure label in a printed spec. */
+.cap {
+  position: absolute; left: 48px; bottom: 42px; z-index: 5;
+  display: flex; align-items: baseline; gap: 14px; max-width: 760px;
+  font: 500 13px/1.45 "JBM", ui-monospace, monospace; letter-spacing: .01em;
+  color: rgba(17, 17, 19, .6);
+}
+.cap b { font-weight: 500; color: #111113; padding-right: 14px; border-right: 1px solid rgba(17, 17, 19, .25); }
