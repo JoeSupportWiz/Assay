@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 (8) — readiness review candidate
+- Home and Studio use the supplied Fold glyphs and scalable text. Demo no longer advertises an active backup or a fixed health score.
+- Receipt history now refuses to overwrite corrupt or unreadable data; the write gate checks risk and capability, and an unverified write stops the batch.
+- AI and network diagnostics distinguish private LAN, carrier NAT and global or malformed addresses. Regression checks run offline.
+- Added the display preset copy, two-sample clock check and standard Mac USB handoff. None resets protected iPhone settings.
+- PR builds and pushes to main run checks with read-only repository permissions. See the [readiness notes](docs/audit/READINESS-20NOV.md).
+
 ## 0.3.0 (3) — Device utilities
 - Compare a reported status clock to actual system time, and check a local preset log for the two exact display settings; this does not reset SpringBoard.
 - Create and undo Assay scenes; export new palette artwork at the display’s native resolution.

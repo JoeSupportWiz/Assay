@@ -1,5 +1,8 @@
 name: Assay iOS CI
 on:
+  pull_request:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       mode:
@@ -13,12 +16,12 @@ on:
         options: [all, four-utilities, studio, acceptance, brand-audit, device-workflows]
         default: all
       commit_screens:
-        description: "Commit screenshots to docs/app-screens"
+        description: "Legacy input; captures are artifacts only. No commits are made."
         type: boolean
-        default: true
+        default: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -26,6 +29,8 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Install XcodeGen
         run: brew install xcodegen
@@ -49,6 +54,10 @@ jobs:
           python3 -m unittest discover -s integrations/minis/tests
           sh tests/usb-handoff/run.sh
           python3 -m unittest discover -s Mac/usb-backup -p 'test_*.py'
+          sh tests/readiness-network/run.sh
+          swiftc -swift-version 5 -parse-as-library App/Features/Lab/ReceiptCalendar.swift tests/receipt-calendar/Fixture.swift -o "$RUNNER_TEMP/receipt-calendar"
+          "$RUNNER_TEMP/receipt-calendar"
+          sh tests/readiness-operations/run.sh
           sh tests/build-library/run.sh
           swiftc -parse-as-library App/Core/Operations.swift tests/rollback-review/Fixture.swift -o "$RUNNER_TEMP/rollback-test"
           "$RUNNER_TEMP/rollback-test"
@@ -73,7 +82,7 @@ jobs:
 
       # ---------- Screenshots ----------
       - name: Build for simulator
-        if: inputs.mode == 'screenshots'
+        if: github.event_name != 'workflow_dispatch' || inputs.mode == 'screenshots'
         run: |
           mkdir -p build
           set -o pipefail
@@ -94,16 +103,6 @@ jobs:
           name: Assay-screens
           path: docs/app-screens
           if-no-files-found: error
-
-      - name: Commit screenshots
-        if: inputs.mode == 'screenshots' && inputs.commit_screens
-        run: |
-          git config user.name "assay-ci"
-          git config user.email "assay-ci@users.noreply.github.com"
-          git config core.ignorecase false
-          git add docs/app-screens
-          git diff --cached --quiet || git commit -m "docs: app screenshots (${GITHUB_SHA::7})"
-          git push
 
       # ---------- Unsigned IPA ----------
       - name: Build unsigned archive
