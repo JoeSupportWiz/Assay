@@ -25,7 +25,7 @@ body{
  --t1:#241D45;--t2:#10283D;--t3:#0F3123;--tileSub:#9A9AA2;--warn:#3A2216;--warnInk:#FF9A66;--tab:#1C1C20;--tabOn:#F5F4F0;--tabOnInk:#111113}
 
 /* ---------- Match wallpaper ---------- */
-.t-wall{--bg:#1A1030;--bgimg:radial-gradient(70% 40% at 20% 8%,rgba(255,229,138,.55),transparent 70%),radial-gradient(60% 40% at 95% 25%,rgba(255,140,90,.55),transparent 70%),radial-gradient(90% 60% at 30% 95%,rgba(122,88,255,.7),transparent 70%),linear-gradient(170deg,#C9783F,#2A1660 60%,#170E2E);
+.t-wall{--bg:#1A1030;--bgimg:radial-gradient(90% 60% at 30% 95%,rgba(122,88,255,.7),transparent 70%),linear-gradient(170deg,#C9783F,#2A1660 60%,#170E2E);
  --card:rgba(255,255,255,.13);--cardBorder:rgba(255,255,255,.2);--ink:#FFFFFF;--ink-2:rgba(255,255,255,.72);--ink-3:rgba(255,255,255,.5);
  --search:rgba(255,255,255,.14);--chip:rgba(255,255,255,.16);--soft:rgba(255,255,255,.14);--primary:#FFD9A8;--onPrimary:#2A1650;
  --hero:rgba(25,12,50,.45);--heroInk:#fff;--heroSub:rgba(255,255,255,.65);--ringTrack:rgba(255,255,255,.15);--ringHero:#FFD9A8;
