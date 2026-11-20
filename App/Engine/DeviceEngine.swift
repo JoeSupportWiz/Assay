@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(UIKit)
 import UIKit
+#endif
 
 /// Result of one write, read back.
 struct WriteResult {
@@ -17,6 +19,8 @@ protocol DeviceEngine {
     /// Read a preference. `nil` = key absent (or unreadable — see `canRead`).
     func read(_ key: PrefKey) async -> PlistValue?
     var canRead: Bool { get }
+    /// Preference-write capability, independent of transport availability or the ability to read.
+    var canWritePreferences: Bool { get }
     /// Write (or remove, when `value == nil`) and read back.
     func write(_ key: PrefKey, _ value: PlistValue?) async -> WriteResult
     /// Run checks and return findings. Read-only.
@@ -24,6 +28,9 @@ protocol DeviceEngine {
 }
 
 extension DeviceEngine {
+    // Both shipping real-device engines are read-only. A future writer must opt in.
+    var canWritePreferences: Bool { mode == .demo }
+
     /// Shared check logic: snapshot facts + every known culprit read from the device.
     func standardCheck(snapshot: DeviceSnapshot) async -> [Finding] {
         var findings: [Finding] = []
@@ -64,12 +71,32 @@ enum EngineAvailability: Equatable {
     case unavailable(String)
 }
 
+/// The same decision is used for review, button enablement, and the engine write boundary.
+struct OperationWritePolicy {
+    let effectiveDryRun: Bool
+    let requiresAcknowledgement: Bool
+
+    init(plan: OperationPlan, requestedDryRun: Bool, canWrite: Bool) {
+        effectiveDryRun = requestedDryRun || !canWrite
+        requiresAcknowledgement = !effectiveDryRun && plan.tier >= .caution
+    }
+
+    func permitsRun(acknowledged: Bool) -> Bool { !requiresAcknowledgement || acknowledged }
+}
+
 /// Runs an OperationPlan through any engine: snapshot → write → read back → receipt.
 struct OperationRunner {
-    enum Stage: Equatable { case snapshot, writing(Int, Int), verifying, done }
+    enum Stage: Equatable { case snapshot, previewing(Int, Int), writing(Int, Int), done }
 
-    static func run(_ plan: OperationPlan, engine: any DeviceEngine, dryRun: Bool, receiptID: Int,
+    static func run(_ plan: OperationPlan, engine: any DeviceEngine, dryRun requestedDryRun: Bool, receiptID: Int,
                     progress: @escaping @MainActor (Stage) -> Void) async -> Receipt {
+        let policy = OperationWritePolicy(plan: plan, requestedDryRun: requestedDryRun, canWrite: engine.canWritePreferences)
+        let dryRun = policy.effectiveDryRun
+        guard policy.permitsRun(acknowledged: plan.riskAcknowledged) else {
+            await progress(.done)
+            return Receipt(id: receiptID, date: Date(), title: plan.title, kind: plan.kind, engine: engine.mode, dryRun: false,
+                           items: plan.changes.map { .init(change: $0, outcome: .skipped, note: "Risk acknowledgement required. Nothing was written.") })
+        }
         await progress(.snapshot)
         // Re-read every "before" right now so undo reflects reality, not the plan.
         var changes = plan.changes
@@ -89,15 +116,18 @@ struct OperationRunner {
         }
         var items: [Receipt.Item] = []
         for (i, c) in changes.enumerated() {
-            await progress(.writing(i + 1, changes.count))
+            await progress(dryRun ? .previewing(i + 1, changes.count) : .writing(i + 1, changes.count))
             if dryRun {
                 items.append(.init(change: c, outcome: .simulated, note: "Nothing was written"))
             } else {
                 let r = await engine.write(c.target, c.after)
                 items.append(.init(change: c, outcome: r.outcome, note: r.note))
+                if r.outcome != .verified {
+                    items += changes.dropFirst(i + 1).map { .init(change: $0, outcome: .skipped, note: "Stopped after “\(c.label)” was not verified.") }
+                    break
+                }
             }
         }
-        await progress(.verifying)
         await progress(.done)
         return Receipt(id: receiptID, date: Date(), title: plan.title, kind: plan.kind, engine: engine.mode, dryRun: dryRun, items: items)
     }
@@ -105,6 +135,7 @@ struct OperationRunner {
 
 // MARK: - On-device facts any engine can use (public APIs only; always Observed)
 
+#if canImport(UIKit)
 @MainActor
 enum LocalFacts {
     static func collect() -> [Fact] {
@@ -154,3 +185,4 @@ enum LocalFacts {
         return f.string(from: ProcessInfo.processInfo.systemUptime) ?? "—"
     }
 }
+#endif

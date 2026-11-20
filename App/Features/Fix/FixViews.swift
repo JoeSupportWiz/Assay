@@ -243,6 +243,12 @@ struct FixSheet: View {
     @State private var understood = false
     @State private var receipt: Receipt?
 
+    private var policy: OperationWritePolicy {
+        OperationWritePolicy(plan: plan, requestedDryRun: dryRun, canWrite: model.engine.canWritePreferences)
+    }
+
+    private var applyLabel: String { model.engine.mode == .demo ? "Apply in Demo" : "Apply changes" }
+
     var body: some View {
         NavigationStack {
             Group {
@@ -287,21 +293,24 @@ struct FixSheet: View {
             }.font(.system(size: 14)).foregroundStyle(t.ink).rowCard()
 
             Section {
-                if model.engine.mode != .demo {
-                    Label("Preview only. This build can’t change system preferences on a real device.", systemImage: "info.circle")
+                if !model.engine.canWritePreferences {
+                    Label("Preview only. This engine can’t change system preferences.", systemImage: "info.circle")
                 } else {
                     Toggle("Dry run (write nothing)", isOn: $dryRun)
                 }
-                if plan.tier >= .caution && !dryRun && model.engine.mode == .demo {
+                if policy.requiresAcknowledgement {
                     Toggle("I understand the risk", isOn: $understood)
+                }
+                if let issue = model.receipts.storageIssue {
+                    Label(issue.message + " Open Undo history to continue.", systemImage: "exclamationmark.triangle")
                 }
             } footer: { Text(plan.tier.explanation) }.rowCard()
 
         }
         .safeAreaInset(edge: .bottom) {
-            Button { Task { await run() } } label: { Text(model.engine.mode != .demo || dryRun ? "Run preview" : "Apply in Demo") }
+            Button { Task { await run() } } label: { Text(policy.effectiveDryRun ? "Run preview" : applyLabel) }
                 .buttonStyle(PrimaryButtonStyle())
-                .disabled(model.engine.mode == .demo && !dryRun && plan.tier >= .caution && !understood)
+                .disabled(!policy.permitsRun(acknowledged: understood) || model.receipts.storageIssue != nil)
                 .padding(.horizontal, 20).padding(.vertical, 10)
                 .background(.bar)
         }
@@ -339,19 +348,14 @@ struct FixSheet: View {
                     Text("Please keep Assay open.").font(.system(size: 13.5)).foregroundStyle(t.ink2)
                 }.frame(maxWidth: .infinity).padding(.vertical, 24)
             }.rowCard()
-            Section("Steps") {
-                step("Read current values", done: s != .snapshot)
-                step("Write", done: { if case .writing = s { return false } else { return s == .verifying || s == .done } }(), active: { if case .writing = s { return true } else { return false } }())
-                step("Read back to verify", done: s == .done, active: s == .verifying)
-            }.rowCard()
         }
     }
 
     private func stageText(_ s: OperationRunner.Stage) -> String {
         switch s {
         case .snapshot: "Saving current values…"
-        case .writing(let i, let n): "Writing \(i) of \(n)…"
-        case .verifying: "Reading back to check…"
+        case .previewing(let i, let n): "Previewing \(i) of \(n)…"
+        case .writing(let i, let n): "Writing and checking \(i) of \(n)…"
         case .done: "Done"
         }
     }
@@ -372,7 +376,11 @@ struct FixSheet: View {
                     VStack(spacing: 10) {
                         Image(systemName: icon(r)).font(.system(size: 44)).foregroundStyle(color(r))
                         Text(headline(r)).font(.system(size: 20, weight: .bold)).foregroundStyle(t.ink)
-                        Text("Receipt #\(r.id)").font(.system(size: 13)).foregroundStyle(t.ink3)
+                        if let issue = model.receipts.storageIssue {
+                            Text("History update not saved. " + issue.message).font(.footnote)
+                        } else {
+                            Text("Receipt #\(r.id)").font(.system(size: 13)).foregroundStyle(t.ink3)
+                        }
                     }.frame(maxWidth: .infinity).padding(.vertical, 16)
                 }.rowCard()
 
@@ -385,7 +393,7 @@ struct FixSheet: View {
                     }
                 }.rowCard()
 
-                if !r.dryRun, let q = plan.userCheck, r.status != .failed, model.receipts.receipts.first(where: { $0.id == r.id })?.userConfirmed == nil {
+                if model.receipts.storageIssue == nil, !r.dryRun, let q = plan.userCheck, r.status != .failed, model.receipts.receipts.first(where: { $0.id == r.id })?.userConfirmed == nil {
                     Section {
                         Text(q).foregroundStyle(t.ink)
                         Button("Yes, that's fixed") { model.receipts.confirm(r.id, ok: true); Haptics.success() }
@@ -398,8 +406,8 @@ struct FixSheet: View {
                 }
 
                 Section {
-                    if r.dryRun && model.engine.mode == .demo {
-                        Button("Apply in Demo") { receipt = nil; dryRun = false; phase = .review }.buttonStyle(PrimaryButtonStyle())
+                    if r.dryRun && model.engine.canWritePreferences {
+                        Button(applyLabel) { receipt = nil; dryRun = false; understood = false; phase = .review }.buttonStyle(PrimaryButtonStyle())
                             .listRowBackground(Color.clear).listRowInsets(.init())
                     } else if let plan = model.receipts.undoPlan(for:r,engine:model.engine.mode) {
                         Button("Undo this") { model.activePlan = plan }.buttonStyle(SecondaryButtonStyle())
@@ -413,8 +421,8 @@ struct FixSheet: View {
     private func headline(_ r: Receipt) -> String {
         switch r.status {
         case .complete: "Applied and read back"
-        case .partial: "Applied, partly verified"
-        case .failed: "Nothing was changed"
+        case .partial: "Not all changes were verified"
+        case .failed: "No verified changes"
         case .simulated: "Dry run — nothing written"
         case .rolledBack: "Rolled back"
         }
@@ -426,17 +434,15 @@ struct FixSheet: View {
         switch r.status { case .complete: Palette.mintDeep; case .partial: Palette.butterDeep; case .failed: Palette.peachDeep; default: t.ink2 }
     }
     @ViewBuilder private func outcomeTag(_ o: Receipt.Outcome) -> some View {
-        switch o {
-        case .verified: Tag(style: .reversible, text: "Read back OK")
-        case .unverified: Tag(style: .caution, text: "Unverified")
-        case .failed: Tag(style: .experimental, text: "Failed")
-        case .simulated: Tag(style: .unknown, text: "Dry run")
-        }
+        Tag(style: o.tag.0, text: o.tag.1)
     }
 
     private func run() async {
+        guard case .review = phase, model.receipts.storageIssue == nil, policy.permitsRun(acknowledged: understood) else { return }
+        var reviewed = plan
+        reviewed.riskAcknowledged = understood
         phase = .running(.snapshot)
-        let r = await model.execute(plan, dryRun: dryRun || model.engine.mode != .demo) { stage in phase = .running(stage) }
+        let r = await model.execute(reviewed, dryRun: policy.effectiveDryRun) { stage in phase = .running(stage) }
         receipt = r
         phase = .result(r.id)
         if r.status == .complete { Haptics.success() } else if r.status == .failed { Haptics.error() }
