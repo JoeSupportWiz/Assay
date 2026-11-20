@@ -167,7 +167,7 @@ struct SignetRootView: View {
         }
         .themedList()
         .navigationTitle("Signet")
-        .onAppear { if ProcessInfo.processInfo.arguments.contains("-uiDemo") { store.setDemo(true) } }
+        .onAppear { if AssayPreviewArguments.values.contains("-uiDemo") { store.setDemo(true) } }
         .navigationBarTitleDisplayMode(.inline)
         .fileImporter(isPresented: $showImporter, allowedContentTypes: SignetStore.importTypes, allowsMultipleSelection: false) { result in
             store.handleImport(result)

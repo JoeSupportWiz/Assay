@@ -66,6 +66,13 @@ struct DisplayCheckView: View {
                     }
                 }
             }
+            if !clock.samples.isEmpty || evidence != nil || lineReport != nil {
+                Section {
+                    ShareLink(item: report) { Label("Share check summary", systemImage: "square.and.arrow.up") }
+                } footer: {
+                    Text("Share before leaving to keep a copy. Includes reading times, time zones and any line report or preset counts, never the imported log. Assay doesn’t save these observations.")
+                }
+            }
             Section {
                 Button { picking = true } label: { Label(reading ? "Reading…" : "Check a GoldenNugget log", systemImage: "doc.text.magnifyingglass") }.disabled(reading)
                 if let e = evidence {
@@ -90,9 +97,6 @@ struct DisplayCheckView: View {
                 Text("If device time is right and the status time differs, first stop any active screen recording or mirroring and compare again. Don’t change Date & Time just to remove a display override.")
                 Text("If you enabled the unlock-test indicator or recording-status override in another app, use that app’s undo or targeted reset for that setting. Don’t select a whole-device reset. If the source tool can’t restore the original value, this app can’t safely invent it.")
                 Text("If the device time itself is wrong against a trusted clock, check Settings → General → Date & Time, including the time zone.")
-            }
-            if !clock.samples.isEmpty || evidence != nil || lineReport != nil {
-                Section { ShareLink(item: report) { Label("Share check summary", systemImage: "square.and.arrow.up") } } footer: { Text("These observations are not saved by Assay. Share before leaving to keep a copy. Includes reading times, time zones and any line report or preset counts, never the imported log.") }
             }
         }
         .scrollDismissesKeyboard(.interactively)

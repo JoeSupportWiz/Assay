@@ -34,6 +34,9 @@ shot() { # name, appearance, args...
 
 for look in light dark; do
   if [[ "${ASSAY_CAPTURE_SET:-all}" == "device-workflows" ]]; then
+    shot "38-workbench-home-$look" "$look" -uiIPhone -tab home
+    shot "39-workbench-studio-$look" "$look" -uiIPhone -tab studio
+    shot "40-receipt-calendar-$look" "$look" -uiDemo -route history
     shot "35-display-preset-$look" "$look" -uiIPhone -route display-preset
     shot "36-usb-handoff-$look" "$look" -uiIPhone -route usb-backup
     shot "37-clock-check-$look" "$look" -uiIPhone -route display-check

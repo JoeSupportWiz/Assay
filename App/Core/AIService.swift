@@ -98,7 +98,7 @@ final class AIService {
 
     init() {
         var s = AIStoredSettings.load()
-        if ProcessInfo.processInfo.arguments.contains("-uiDemo") { s.demoMode = true }   // screenshots: not saved
+        if AssayPreviewArguments.values.contains("-uiDemo") { s.demoMode = true }   // screenshots: not saved
         settings = s
     }
 

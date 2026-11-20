@@ -61,7 +61,7 @@ struct DisplayClockReport {
         case ambiguous = "At least one 9:41 report is compatible with the device time or a minute rollover. Try again later."
         case unconfirmed = "You reported 9:41 twice while the device clock advanced. Two matching independent readings are needed to distinguish a display discrepancy from a device clock problem."
         case conflicting = "You reported 9:41 twice while the device clock advanced, but the trusted local clock disagreed with the device. Check the device time and time zone before drawing a conclusion."
-        case supported = "You reported 9:41 twice while the device clock advanced and matched both trusted local readings. This supports a display-only discrepancy. It does not prove a particular preference or cause."
+        case supported = "You reported 9:41 twice while the device clock advanced and matched both trusted local readings. This supports a display-only discrepancy. It does not prove a particular preference or cause. Only local time of day was compared, not the calendar date or region."
     }
 
     var finding: Finding {

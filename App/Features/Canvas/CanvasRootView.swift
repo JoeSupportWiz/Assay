@@ -44,7 +44,7 @@ import UniformTypeIdentifiers
         }.themedList().navigationTitle("Canvas").navigationBarTitleDisplayMode(.inline).searchable(text:$search,prompt:"Filter image layers")
         .fileImporter(isPresented:$choosing,allowedContentTypes:chooseLayer ? [.image]:[.data]) { res in guard case .success(let url)=res else {return};if chooseLayer {replace(url)} else {open(url)} }
         .fileExporter(isPresented:$exporting,document:document,contentType:.data,defaultFilename:defaultName){r in document=nil;if case .success=r {message="Edited archive exported. Check it in your wallpaper app; Assay hasn’t tested system playback."} else if case .failure(let e)=r,(e as NSError).code != NSUserCancelledError {message="The edited copy could not be exported."}}
-        .onAppear { if ProcessInfo.processInfo.arguments.contains("-canvasSample"),let u=Bundle.main.url(forResource:"AssayCanvasSample",withExtension:"zip"){open(u)} }
+        .onAppear { if AssayPreviewArguments.values.contains("-canvasSample"),let u=Bundle.main.url(forResource:"AssayCanvasSample",withExtension:"zip"){open(u)} }
         .onDisappear {validTask=UUID();busy=false}
     }
     private func open(_ url:URL){let token=UUID();validTask=token;busy=true;selected=nil;replacement=nil;preview=nil;project=nil;index=nil;message="";search=""

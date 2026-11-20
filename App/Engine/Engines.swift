@@ -38,12 +38,10 @@ struct DemoEngine: DeviceEngine {
                        facts: [
                         Fact(label: "Model", value: "iPhone17,1", evidence: .observed, source: "Demo"),
                         Fact(label: "iOS", value: "26.1 (23B85)", evidence: .observed, source: "Demo"),
-                        Fact(label: "Battery health", value: "94%", evidence: .observed, source: "Demo"),
                         Fact(label: "Status bar override", value: override ? "Present" : "None", evidence: override ? .inferred(82) : .observed, source: "Demo"),
                         Fact(label: "Current wallpaper", value: "Not shared with apps", evidence: .unknown, source: "iOS privacy"),
                        ],
-                       healthScore: override ? 94 : 100,
-                       backup: BackupStatus(phase: .running(0.62), reusedBytes: 2_300_000_000, totalBytes: 6_600_000_000))
+                       healthScore: nil, backup: nil)
     }
 }
 

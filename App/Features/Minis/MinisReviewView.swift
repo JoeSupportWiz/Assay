@@ -104,7 +104,7 @@ struct MinisReviewView: View {
             if let request, document == nil { await capture(request) }
         }
         .onAppear {
-            let args = ProcessInfo.processInfo.arguments
+            let args = AssayPreviewArguments.values
             if !usedDemoHook, args.contains("-uiDemo"), args.contains("-minisReportPreview"),
                model.engineMode == .demo, !includeReceipts {
                 usedDemoHook = true

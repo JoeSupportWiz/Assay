@@ -71,7 +71,7 @@ import SwiftUI
         .navigationTitle("Layout planner")
         .scrollDismissesKeyboard(.interactively)
         .confirmationDialog("Replace this unsaved draft?",isPresented:$confirmStarter,titleVisibility:.visible) { Button("Use recipe") { if let st=awaitingStarter { draft=st.recipe;lastSave=nil };awaitingStarter=nil };Button("Cancel",role:.cancel){awaitingStarter=nil} } message:{Text("Saved layouts stay unchanged.")}
-        .onAppear { reload(); if ProcessInfo.processInfo.arguments.contains("-layoutSample") && draft == LayoutRecipe() { draft=LayoutStarter.work.recipe } }
+        .onAppear { reload(); if AssayPreviewArguments.values.contains("-layoutSample") && draft == LayoutRecipe() { draft=LayoutStarter.work.recipe } }
     }
 
     private var sceneMissing: Bool { draft.sceneID != nil && library.state.scene(draft.sceneID) == nil }

@@ -3,7 +3,9 @@ import UniformTypeIdentifiers
 
 struct DisplayPresetCopyView: View {
     @State private var review: DisplayPresetCopy?
-    @State private var picking = false, saving = false, busy = false
+    @State private var picking = false
+    @State private var saving = false
+    @State private var busy = false
     @State private var note: String?
     var body: some View {
         List {

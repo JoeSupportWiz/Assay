@@ -20,7 +20,7 @@ struct BluetoothRootView: View {
         }
         .themedList()
         .navigationTitle("Bluetooth")
-        .onAppear { if ProcessInfo.processInfo.arguments.contains("-uiDemo") { scanner.setDemo(true) } }
+        .onAppear { if AssayPreviewArguments.values.contains("-uiDemo") { scanner.setDemo(true) } }
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $query, prompt: "Name, UUID or service")
         .toolbar {

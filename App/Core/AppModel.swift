@@ -39,7 +39,7 @@ final class AppModel {
     private let uiDemo: Bool
 
     init() {
-        let args = ProcessInfo.processInfo.arguments
+        let args = AssayPreviewArguments.values
         uiDemo = args.contains("-uiDemo")
         receipts = uiDemo ? ReceiptStore(persist: false, seed: ReceiptStore.demoSeed()) : ReceiptStore()
         let d = UserDefaults.standard
