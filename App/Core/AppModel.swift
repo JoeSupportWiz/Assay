@@ -24,6 +24,8 @@ final class AppModel {
     var selectedTab: AppTab = .home
     var labPath: [LabRoute] = []
     var studioPath: [StudioRoute] = []
+    var morePath: [MoreRoute] = []
+    var scenePath: [PlannerRoute] = []
     var toast: Toast?
     private(set) var engine: any DeviceEngine = DemoEngine()
     var snapshot: DeviceSnapshot?
@@ -37,7 +39,7 @@ final class AppModel {
     private let uiDemo: Bool
 
     init() {
-        let args = ProcessInfo.processInfo.arguments
+        let args = AssayPreviewArguments.values
         uiDemo = args.contains("-uiDemo")
         receipts = uiDemo ? ReceiptStore(persist: false, seed: ReceiptStore.demoSeed()) : ReceiptStore()
         let d = UserDefaults.standard
@@ -48,6 +50,7 @@ final class AppModel {
         expertMode = d.bool(forKey: "expertMode")
         userName = d.string(forKey: "userName") ?? ""
         // Screenshot / UI-test hooks (CI renders every screen with deterministic state).
+        if args.contains("-uiIPhone") { hasOnboarded = true; engineMode = .iphone }
         if uiDemo { hasOnboarded = true; engineMode = .demo; userName = "Joe" }
         if let i = args.firstIndex(of: "-theme"), i + 1 < args.count, let id = ThemeID(rawValue: args[i + 1]) { themeID = id }
         if let i = args.firstIndex(of: "-tab"), i + 1 < args.count, let tab = AppTab(rawValue: args[i + 1]) { selectedTab = tab }
@@ -55,6 +58,17 @@ final class AppModel {
         rebuildEngine()
         if let i = args.firstIndex(of: "-route"), i + 1 < args.count {
             let r = args[i + 1]
+            if r == "scene-transfer" { selectedTab = .scenes; scenePath = [.transfer]; return }
+            if r == "bench" { selectedTab = .lab; labPath = [.bench]; return }
+            if r == "crash-review" { selectedTab = .lab; labPath = [.crashReview]; return }
+            if r == "layout-planner" { selectedTab = .scenes; scenePath = [.layout]; return }
+            if r == "alchemy" { selectedTab = .studio; studioPath = [.module(.alchemy)]; return }
+            if r == "canvas" || r == "cards" { selectedTab = .studio; studioPath = [.module(r == "canvas" ? .canvas:.cards)]; return }
+            if r == "privacy-lock" || r == "supporter" { selectedTab = .more; morePath = [r == "privacy-lock" ? .lock:.supporter]; return }
+            if r == "preset-files" { selectedTab = .studio; studioPath = [.module(.gild), .presetFiles]; return }
+            if r == "apple-team" { selectedTab = .studio; studioPath = [.module(.signet), .appleTeam]; return }
+            if r == "build-library" { selectedTab = .studio; studioPath = [.module(.signet), .buildLibrary]; return }
+            if r == "signer-preflight" { selectedTab = .studio; studioPath = [.module(.signet), .signerPreflight]; return }
             if r == "signet" { selectedTab = .studio; studioPath = [.module(.signet)]; return }
             if r == "gild" || r == "gild-staged" || r.hasPrefix("tweak:") {
                 selectedTab = .studio
@@ -69,7 +83,12 @@ final class AppModel {
                 return
             }
             selectedTab = .lab
-            if r == "diagnose" { labPath = [.diagnose] }
+            if r == "display-check" { labPath = [.displayCheck] }
+            else if r == "display-preset" { labPath = [.displayPreset] }
+            else if r == "usb-backup" { labPath = [.usbHandoff] }
+            else if r == "file-vault" { labPath = [.fileVault] }
+            else if r == "minis-report" { labPath = [.minis] }
+            else if r == "diagnose" { labPath = [.diagnose] }
             else if r == "history" { labPath = [.history] }
             else if r == "bluetooth" { labPath = [.bluetooth] }
             else if r == "network" { labPath = [.network] }
@@ -88,7 +107,9 @@ final class AppModel {
         d.set(userName, forKey: "userName")
     }
 
+    private(set) var engineGeneration = UUID()
     private func rebuildEngine() {
+        engineGeneration = UUID(); snapshot = nil; findings = []; lastCheck = nil; checking = false; activePlan = nil; tweaks = TweakState()
         switch engineMode {
         case .iphone: engine = OnDeviceEngine()
         case .mac: engine = MacCompanionEngine()
@@ -108,24 +129,26 @@ final class AppModel {
     }
 
     @MainActor func refresh() async {
-        snapshot = await engine.snapshot()
+        let g = engineGeneration, snap = await engine.snapshot()
+        if g == engineGeneration { snapshot = snap }
     }
 
     /// Read-only device check: snapshot + findings.
     @MainActor func runCheck() async {
         guard !checking else { return }
         checking = true
-        snapshot = await engine.snapshot()
-        let f = await engine.check()
-        try? await Task.sleep(for: .milliseconds(500))
-        withAnimation(Motion.spring) { findings = f; lastCheck = Date(); checking = false }
+        let g = engineGeneration, selected = engine
+        let snap = await selected.snapshot()
+        let f = await selected.standardCheck(snapshot: snap)
+        guard g == engineGeneration else { return }
+        withAnimation(Motion.spring) { snapshot = snap; findings = f; lastCheck = Date(); checking = false }
     }
 
     /// Run a reviewed plan through the current engine and record a receipt.
     @MainActor func execute(_ plan: OperationPlan, dryRun: Bool, progress: @escaping @MainActor (OperationRunner.Stage) -> Void) async -> Receipt {
         let r = await OperationRunner.run(plan, engine: engine, dryRun: dryRun, receiptID: receipts.nextID, progress: progress)
         receipts.add(r)
-        if !dryRun && !plan.undoOf.isEmpty && r.status != .failed { receipts.markRolledBack(plan.undoOf) }
+        receipts.acknowledgeUndo(plan, result: r)
         if !dryRun { tweaks.discard(); await tweaks.load(engine: engine); await runCheck() }
         return r
     }
@@ -159,14 +182,17 @@ struct Toast: Identifiable, Equatable {
 
 
 /// Screens pushed inside the Studio tab.
+enum PlannerRoute: Hashable { case layout, transfer }
+enum MoreRoute: Hashable { case lock, supporter }
 enum StudioRoute: Hashable {
     case module(StudioModule)
     case gild(GildRoute)
+    case signerPreflight, appleTeam, presetFiles, buildLibrary
 }
 
 /// Screens pushed inside the Lab tab.
 enum LabRoute: Hashable {
-    case diagnose, history, bluetooth, network
+    case diagnose, history, bluetooth, network, minis, displayCheck, displayPreset, usbHandoff, fileVault, crashReview, bench
     case symptom(String)
     case receipt(Int)
 }

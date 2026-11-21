@@ -34,7 +34,7 @@ final class TweakState {
 
     func stage(_ t: Tweak, value: PlistValue?) {
         // Drop the edit if it matches what's already on the device.
-        if value == current[t.id] { staged[t.id] = nil; staged.removeValue(forKey: t.id) } else { staged[t.id] = .some(value) }
+        if loaded && value == current[t.id] { staged.removeValue(forKey: t.id) } else { staged[t.id] = .some(value) }
     }
 
     func toggle(_ t: Tweak, on: Bool) { stage(t, value: on ? t.onValue : nil) }

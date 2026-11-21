@@ -10,19 +10,18 @@ struct MoreView: View {
             Section {
                 NavigationLink { AppearanceView() } label: { LabeledContent("Appearance") { Text(model.themeID.title) } }
                 NavigationLink { EngineView() } label: { LabeledContent("Engine") { Text(model.engineMode?.title ?? "Not set") } }
+                NavigationLink { AISettingsView() } label: { Label("AI providers", systemImage: "brain") }
+                NavigationLink(value: MoreRoute.lock) { Label("Privacy lock", systemImage: "lock") }
+                NavigationLink(value: MoreRoute.supporter) { Label("Support Assay", systemImage: "star") }
                 Toggle("Expert mode", isOn: $model.expertMode)
             } footer: { Text("Expert mode shows raw keys, bundle IDs and UUIDs inline.") }.rowCard()
 
-            Section("Coming up") {
-                ForEach(Self.upcoming, id: \.title) { u in
-                    HStack { Label(u.title, systemImage: u.symbol).foregroundStyle(t.ink2); Spacer(); Tag(style: .neutral, text: u.phase) }
-                }
-            }.rowCard()
+            Section { Button("Browse Assay builds") { model.selectedTab = .studio; model.studioPath = [.module(.signet), .buildLibrary] } }.rowCard()
 
             Section {
-                LabeledContent("Version") { Text("0.1.0 (1)") }
-                LabeledContent("Build") { Text("Phase 1 · safety core") }
-            } footer: { Text("Assay is a working name · not affiliated with Apple.") }.rowCard()
+                LabeledContent("Version") { Text("\(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—") (\(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"))") }
+                LabeledContent("Build") { Text("Developer preview") }
+            } footer: { Text("Assay is independent and is not affiliated with Apple.") }.rowCard()
         }
         .themedList()
         .navigationTitle("More")
@@ -30,10 +29,8 @@ struct MoreView: View {
 
     private struct Upcoming { let title: String; let symbol: String; let phase: String }
     private static let upcoming: [Upcoming] = [
-        .init(title: "AI providers", symbol: "brain", phase: "Phase 5"),
         .init(title: "Permissions and privacy", symbol: "hand.raised", phase: "Phase 8"),
         .init(title: "Updates", symbol: "arrow.down.circle", phase: "Phase 2"),
-        .init(title: "Assay Pro", symbol: "star", phase: "Phase 9"),
     ]
 }
 
@@ -57,7 +54,8 @@ struct AppearanceView: View {
                         }
                     }
                 }
-            } footer: { Text("Millennium and Pinstripe are original homages. Wallpaper match uses a colour palette; iOS doesn't share your wallpaper with apps.") }.rowCard()
+            } footer: { Text("Wallpaper match uses your scene’s palette, not the system wallpaper.") }.rowCard()
+            FoldIconPicker()
         }
         .themedList()
         .navigationTitle("Appearance")
@@ -87,9 +85,16 @@ struct EngineView: View {
                         }
                     }
                 }
-            } footer: { Text("Mac is faster and keeps going while the iPhone is locked. iPhone only keeps everything on the phone.") }.rowCard()
+            } footer: { Text("Use iPhone only for real device checks. Choose Demo to practise reviewing and undoing changes without changing your phone.") }.rowCard()
 
-            Section("Status") {
+            if model.engine.mode != .demo {
+                Section("Available now") {
+                    NavigationLink { DisplayCheckView() } label: { Label("Clock & Lock Screen",systemImage:"clock") }
+                    NavigationLink { DisplayPresetCopyView() } label: { Label("Edit a display preset copy",systemImage:"doc.on.doc") }
+                    NavigationLink { USBBackupHandoffView() } label: { Label("USB backup with a Mac",systemImage:"externaldrive") }
+                }.rowCard()
+            }
+            Section("System preference access") {
                 switch availability {
                 case .ready: Label("Ready", systemImage: "checkmark.circle").foregroundStyle(t.ink)
                 case .needsSetup(let s): Label(s, systemImage: "exclamationmark.circle").foregroundStyle(t.ink)
@@ -106,8 +111,8 @@ struct EngineView: View {
 
     private func blurb(_ m: EngineMode) -> String {
         switch m {
-        case .mac: "Fastest · USB · needs Assay for Mac"
-        case .iphone: "Most private · nothing leaves the phone"
+        case .mac: "USB backup via file handoff"
+        case .iphone: "Local checks and editable file copies"
         case .demo: "Sample device to explore the app"
         }
     }

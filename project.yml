@@ -9,20 +9,28 @@ settings:
     SWIFT_VERSION: "5.0"
     IPHONEOS_DEPLOYMENT_TARGET: "17.0"
     TARGETED_DEVICE_FAMILY: "1"
-    MARKETING_VERSION: "0.1.0"
-    CURRENT_PROJECT_VERSION: "1"
+    MARKETING_VERSION: "0.3.0"
+    CURRENT_PROJECT_VERSION: "8"
 targets:
   Assay:
     type: application
     platform: iOS
     sources:
       - path: App
+      - path: SharedSurfaces
+    dependencies:
+      - target: AssayWidgets
+        embed: true
     info:
       path: App/Info.plist
       properties:
         CFBundleDisplayName: Assay
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSSupportsLiveActivities: true
+        CFBundleURLTypes:
+          - CFBundleURLName: com.joesupportwiz.assay.open
+            CFBundleURLSchemes: [assay]
         UILaunchScreen:
           UIColorName: LaunchBackground
         UIApplicationSceneManifest:
@@ -30,7 +38,9 @@ targets:
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         ITSAppUsesNonExemptEncryption: false
         NSBluetoothAlwaysUsageDescription: Assay scans nearby Bluetooth devices only when you open the Bluetooth notebook. Reads only; writes always ask first.
-        NSLocalNetworkUsageDescription: Assay looks for services on networks you own or are allowed to test, and for Assay for Mac.
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+        NSLocalNetworkUsageDescription: Assay uses your local network for Bonjour discovery, Assay for Mac, and AI endpoints you choose.
         NSBonjourServices:
           - _assay-companion._tcp
           - _http._tcp
@@ -55,6 +65,7 @@ targets:
         TARGETED_DEVICE_FAMILY: "1"
         SUPPORTS_MACCATALYST: NO
         PRODUCT_NAME: Assay
+        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: "FoldMillennium FoldPinstripe"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         CODE_SIGNING_ALLOWED: NO
@@ -64,3 +75,29 @@ targets:
     scheme:
       testTargets: []
       gatherCoverageData: false
+
+  AssayWidgets:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: Widgets
+      - path: SharedSurfaces
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.joesupportwiz.assay.widgets
+        PRODUCT_NAME: AssayWidgets
+        APPLICATION_EXTENSION_API_ONLY: YES
+        SKIP_INSTALL: YES
+        CODE_SIGNING_ALLOWED: NO
+        CODE_SIGNING_REQUIRED: NO
+        TARGETED_DEVICE_FAMILY: "1"
+        SUPPORTS_MACCATALYST: NO
+    info:
+      path: Generated/AssayWidgets-Info.plist
+      properties:
+        CFBundleDisplayName: Assay widgets
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension

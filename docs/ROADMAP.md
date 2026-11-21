@@ -24,12 +24,15 @@ Built in order, one shippable slice at a time. Each slice ends with simulator sc
 | 1.4 | Diagnose: describe or pick a problem → cause, confidence, current value, fix (9:41 clock, green line, touch dots…) | ✅ keyword match · AI reasoning arrives with 5.x |
 | 1.5 | Fix sheet: review diff → dry run → applying → result → "is it fixed?" check | ✅ |
 
+## Device utilities · version 0.3.0 (3)
+Real [file checkpoints and verified export](features/file-vault.md), [scene activation and undo](features/scenes.md), [certificate/profile preflight](features/signer-preflight.md), and a live clock/preset-log check. No system preference writes, automatic device layout changes or signing implied.
+
 ## Phase 2 — Gild (tweaks)
 | # | Slice | Status |
 |---|---|---|
-| 2.1 | Catalogue model: tier, domain/key, versions, verification, conflicts, recovery | ○ |
-| 2.2 | Catalogue UI + review bar + tweak detail + Experimental confirm | ○ |
-| 2.3 | Presets, compare/diff, import/export | ○ |
+| 2.1 | Catalogue model: tier, domain/key, versions, verification, conflicts, recovery | implemented · demo catalogue |
+| 2.2 | Catalogue UI + review bar + tweak detail + Experimental confirm | implemented · staged review |
+| 2.3 | Presets, compare/diff, import/export | built-in presets only; import/export pending |
 | 2.4 | Custom tweak builder | ○ |
 | 2.5 | Signed catalogue updates (x16) | ○ |
 
@@ -45,37 +48,37 @@ Built in order, one shippable slice at a time. Each slice ends with simulator sc
 ## Phase 4 — Scenes & Studio
 | # | Slice | Status |
 |---|---|---|
-| 4.1 | Scenes: recipes, composer, preview, consistency check, guided apply, snapshots (x10) | ○ |
+| 4.1 | Scene library, activation, wallpaper PNG export, undo | Local scene CRUD/appearance; system layout, widget automation and snapshots pending |
 | 4.2 | Palette Lab (x06) + Wallpaper-match theme | ○ |
-| 4.3 | Canvas / Poster Studio: `.tendies` import, inspect, layers, timeline, validate, export (x11) | ○ |
-| 4.4 | Cards: Wallet visual editor | ○ |
+| 4.3 | Canvas: inspect a local ZIP wallpaper project, replace one chosen PNG layer, export a new ZIP | simulator + fixture; no timeline or system-wallpaper install |
+| 4.4 | Cards: local art editor, 1600×1000 PNG export | simulator; art only, no Wallet pass |
 | 4.5 | Icon packs (x05) | ○ |
 | 4.6 | Scene sharing `.assayscene` (x09) + automations via Shortcuts (x08) | ○ |
 
 ## Phase 5 — Alchemy (AI)
 | # | Slice | Status |
 |---|---|---|
-| 5.1 | Providers: Minis, OpenAI, Anthropic, Google, OpenRouter, Ollama; Keychain keys; connection test | ○ |
-| 5.2 | Explain-before-execute plans | ○ |
+| 5.1 | Providers: Minis, OpenAI, Anthropic, Google, OpenRouter, Ollama; Keychain keys; connection test | wired · simulator review; live providers not tested |
+| 5.2 | Explain-before-execute plans | optional chat & symptom suggestions; advice only |
 | 5.3 | Asset pipeline: prompt → draft → editor → before/after → apply | ○ |
-| 5.4 | MCP bridge (read-only first, on-device approval for changes) | ○ |
+| 5.4 | [Analyse with Minis](features/minis.md): reviewed snapshots, optional local log counts, status/latest/compare over STDIO | Read-only, no live device access or write tools |
 
 ## Phase 6 — Signet (signing)
 | # | Slice | Status |
 |---|---|---|
-| 6.1 | IPA inspector: targets, entitlements, Info.plist, privacy manifests (x04) | ○ |
-| 6.2 | Signing matrix + entitlement diff | ○ |
-| 6.3 | App Store Connect API key: certificates, profiles, devices, expiry | ○ 🔒 |
-| 6.4 | Per-target sign & verify, build receipts | ○ 🔒 |
-| 6.5 | Expiry calendar (x12) + renewal assistant | ○ |
+| 6.1 | IPA inspector: targets, entitlements, Info.plist, privacy manifests (x04) | local inspector · sample included |
+| 6.2 | Signing matrix + entitlement diff | profile claims plus bounded Mach-O entitlement evidence; unsupported cases stay Unknown |
+| 6.3 | App Store Connect API key: certificates, profiles, devices, expiry | team inventory + reviewed development-profile request; synthetic tests, no live account run |
+| 6.4 | Per-target sign & verify, build receipts | preflight and verified build retrieval; signing and install remain pending |
+| 6.5 | Expiry calendar (x12) + renewal assistant | expiry export only; renewal pending |
 | 6.6 | **In-app installer/signer** — pulls the build, reads every target's entitlements, creates bundle IDs, capabilities and per-target profiles, signs each part, verifies, installs | ○ 🔒 |
 | 6.7 | Sign-in: App Store Connect API key (default, official) · Apple ID login (opt-in, labelled risky, free accounts) · or import your own .p12 + profiles and Assay checks their entitlements against each target | ○ |
 
 ## Phase 7 — Lab & Tools
 | # | Slice | Status |
 |---|---|---|
-| 7.1 | BLE scanner + notebook: RSSI, GATT, reads, authorised writes, history, export (x14) | ○ |
-| 7.2 | LAN: Bonjour inventory, latency, TLS certificate check (x15) | ○ |
+| 7.1 | BLE scanner + notebook: RSSI, GATT, reads, authorised writes, history, export (x14) | simulator demo; accessory verification pending |
+| 7.2 | LAN: Bonjour inventory, latency, TLS certificate check (x15) | simulator demo; real LAN verification pending |
 | 7.3 | Passport & snapshot compare, post-update re-check (x02) | ○ |
 | 7.4 | Crash/log explainer + sysdiagnose guide (x13) | ○ |
 | 7.5 | Test bench, recovery coach, multi-device (x18) | ○ |
@@ -84,15 +87,15 @@ Built in order, one shippable slice at a time. Each slice ends with simulator sc
 ## Phase 8 — System surfaces
 | # | Slice | Status |
 |---|---|---|
-| 8.1 | Widgets (Home + Lock Screen), Live Activity, Dynamic Island | ○ |
-| 8.2 | Control Centre controls + App Intents / Shortcuts | ○ |
-| 8.3 | App lock (Assay only, Face ID) (x07) | ○ |
+| 8.1 | Widgets (Home + Lock Screen), Live Activity, Dynamic Island | embedded; simulator compiled; Vault Live Activity needs device verification |
+| 8.2 | Control Centre controls + App Intents / Shortcuts | open-app control and two Shortcuts; device verification pending |
+| 8.3 | App lock (Assay only, Face ID) (x07) | optional foreground lock; device verification pending |
 | 8.4 | "Still good?" follow-ups (x17) | ○ |
 
 ## Phase 9 — Assay Pro
 | # | Slice | Status |
 |---|---|---|
-| 9.1 | StoreKit 2 supporter purchase: Yearly £9.99 · Lifetime £29.99 — every feature stays free; Pro adds a badge and alternate icons | ○ |
+| 9.1 | StoreKit 2 supporter purchase: Yearly £9.99 · Lifetime £29.99 — every feature stays free | client and local test file; App Store Connect/TestFlight untested |
 | 9.2 | App Store Connect products `assay.pro.yearly`, `assay.pro.lifetime` | ○ 🔒 |
 
 > **StoreKit note:** real purchases only work for App Store / TestFlight builds. A sideloaded build can test with the included StoreKit configuration file in the simulator only.

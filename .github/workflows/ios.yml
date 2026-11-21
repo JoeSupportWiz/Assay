@@ -1,5 +1,8 @@
 name: Assay iOS CI
 on:
+  pull_request:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       mode:
@@ -7,13 +10,18 @@ on:
         type: choice
         options: [screenshots, ipa]
         default: screenshots
+      capture_set:
+        description: "Full gallery or the four new utility screens"
+        type: choice
+        options: [all, four-utilities, studio, acceptance, brand-audit, device-workflows]
+        default: all
       commit_screens:
-        description: "Commit screenshots to docs/app-screens"
+        description: "Legacy input; captures are artifacts only. No commits are made."
         type: boolean
-        default: true
+        default: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -21,6 +29,8 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Install XcodeGen
         run: brew install xcodegen
@@ -31,9 +41,48 @@ jobs:
       - name: Toolchain
         run: xcodebuild -version && xcrun simctl list runtimes | tail -5
 
+      - name: Verify real utilities on local fixtures
+        run: |
+          set -eu
+          swiftc -parse-as-library App/Features/AppleTeam/TeamPortal.swift tests/apple-team/TeamFixture.swift -o "$RUNNER_TEMP/team-test"
+          "$RUNNER_TEMP/team-test"
+          swiftc -parse-as-library App/Core/Catalog.swift App/Features/PresetFiles/PortableEdits.swift tests/preset-files/Fixture.swift -o "$RUNNER_TEMP/preset-test"
+          "$RUNNER_TEMP/preset-test"
+          swiftc -parse-as-library App/Features/DisplayPreset/DisplayPresetCopy.swift tests/display-preset/Fixture.swift -o "$RUNNER_TEMP/display-preset-test"
+          "$RUNNER_TEMP/display-preset-test"
+          python3 scripts/package-mac-helper.py --check
+          python3 -m unittest discover -s integrations/minis/tests
+          sh tests/usb-handoff/run.sh
+          python3 -m unittest discover -s Mac/usb-backup -p 'test_*.py'
+          sh tests/readiness-network/run.sh
+          swiftc -swift-version 5 -parse-as-library App/Features/Lab/ReceiptCalendar.swift tests/receipt-calendar/Fixture.swift -o "$RUNNER_TEMP/receipt-calendar"
+          "$RUNNER_TEMP/receipt-calendar"
+          sh tests/readiness-operations/run.sh
+          sh tests/build-library/run.sh
+          swiftc -parse-as-library App/Core/Operations.swift tests/rollback-review/Fixture.swift -o "$RUNNER_TEMP/rollback-test"
+          "$RUNNER_TEMP/rollback-test"
+          swiftc -parse-as-library App/Features/TestBench/BenchArchive.swift tests/test-bench/Fixture.swift -o "$RUNNER_TEMP/bench-test"
+          "$RUNNER_TEMP/bench-test"
+          bash tests/layout-studio/smoke.sh
+          bash tests/scene-transfer/smoke.sh
+          bash tests/palette-lab/smoke.sh
+          swiftc -parse-as-library App/Features/CrashReview/CrashReview.swift tests/crash-review/Fixture.swift -o "$RUNNER_TEMP/crash-fixture"
+          "$RUNNER_TEMP/crash-fixture"
+          python3 scripts/check-fold-assets.py
+          sh tests/supporter/run.sh
+          swiftc -parse-as-library App/Features/Signet/SignetBinaryEvidence.swift tests/macho/Fixture.swift -o "$RUNNER_TEMP/mach-check"
+          "$RUNNER_TEMP/mach-check"
+          bash tests/file-vault/run.sh
+          swiftc -parse-as-library App/Features/Canvas/CanvasArchive.swift App/Features/Signet/SignetZip.swift tests/canvas/Fixture.swift -o "$RUNNER_TEMP/canvas-test"
+          "$RUNNER_TEMP/canvas-test" App/ArtResources/AssayCanvasSample.zip
+          bash tests/scenes/smoke.sh
+          sh tests/display-check/run.sh
+          swiftc App/Features/Signet/SignerPreflightRules.swift App/Features/Signet/SignerPreflightEnvelope.swift tests/signer-preflight/main.swift -o "$RUNNER_TEMP/signet-fixture"
+          "$RUNNER_TEMP/signet-fixture"
+
       # ---------- Screenshots ----------
       - name: Build for simulator
-        if: inputs.mode == 'screenshots'
+        if: github.event_name != 'workflow_dispatch' || inputs.mode == 'screenshots'
         run: |
           mkdir -p build
           set -o pipefail
@@ -43,6 +92,8 @@ jobs:
           grep -q 'BUILD SUCCEEDED' build/build.log || { echo '::group::compile errors'; grep -E 'error:' build/build.log | sort -u | head -80; echo '::endgroup::'; exit 1; }
 
       - name: Render screens
+        env:
+          ASSAY_CAPTURE_SET: ${{ inputs.capture_set }}
         if: inputs.mode == 'screenshots'
         run: bash scripts/screenshots.sh build/dd/Build/Products/Debug-iphonesimulator/Assay.app docs/app-screens
 
@@ -52,16 +103,6 @@ jobs:
           name: Assay-screens
           path: docs/app-screens
           if-no-files-found: error
-
-      - name: Commit screenshots
-        if: inputs.mode == 'screenshots' && inputs.commit_screens
-        run: |
-          git config user.name "assay-ci"
-          git config user.email "assay-ci@users.noreply.github.com"
-          git config core.ignorecase false
-          git add docs/app-screens
-          git diff --cached --quiet || git commit -m "docs: app screenshots (${GITHUB_SHA::7})"
-          git push
 
       # ---------- Unsigned IPA ----------
       - name: Build unsigned archive

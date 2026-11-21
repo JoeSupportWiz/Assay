@@ -17,10 +17,12 @@ enum AIKeychain {
         }
     }
 
-    private static func baseQuery(_ kind: AIProviderKind) -> [String: Any] {
-        [kSecClass as String: kSecClassGenericPassword,
+    private static func baseQuery(_ kind: AIProviderKind, endpoint: String? = nil) -> [String: Any] {
+        // A custom credential is valid only for its configured endpoint, never for the next server entered.
+        let account = kind.isHostedService ? kind.rawValue : kind.rawValue + "|" + (endpoint ?? AIStoredSettings.load().baseURL(for: kind))
+        return [kSecClass as String: kSecClassGenericPassword,
          kSecAttrService as String: service,
-         kSecAttrAccount as String: kind.rawValue]
+         kSecAttrAccount as String: account]
     }
 
     /// Cleans pasted text and checks it is safe to put in an HTTP header.
@@ -57,8 +59,8 @@ enum AIKeychain {
     }
 
     /// Only AIClient should call this, to build an auth header.
-    static func read(for kind: AIProviderKind) -> String? {
-        var q = baseQuery(kind)
+    static func read(for kind: AIProviderKind, endpoint: String? = nil) -> String? {
+        var q = baseQuery(kind, endpoint: endpoint)
         q[kSecReturnData as String] = true
         q[kSecMatchLimit as String] = kSecMatchLimitOne
         var out: AnyObject?

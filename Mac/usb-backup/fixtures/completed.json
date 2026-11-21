@@ -1,0 +1,1 @@
+{"schema":"assay.usb.result.v1","job_id":"11111111-2222-4333-8444-555555555555","state":"completed","started_at":"2025-01-01T00:00:00Z","finished_at":"2025-01-01T00:01:00Z","backup_tool_succeeded":true,"fresh_manifest_verified":true}

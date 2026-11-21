@@ -33,6 +33,44 @@ shot() { # name, appearance, args...
 }
 
 for look in light dark; do
+  if [[ "${ASSAY_CAPTURE_SET:-all}" == "device-workflows" ]]; then
+    shot "38-workbench-home-$look" "$look" -uiIPhone -tab home
+    shot "39-workbench-studio-$look" "$look" -uiIPhone -tab studio
+    shot "40-receipt-calendar-$look" "$look" -uiDemo -route history
+    shot "35-display-preset-$look" "$look" -uiIPhone -route display-preset
+    shot "36-usb-handoff-$look" "$look" -uiIPhone -route usb-backup
+    shot "37-clock-check-$look" "$look" -uiIPhone -route display-check
+    continue
+  fi
+  if [[ "${ASSAY_CAPTURE_SET:-all}" == "brand-audit" ]]; then
+    shot "00-onboarding-$look" "$look" -onboarding
+    shot "01-home-$look" "$look" -uiDemo -tab home
+    shot "07-studio-$look" "$look" -uiDemo -tab studio
+    shot "02-lab-$look" "$look" -uiDemo -tab lab
+    shot "29-layout-$look" "$look" -uiDemo -route layout-planner -layoutSample
+    shot "30-scene-transfer-$look" "$look" -uiDemo -route scene-transfer
+    shot "34-bench-$look" "$look" -uiDemo -route bench
+    shot "31-crash-review-$look" "$look" -uiDemo -route crash-review
+    continue
+  fi
+  if [[ "${ASSAY_CAPTURE_SET:-all}" == "all" || "${ASSAY_CAPTURE_SET:-all}" == "acceptance" ]]; then
+    shot "25-preset-files-$look" "$look" -uiDemo -route preset-files
+    shot "26-privacy-lock-$look" "$look" -uiDemo -route privacy-lock
+    shot "28-build-library-$look" "$look" -uiDemo -route build-library
+    shot "27-supporter-$look" "$look" -uiDemo -route supporter
+  fi
+  if [[ "${ASSAY_CAPTURE_SET:-all}" == "acceptance" ]]; then continue; fi
+  if [[ "${ASSAY_CAPTURE_SET:-all}" != "four-utilities" ]]; then
+    shot "23-canvas-$look" "$look" -uiDemo -route canvas -canvasSample
+    shot "24-cards-$look" "$look" -uiDemo -route cards
+  fi
+  shot "22-apple-team-$look" "$look" -uiDemo -route apple-team
+  if [[ "${ASSAY_CAPTURE_SET:-all}" == "studio" ]]; then continue; fi
+  shot "18-clock-evidence-$look" "$look" -route display-check -uiDemo
+  shot "19-file-vault-$look" "$look" -route file-vault -uiDemo
+  shot "20-scenes-library-$look" "$look" -tab scenes -uiDemo
+  shot "21-signer-preflight-$look" "$look" -route signer-preflight -uiDemo
+  if [[ "${ASSAY_CAPTURE_SET:-all}" == "four-utilities" ]]; then continue; fi
   shot "00-onboarding-$look"  "$look" -onboarding
   shot "01-home-$look"        "$look" -uiDemo -tab home
   shot "02-lab-$look"         "$look" -uiDemo -tab lab
@@ -48,7 +86,11 @@ for look in light dark; do
   shot "12-bluetooth-$look"   "$look" -uiDemo -route bluetooth
   shot "13-network-$look"     "$look" -uiDemo -route network
   shot "14-signet-$look"      "$look" -uiDemo -route signet
+  shot "15-alchemy-$look"     "$look" -uiDemo -route alchemy
+  shot "16-minis-$look"       "$look" -uiDemo -route minis-report
+  shot "17-minis-review-$look" "$look" -uiDemo -route minis-report -minisReportPreview
 done
+if [[ "${ASSAY_CAPTURE_SET:-all}" == "all" ]]; then
 shot "01-home-millennium" light -uiDemo -tab home -theme millennium
 shot "01-home-pinstripe"  light -uiDemo -tab home -theme pinstripe
 shot "01-home-wallpaper"  dark  -uiDemo -tab home -theme wallpaper
@@ -56,12 +98,23 @@ shot "09-gild-millennium" light -uiDemo -route gild -theme millennium
 shot "09-gild-pinstripe"  light -uiDemo -route gild -theme pinstripe
 shot "09-gild-wallpaper"  dark  -uiDemo -route gild -theme wallpaper
 
+fi
+
+if [[ "${ASSAY_CAPTURE_SET:-all}" == "brand-audit" ]]; then
+  shot "01-home-wallpaper" dark -uiDemo -tab home -theme wallpaper
+  shot "01-home-millennium" light -uiDemo -tab home -theme millennium
+  shot "01-home-pinstripe" light -uiDemo -tab home -theme pinstripe
+  xcrun simctl ui "$UDID" content_size accessibility-extra-extra-extra-large
+  shot "32-studio-accessibility" light -uiDemo -tab studio -theme light
+  shot "33-onboarding-accessibility" dark -onboarding -theme dark
+  xcrun simctl ui "$UDID" content_size large
+fi
 # Contact sheet for quick review
 python3 - "$OUT" <<'PY'
 import sys, pathlib
 out = pathlib.Path(sys.argv[1])
 imgs = sorted(p.name for p in out.glob("*.png"))
 rows = "\n".join(f'<td align="center"><img src="{n}" width="200"><br><sub>{n[:-4]}</sub></td>' + ("</tr><tr>" if (i+1) % 4 == 0 else "") for i, n in enumerate(imgs))
-(out / "README.md").write_text(f"# App screenshots\n\nRendered by CI in the iOS Simulator (demo engine, 9:41 status bar).\n\n<table><tr>{rows}</tr></table>\n")
+(out / "README.md").write_text(f"# App screenshots\n\nRendered by CI in the iOS Simulator (9:41 status bar; device-workflow screens use iPhone mode).\n\n<table><tr>{rows}</tr></table>\n")
 PY
 echo "Done: $(ls "$OUT"/*.png | wc -l) screenshots"

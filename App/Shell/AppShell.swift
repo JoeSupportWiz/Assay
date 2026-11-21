@@ -4,7 +4,7 @@ import SwiftUI
 struct AssayApp: App {
     @State private var model = AppModel()
     var body: some Scene {
-        WindowGroup { RootView().environment(model) }
+        WindowGroup { AssayPrivacyGate { RootView().environment(model) }.task { await AssaySupporterStore.shared.start() } }
     }
 }
 
@@ -21,7 +21,16 @@ struct RootView: View {
         .environment(\.theme, theme)
         .tint(theme.accentColor)
         .preferredColorScheme(preferredScheme)
-        .task { await model.refresh() }
+        .onOpenURL { url in
+            guard model.hasOnboarded, let target = AssaySurfaceRoute(url: url) else { return }
+            switch target {
+            case .clock: model.selectedTab = .lab; model.labPath = [.displayCheck]
+            case .vault: model.selectedTab = .lab; model.labPath = [.fileVault]
+            case .scenes: model.selectedTab = .scenes
+            }
+        }
+        .onAppear { SceneLibraryStore.shared.attach(to: model) }
+        .task(id: model.engineGeneration) { await model.refresh() }
     }
 
     private var preferredScheme: ColorScheme? {
@@ -46,8 +55,8 @@ extension Theme {
     /// Selected tab tint, chosen to read on that theme's tab bar.
     var tabTint: Color {
         switch id {
-        case .millennium: Color(hex: 0xA6F59A)
-        case .pinstripe: Color(hex: 0x6FB8FF)
+        case .millennium: Color(hex: 0x205A31)
+        case .pinstripe: Color(hex: 0x204F85)
         default: accentColor
         }
     }
@@ -64,13 +73,13 @@ struct MainShell: View {
                 Group {
                     switch tab {
                     case .home: NavigationStack { HomeView() }
-                    case .scenes: NavigationStack { ScenesView() }
+                    case .scenes: ScenePlannerRoot()
                     case .studio: StudioRoot()
                     case .lab: LabRoot()
-                    case .more: NavigationStack { MoreView() }
+                    case .more: MoreRoot()
                     }
                 }
-                .tabItem { Label(tab.title, systemImage: tab.symbol) }
+                .tabItem { Label { Text(tab.title) } icon: { Image("fold-" + tab.rawValue).renderingMode(.template) } }
                 .tag(tab)
             }
         }
@@ -96,9 +105,15 @@ struct StudioRoot: View {
                     case .module(let m):
                         switch m {
                         case .gild: GildView()
+                        case .alchemy: AlchemyRootView()
                         case .signet: SignetRootView()
-                        default: ModuleComingView(module: m)
+                        case .canvas: CanvasRootView()
+                        case .cards: CardArtRootView()
                         }
+                    case .appleTeam: AppleTeamView()
+                    case .presetFiles: GildPresetFilesView()
+                    case .buildLibrary: SignetBuildLibrary()
+                    case .signerPreflight: SignerPreflightView()
                     case .gild(let g): switch g { case .tweak(let id): TweakDetailView(id: id); case .preset(let id): PresetView(id: id) }
                     }
                 }
@@ -117,6 +132,13 @@ struct LabRoot: View {
                     switch route {
                     case .diagnose: DiagnoseView()
                     case .history: HistoryView()
+                    case .displayCheck: DisplayCheckView()
+                    case .displayPreset: DisplayPresetCopyView()
+                    case .usbHandoff: USBBackupHandoffView()
+                    case .fileVault: FileVaultView()
+                    case .bench: BenchView()
+                    case .crashReview: CrashReviewView()
+                    case .minis: MinisReviewView()
                     case .bluetooth: BluetoothRootView()
                     case .network: NetworkRootView()
                     case .symptom(let id): SymptomView(id: id)
@@ -124,5 +146,23 @@ struct LabRoot: View {
                     }
                 }
         }
+    }
+}
+
+struct MoreRoot: View {
+    @Environment(AppModel.self) private var model
+    var body: some View {
+        @Bindable var model = model
+        NavigationStack(path: $model.morePath) { MoreView().navigationDestination(for: MoreRoute.self) { route in
+            switch route { case .lock: AssayPrivacyLockSettings(); case .supporter: SupporterView() }
+        }}
+    }
+}
+
+struct ScenePlannerRoot: View {
+    @Environment(AppModel.self) private var model
+    var body: some View {
+        @Bindable var model = model
+        NavigationStack(path: $model.scenePath) { SceneLibraryView().navigationDestination(for: PlannerRoute.self) { r in switch r { case .layout: SceneLayoutPlannerView(); case .transfer: SceneTransferView() } } }
     }
 }

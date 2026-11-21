@@ -1,4 +1,5 @@
 import Foundation
+import Observation
 
 // MARK: - Values and targets
 
@@ -70,6 +71,9 @@ struct OperationPlan: Identifiable, Hashable {
     var userCheck: String? = nil
     /// Receipts this plan reverses (undo / restore all).
     var undoOf: [Int] = []
+    var undoEngine: EngineMode? = nil
+    /// Set only on the transient copy submitted after the owner reviews this plan.
+    var riskAcknowledged = false
     var tier: Tier { changes.map(\.tier).max() ?? .reversible }
 }
 
@@ -77,7 +81,20 @@ struct OperationPlan: Identifiable, Hashable {
 
 /// The record left behind by every operation, including dry runs.
 struct Receipt: Identifiable, Codable, Hashable {
-    enum Outcome: String, Codable { case verified, unverified, failed, simulated }
+    enum Outcome: String, Codable {
+        case verified, unverified, failed, simulated, skipped
+
+        var potentiallyApplied: Bool { self == .verified || self == .unverified }
+        var tag: (TagStyle, String) {
+            switch self {
+            case .verified: (.reversible, "Read back OK")
+            case .unverified: (.caution, "Unverified")
+            case .failed: (.experimental, "Failed")
+            case .simulated: (.unknown, "Dry run")
+            case .skipped: (.neutral, "Not attempted")
+            }
+        }
+    }
     struct Item: Codable, Hashable {
         var change: Change
         var outcome: Outcome
@@ -96,20 +113,19 @@ struct Receipt: Identifiable, Codable, Hashable {
     var userConfirmed: Bool? = nil
 
     var status: Status {
-        if dryRun { return .simulated }
+        if dryRun { return items.allSatisfy({ $0.outcome == .simulated }) ? .simulated : .failed }
         if rolledBack { return .rolledBack }
-        let failed = items.filter { $0.outcome == .failed }.count
-        if !items.isEmpty && failed == items.count { return .failed }
-        if failed > 0 || items.contains(where: { $0.outcome == .unverified }) { return .partial }
-        return .complete
+        if items.isEmpty { return .failed }
+        if items.allSatisfy({ $0.outcome == .verified }) { return .complete }
+        return items.contains(where: { $0.outcome.potentiallyApplied }) ? .partial : .failed
     }
 
     var undoable: Bool {
         !dryRun && !rolledBack && kind != .undo && kind != .restoreAll
-            && items.contains(where: { $0.outcome != .failed && $0.change.beforeKnown })
+            && !items.isEmpty && items.allSatisfy { $0.outcome == .verified && $0.change.beforeKnown }
     }
 
-    var reversibleCount: Int { items.filter { $0.outcome != .failed && $0.change.beforeKnown }.count }
+    var reversibleCount: Int { items.filter { $0.outcome == .verified && $0.change.beforeKnown }.count }
 
     var statusTag: (TagStyle, String) {
         switch status {
@@ -126,55 +142,92 @@ struct Receipt: Identifiable, Codable, Hashable {
 @Observable
 final class ReceiptStore {
     private(set) var receipts: [Receipt] = []
+    enum StorageIssue: Equatable {
+        case damaged, unavailable, changed, saveFailed
+        var message: String {
+            switch self {
+            case .damaged: "Assay couldn’t decode the existing history. Its file has been kept unchanged. No receipts can be saved until you choose how to continue."
+            case .unavailable: "Assay can’t read the history file. Unlock the device and try reading it again. No new history will be created."
+            case .changed: "The history file changed since it was read. Read it again before continuing."
+            case .saveFailed: "Assay couldn’t save this history update. Read history again before continuing."
+            }
+        }
+    }
+    private(set) var storageIssue: StorageIssue?
+    private(set) var lastBackupName: String?
     private let persist: Bool
+    private let fileURL: URL
+    @ObservationIgnored private var loadedBytes: Data?
 
-    init(persist: Bool = true, seed: [Receipt] = []) {
+    init(persist: Bool = true, seed: [Receipt] = [], fileURL: URL? = nil) {
         self.persist = persist
-        receipts = persist ? Self.load() : seed
+        self.fileURL = fileURL ?? Self.url
+        if persist { reload() } else { receipts = seed }
     }
 
     var nextID: Int { (receipts.map(\.id).max() ?? 200) + 1 }
-    var changeCount: Int { receipts.filter { !$0.dryRun && !$0.rolledBack }.reduce(0) { $0 + $1.items.count } }
+    var changeCount: Int { verifiedChangeCount(engine: nil) }
+    func verifiedChangeCount(engine: EngineMode?) -> Int {
+        receipts.filter { !$0.dryRun && !$0.rolledBack && (engine == nil || $0.engine == engine) }
+            .reduce(0) { $0 + $1.items.filter { $0.outcome == .verified }.count }
+    }
 
-    func add(_ r: Receipt) { receipts.insert(r, at: 0); save() }
+    func add(_ r: Receipt) { save([r] + receipts) }
 
-    func markRolledBack(_ ids: [Int]) {
-        for id in ids { if let i = receipts.firstIndex(where: { $0.id == id }) { receipts[i].rolledBack = true } }
-        save()
+    func acknowledgeUndo(_ plan: OperationPlan, result: Receipt) {
+        guard !plan.undoOf.isEmpty, plan.undoEngine == result.engine, !result.dryRun, result.status == .complete,
+              result.kind == plan.kind, result.items.count == plan.changes.count,
+              zip(result.items,plan.changes).allSatisfy({ item, change in item.outcome == .verified && item.change.target == change.target && item.change.after == change.after }) else { return }
+        var updated = receipts
+        for i in receipts.indices where plan.undoOf.contains(receipts[i].id) && receipts[i].engine == result.engine && receipts[i].undoable { updated[i].rolledBack = true }
+        save(updated)
     }
 
     func confirm(_ id: Int, ok: Bool) {
-        if let i = receipts.firstIndex(where: { $0.id == id }) { receipts[i].userConfirmed = ok; save() }
+        if let i = receipts.firstIndex(where: { $0.id == id }) {
+            var updated = receipts; updated[i].userConfirmed = ok; save(updated)
+        }
     }
 
-    func undoPlan(for r: Receipt) -> OperationPlan {
-        let changes = r.items.filter { $0.outcome != .failed && $0.change.beforeKnown }.map { $0.change.inverted }
+    func undoPlan(for r: Receipt, engine: EngineMode) -> OperationPlan? {
+        guard storageIssue == nil, r.engine == engine, r.undoable, let position = receipts.firstIndex(where: { $0.id == r.id && $0.engine == engine }), receipts[position] == r else { return nil }
+        let keys = Set(r.items.map(\.change.target))
+        guard !receipts.prefix(position).contains(where: { other in
+            other.engine == engine && !other.dryRun && !other.rolledBack && other.kind != .undo && other.kind != .restoreAll && other.items.contains { keys.contains($0.change.target) && $0.outcome.potentiallyApplied }
+        }) else { return nil }
+        let changes = r.items.reversed().map { $0.change.inverted }
         return OperationPlan(title: "Undo #\(r.id) · \(r.title)", kind: .undo, changes: changes,
-                             needsRespring: true, userCheck: "Is everything back to how it was?", undoOf: [r.id])
+                             needsRespring: true, userCheck: "Is everything back to how it was?", undoOf: [r.id], undoEngine: engine)
     }
 
     /// Reverse every undoable receipt, newest first; for keys touched more than once the oldest "before" wins.
-    func restoreAllPlan() -> OperationPlan? {
-        let targets = receipts.filter(\.undoable).sorted { $0.date > $1.date }
+    func restoreAllPlan(engine: EngineMode) -> OperationPlan? {
+        guard storageIssue == nil else { return nil }
+        let relevant = receipts.filter { $0.engine == engine && !$0.dryRun && !$0.rolledBack && $0.kind != .undo && $0.kind != .restoreAll }
+        guard !relevant.contains(where: { !$0.undoable && $0.items.contains { $0.outcome == .verified || $0.outcome == .unverified } }) else {return nil}
+        let targets = relevant.filter(\.undoable).sorted { $0.date == $1.date ? $0.id > $1.id : $0.date > $1.date }
         guard !targets.isEmpty else { return nil }
         var order: [PrefKey] = []
         var byKey: [PrefKey: Change] = [:]
         for r in targets {
-            for item in r.items where item.outcome != .failed && item.change.beforeKnown {
-                let inv = item.change.inverted
-                if byKey[inv.target] == nil { order.append(inv.target) }
+            for item in r.items.reversed() {
+                var inv = item.change.inverted
+                if let newest = byKey[inv.target] {
+                    guard newest.after == inv.before else { return nil } // discontinuous history
+                    inv.before = newest.before
+                } else { order.append(inv.target) }
                 byKey[inv.target] = inv
             }
         }
         let changes = order.compactMap { byKey[$0] }
         return OperationPlan(title: "Restore to before Assay", kind: .restoreAll, changes: changes,
                              needsRespring: true, userCheck: "Is your iPhone back to how it was before Assay?",
-                             undoOf: targets.map(\.id))
+                             undoOf: targets.map(\.id), undoEngine: engine)
     }
 
     var needsYouCount: Int {
         receipts.filter { !$0.dryRun && !$0.rolledBack }.reduce(0) { acc, r in
-            acc + r.items.filter { !$0.change.beforeKnown && $0.outcome != .failed }.count
+            acc + r.items.filter { !$0.change.beforeKnown && $0.outcome.potentiallyApplied }.count
         }
     }
 
@@ -185,18 +238,66 @@ final class ReceiptStore {
             .appendingPathComponent("Assay", isDirectory: true).appendingPathComponent("receipts.json")
     }
 
-    private static func load() -> [Receipt] {
-        guard let data = try? Data(contentsOf: url) else { return [] }
-        let dec = JSONDecoder(); dec.dateDecodingStrategy = .iso8601
-        return (try? dec.decode([Receipt].self, from: data)) ?? []
+    /// Absence is the only read error that permits initial creation. A directory, protected
+    /// file, or other I/O error is *not* evidence that history is empty or damaged.
+    private func sourceBytes() throws -> Data? {
+        // Inspect the entry itself first: a dangling symlink is not a missing history.
+        let attributes: [FileAttributeKey: Any]
+        do { attributes = try FileManager.default.attributesOfItem(atPath: fileURL.path) }
+        catch let error as CocoaError where error.code == .fileReadNoSuchFile || error.code == .fileNoSuchFile { return nil }
+        guard attributes[.type] as? FileAttributeType == .typeRegular else { throw CocoaError(.fileReadUnknown) }
+        return try Data(contentsOf: fileURL)
     }
 
-    private func save() {
+    func reload() {
         guard persist else { return }
-        let enc = JSONEncoder(); enc.dateEncodingStrategy = .iso8601
-        guard let data = try? enc.encode(receipts) else { return }
-        try? FileManager.default.createDirectory(at: Self.url.deletingLastPathComponent(), withIntermediateDirectories: true)
-        try? data.write(to: Self.url, options: [.atomic, .completeFileProtection])
+        do { loadedBytes = try sourceBytes() }
+        catch { storageIssue = .unavailable; return }
+        guard let loadedBytes else { receipts = []; storageIssue = nil; return }
+        let decoder = JSONDecoder(); decoder.dateDecodingStrategy = .iso8601
+        do { receipts = try decoder.decode([Receipt].self, from: loadedBytes); storageIssue = nil }
+        catch { receipts = []; storageIssue = .damaged }
+    }
+
+    private func sourceIsUnchanged() -> Bool {
+        do { if try sourceBytes() == loadedBytes { return true }; storageIssue = .changed }
+        catch { storageIssue = .unavailable }
+        return false
+    }
+
+    /// Only the explicit History confirmation calls this. A failed backup never unlocks saves.
+    func startNewHistory() {
+        guard storageIssue == .damaged, let bytes = loadedBytes, sourceIsUnchanged() else { return }
+        let base = fileURL.deletingPathExtension().lastPathComponent
+        let directory = fileURL.deletingLastPathComponent()
+        var index = 1
+        do {
+            while true {
+                let backup = directory.appendingPathComponent("\(base).damaged-\(index).json")
+                do { try bytes.write(to: backup, options: [.withoutOverwriting, .completeFileProtection]) }
+                catch let error as CocoaError where error.code == .fileWriteFileExists { index += 1; continue }
+                lastBackupName = backup.lastPathComponent
+                break
+            }
+            guard sourceIsUnchanged() else { return }
+            let empty = Data("[]".utf8)
+            try empty.write(to: fileURL, options: [.atomic, .completeFileProtection])
+            receipts = []; loadedBytes = empty; storageIssue = nil
+        } catch { storageIssue = .saveFailed }
+    }
+
+    private func save(_ updated: [Receipt]) {
+        guard storageIssue == nil else { return }
+        guard persist else { receipts = updated; return }
+        guard sourceIsUnchanged() else { return }
+        let encoder = JSONEncoder(); encoder.dateEncodingStrategy = .iso8601
+        do {
+            let data = try encoder.encode(updated)
+            try FileManager.default.createDirectory(at: fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+            let options: Data.WritingOptions = loadedBytes == nil ? [.withoutOverwriting, .completeFileProtection] : [.atomic, .completeFileProtection]
+            try data.write(to: fileURL, options: options)
+            receipts = updated; loadedBytes = data
+        } catch { storageIssue = .saveFailed }
     }
 
     /// Sample history for the Demo engine (screenshots and first look). Every item is engine = .demo.

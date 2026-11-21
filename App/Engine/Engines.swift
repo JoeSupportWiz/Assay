@@ -38,12 +38,10 @@ struct DemoEngine: DeviceEngine {
                        facts: [
                         Fact(label: "Model", value: "iPhone17,1", evidence: .observed, source: "Demo"),
                         Fact(label: "iOS", value: "26.1 (23B85)", evidence: .observed, source: "Demo"),
-                        Fact(label: "Battery health", value: "94%", evidence: .observed, source: "Demo"),
                         Fact(label: "Status bar override", value: override ? "Present" : "None", evidence: override ? .inferred(82) : .observed, source: "Demo"),
                         Fact(label: "Current wallpaper", value: "Not shared with apps", evidence: .unknown, source: "iOS privacy"),
                        ],
-                       healthScore: override ? 94 : 100,
-                       backup: BackupStatus(phase: .running(0.62), reusedBytes: 2_300_000_000, totalBytes: 6_600_000_000))
+                       healthScore: nil, backup: nil)
     }
 }
 
@@ -54,7 +52,7 @@ struct OnDeviceEngine: DeviceEngine {
     let displayName = "This iPhone"
     let canRead = false
     func availability() async -> EngineAvailability {
-        .needsSetup("Import a pairing file and turn on the Assay loopback to make changes.")
+        .unavailable("No direct system preference access. Device checks and editing a copy of a file work without pairing.")
     }
     func read(_ key: PrefKey) async -> PlistValue? { nil }
     func write(_ key: PrefKey, _ value: PlistValue?) async -> WriteResult {
@@ -76,7 +74,7 @@ struct MacCompanionEngine: DeviceEngine {
     let displayName = "Assay for Mac"
     let canRead = false
     func availability() async -> EngineAvailability {
-        .needsSetup("Open Assay for Mac on the same network, then approve this iPhone.")
+        .unavailable("USB backup uses an exported request and a receipt from your Mac. This is not a live connection and cannot change system preferences.")
     }
     func read(_ key: PrefKey) async -> PlistValue? { nil }
     func write(_ key: PrefKey, _ value: PlistValue?) async -> WriteResult {

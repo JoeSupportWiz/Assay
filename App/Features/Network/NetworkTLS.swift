@@ -208,16 +208,16 @@ final class NetProbeStore {
         "\(demo ? "demo|" : "")\(host):\(port)"
     }
 
-    private func refusal(host: String, source: Source) -> String? {
-        let v = source == .manual ? NetAddressPolicy.check(host) : NetAddressPolicy.checkDiscovered(host)
-        return v.allowed ? nil : v.reason
+    private func verdict(host: String, source: Source) -> NetAddressPolicy.Verdict {
+        source == .manual ? NetAddressPolicy.check(host) : NetAddressPolicy.checkDiscovered(host)
     }
 
     func runLatency(host: String, port: UInt16, source: Source, demo: [Double?]? = nil) async {
         let key = Self.key(host: host, port: port, demo: demo != nil)
         guard activeKey == nil else { return }
         notices[key] = nil
-        if demo == nil, let why = refusal(host: host, source: source) { notices[key] = why; return }
+        let target = verdict(host: host, source: source)
+        if demo == nil && !target.allowed { notices[key] = target.reason; return }
         activeKey = "latency|" + key
         live = []
         defer { activeKey = nil }
@@ -228,7 +228,7 @@ final class NetProbeStore {
                 try? await Task.sleep(for: .milliseconds(250))
                 samples.append(s); live = samples
             }
-        } else {
+        } else if let host = target.host {
             for i in 0..<5 {
                 if Task.isCancelled { break }
                 let ms = await NetTCPProbe.connectOnce(host: host, port: port, timeout: 2)
@@ -243,7 +243,8 @@ final class NetProbeStore {
         let key = Self.key(host: host, port: port, demo: demo != nil)
         guard activeKey == nil else { return }
         notices[key] = nil
-        if demo == nil, let why = refusal(host: host, source: source) { notices[key] = why; return }
+        let target = verdict(host: host, source: source)
+        if demo == nil && !target.allowed { notices[key] = target.reason; return }
         activeKey = "cert|" + key
         defer { activeKey = nil }
 
@@ -252,6 +253,7 @@ final class NetProbeStore {
             cert[key] = NetCertResult(info: demo, error: nil, date: Date())
             return
         }
+        guard let host = target.host else { return }
         let r = await NetCertInspector.inspect(host: host, port: port)
         cert[key] = NetCertResult(info: r.info, error: r.error, date: Date())
     }
@@ -260,17 +262,9 @@ final class NetProbeStore {
     func isRunning(certFor key: String) -> Bool { activeKey == "cert|" + key }
 }
 
-extension NetAddressPolicy {
-    /// For hosts that came from Bonjour. IPv6 is accepted because it was advertised on the local link;
-    /// IPv4 and names still go through the private/local check.
-    static func checkDiscovered(_ host: String) -> Verdict {
-        if host.contains(":") { return Verdict(allowed: true, reason: "Advertised on the local network.") }
-        return check(host)
-    }
-}
-
 // MARK: - Plain-text report
 
+@MainActor
 enum NetReport {
     static func text(devices: [NetDevice], probes: NetProbeStore, demo: Bool, now: Date = Date()) -> String {
         var out: [String] = []

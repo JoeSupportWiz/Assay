@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.3.0 (8) — readiness review candidate
+- Home and Studio use the supplied Fold glyphs and scalable text. Demo no longer advertises an active backup or a fixed health score.
+- Receipt history now refuses to overwrite corrupt or unreadable data; the write gate checks risk and capability, and an unverified write stops the batch.
+- AI and network diagnostics distinguish private LAN, carrier NAT and global or malformed addresses. Regression checks run offline.
+- Added the display preset copy, two-sample clock check and standard Mac USB handoff. None resets protected iPhone settings.
+- PR builds and pushes to main run checks with read-only repository permissions. See the [readiness notes](docs/audit/READINESS-20NOV.md).
+
+## 0.3.0 (3) — Device utilities
+- Compare a reported status clock to actual system time, and check a local preset log for the two exact display settings; this does not reset SpringBoard.
+- Create and undo Assay scenes; export new palette artwork at the display’s native resolution.
+- File Vault checkpoints selected documents and verifies restored copies without overwriting originals.
+- Signet matches a public signing certificate to profiles for specified bundle IDs without requesting a private key.
+- Failed receipt items no longer count as verified changes. Old engine readings are cleared when you switch engines.
+
+## Unreleased · Build 7 audit
+- Applied the supplied Fold masters, reduced decorative copy, strengthened caption contrast and removed ambiguous evidence abbreviations.
+- Added Home Screen layout recipes with a manual placement checklist, Palette Lab, scene exchange, local crash review and a saved test bench.
+- Tightened undo: only verified changes from the selected engine, with newer overlapping edits and uncertain history refused.
+- Added `docs/audit/REQUESTS.md`, a request-to-code audit that distinguishes source, fixture, simulator and device evidence.
+
+## Unreleased · Build 6 review
+- Signet reads bounded per-target entitlement evidence from executables, with explicit Unknown states for unsupported or malformed binaries.
+- Added a verified Assay build library, preset import/export review, optional Assay-only privacy lock and supporter purchase client. No App Store, TestFlight or signed-device verification yet.
+- Repeat File Vault checkpoints reuse verified blobs without writing duplicate payloads.
+
+## Unreleased · Studio and Lab integration
+- **Analyse with Minis**: review an allowlisted snapshot, optionally add receipt summaries or counts from an imported backup log, then share or export. A local read-only MCP server compares user-approved exports. No pairing file or model key required.
+- **Engine status** now distinguishes public iPhone checks from unimplemented system writes. The review sheet allows previews, not live writes, on real-device engines.
+- Added [four feature test cards](docs/features/README.md): Bluetooth notebook, local network inventory, Signet IPA inspection and Alchemy chat. Simulator coverage is not live hardware or provider verification.
+- Added an explicit, advice-only AI second opinion in Diagnose; keyword matching still works offline.
+- Scoped custom AI credentials and hosted consent to their configured endpoints; credentials are never sent over HTTP.
+
 ## 0.2.0 — Phase 1 · Safety core
 - **New** Every change goes through one pipeline: current value re-read, exact diff shown, written, read back, receipt kept.
 - **New** Undo history: per-change undo, and Restore to before Assay. Changes that couldn't be read first are listed as not undoable.

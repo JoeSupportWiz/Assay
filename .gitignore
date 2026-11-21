@@ -10,3 +10,5 @@ xcuserdata/
 *.mobileprovision
 *.mobiledevicepairing
 *.key
+__pycache__/
+*.pyc

@@ -96,6 +96,7 @@ enum SignetInspector {
         var appInfo: SignetAppInfo?
         var appTracking: Bool?
 
+        var binaryBudget = 32 * 1024 * 1024
         for (idx, b) in bundleDirs.enumerated() {
             progress?("Reading \(b.dir)")
             guard let e = zip.entry(named: b.dir + "Info.plist") else { throw SignetInspectError.noInfoPlist(b.dir) }
@@ -133,10 +134,15 @@ enum SignetInspector {
                 }
             }
 
+            var binary = SignetBinaryEvidence.unavailable
+            if let name = plist["CFBundleExecutable"] as? String, !name.isEmpty, name != ".", name != "..", !name.contains("/"), !name.contains("\\"), let executable = zip.entry(named: b.dir + name), executable.uncompressedSize <= binaryBudget, executable.uncompressedSize <= SignetZipReader.maxEntryBytes {
+                binaryBudget -= executable.uncompressedSize
+                if let bytes = try? zip.extract(executable) { binary = .inspect(bytes) }
+            }
             targets.append(SignetTarget(
                 kind: b.kind, path: b.dir, bundleID: bundleID, displayName: display, extensionPoint: ext,
                 profile: profile, hasCodeSignature: zip.hasEntry(b.dir + "_CodeSignature/CodeResources"),
-                hasPrivacyManifest: privacy))
+                hasPrivacyManifest: privacy, binary: binary))
 
             if idx == 0 {
                 let families = (plist["UIDeviceFamily"] as? [Any] ?? []).compactMap { v -> String? in
@@ -170,7 +176,7 @@ enum SignetInspector {
         try zip.readChunks { hasher.update(data: $0) }
         let hex = hasher.finalize().map { String(format: "%02x", $0) }.joined()
 
-        notes.append("Binary entitlements not read. The profile's allowed entitlements are shown; what the binary requests is Unknown.")
+        notes.append("Requests are read from supported Mach-O XML entitlement slots; other cases are labelled unknown or inferred. A parsed declaration is not proof of signature validity.")
         return SignetInspection(
             fileName: url.lastPathComponent, fileSize: zip.fileSize, sha256: hex, app: info, targets: targets,
             frameworks: fw.sorted(), privacyTrackingDeclared: appTracking, notes: notes, isDemo: false)

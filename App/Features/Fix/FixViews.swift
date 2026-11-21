@@ -3,12 +3,18 @@ import SwiftUI
 // MARK: - Diagnose
 
 struct DiagnoseView: View {
-    @Environment(AppModel.self) private var model
     @Environment(\.theme) private var t
     @State private var text = ""
-    @State private var showAll = false
+    @State private var pending: AIPendingSend?
+    @State private var requesting = false
+    @State private var advice: AIDiagnosisResult?
+    @State private var requestError: String?
     @FocusState private var focused: Bool
 
+    private var ai: AIService { AIService.shared }
+    private var destination: AIResolved { ai.settings.resolve(task: .diagnose) }
+    private var prompt: String { text.trimmingCharacters(in: .whitespacesAndNewlines) }
+    private var busy: Bool { pending != nil || requesting }
     private var matches: [(Symptom, Int)] { Knowledge.match(text) }
 
     var body: some View {
@@ -17,16 +23,19 @@ struct DiagnoseView: View {
                 TextField("Describe it, e.g. clock stuck at 9:41", text: $text, axis: .vertical)
                     .focused($focused)
                     .submitLabel(.search)
-            } footer: { Text("Matches your words against known problems. Nothing is sent anywhere.") }.rowCard()
+                    .disabled(busy)
+            } footer: { Text("Catalogue matching stays on your phone. Asking for a second opinion is optional.") }.rowCard()
 
-            if !text.trimmingCharacters(in: .whitespaces).isEmpty {
+            if !prompt.isEmpty {
                 Section(matches.isEmpty ? "No match" : "Best matches") {
                     if matches.isEmpty {
-                        Text("Nothing in the catalogue matches that yet. Try different words, or pick from the list below. Once an AI provider is connected, Assay can reason about problems that aren't listed.")
+                        Text("Nothing in the catalogue matches that yet. Try different words, or pick from the list below.")
                             .font(.system(size: 14)).foregroundStyle(t.ink2)
                     }
                     ForEach(matches.prefix(4), id: \.0.id) { s, _ in row(s) }
                 }.rowCard()
+
+                secondOpinion
             }
 
             Section(text.isEmpty ? "Common problems" : "All problems") {
@@ -36,6 +45,80 @@ struct DiagnoseView: View {
         .themedList()
         .navigationTitle("Diagnose")
         .navigationBarTitleDisplayMode(.inline)
+        .onChange(of: text) { advice = nil; requestError = nil }
+        .sheet(item: $pending) { preview in
+            AIConsentSheet(pending: preview, onConfirm: { confirm(preview) }, onCancel: { pending = nil })
+        }
+    }
+
+    private var secondOpinion: some View {
+        Section {
+            if ai.demoMode {
+                Text("Demo uses local keywords. No model is contacted.")
+            } else {
+                LabeledContent(destination.provider.displayName, value: destination.model)
+                Text(ai.privacyLabel(for: destination.provider).title).font(.footnote)
+            }
+            Button("Ask for a second opinion", action: ask).disabled(busy)
+            if requesting { ProgressView("Checking for a known symptom…") }
+            if let requestError { Text(requestError) }
+            if let advice {
+                if let id = advice.symptomID, let symptom = Knowledge.symptoms.first(where: { $0.id == id }) {
+                    Text(symptom.title).font(.headline)
+                } else {
+                    Text("No known symptom identified").font(.headline)
+                }
+                Text(verbatim: advice.explanation)
+                if let provider = advice.provider, let model = advice.model {
+                    Text("Reply from \(provider.displayName) · \(model)").font(.footnote)
+                }
+            }
+        } header: { Text("Second opinion") } footer: {
+            Text("Advice only. This does not read or change device settings.")
+        }.rowCard()
+    }
+
+    private func ask() {
+        guard !busy, !prompt.isEmpty else { return }
+        focused = false
+        advice = nil
+        requestError = nil
+        let target = destination
+        if !ai.demoMode {
+            switch ai.status(for: target.provider) {
+            case .needsKey: requestError = AIError.noKey.errorDescription; return
+            case .notAvailable(let reason): requestError = reason; return
+            case .configured: break
+            }
+        }
+        if AIDiagnosis.needsConsent() {
+            pending = AIPendingSend(provider: target.provider, model: target.model, baseURL: target.baseURL,
+                                    outgoing: AIDiagnosis.outgoing(for: prompt), withContext: false)
+        } else {
+            requestAdvice(for: prompt)
+        }
+    }
+
+    private func confirm(_ preview: AIPendingSend) {
+        guard pending?.id == preview.id else { return }
+        pending = nil
+        guard !ai.demoMode, preview.provider == destination.provider,
+              preview.model == destination.model, preview.baseURL == destination.baseURL else {
+            requestError = "AI settings changed. Check the provider and model before asking again."
+            return
+        }
+        ai.recordConsent(provider: preview.provider, withContext: false)
+        requestAdvice(for: prompt)
+    }
+
+    private func requestAdvice(for description: String) {
+        requesting = true
+        Task { @MainActor in
+            defer { requesting = false }
+            do { advice = try await AIDiagnosis.suggest(text: description) }
+            catch let error as AIError { requestError = error.errorDescription }
+            catch { requestError = "Could not get a second opinion. Try again." }
+        }
     }
 
     private func row(_ s: Symptom) -> some View {
@@ -72,9 +155,12 @@ struct SymptomView: View {
                     }
                 }.rowCard()
 
+                if id == "clock-941" || id == "green-line" {
+                    Section { NavigationLink(value: LabRoute.displayCheck) { Label("Check the clock and preset evidence", systemImage: "clock") } }.rowCard()
+                }
                 Section("What we think is happening") {
                     Text(s.cause).foregroundStyle(t.ink)
-                    HStack { Tag(style: .inferred(s.confidence)); Text("Matches reports, not proof for your phone").font(.system(size: 12.5)).foregroundStyle(t.ink3) }
+                    HStack { Tag(style: .inferred(nil)); Text("Known explanation; not confirmed on this phone.").font(.footnote).foregroundStyle(t.ink2) }
                 }.rowCard()
 
                 if let key = s.culprit {
@@ -106,14 +192,15 @@ struct SymptomView: View {
                         if model.engine.canRead && loaded && current != s.culpritValue {
                             Text("This setting isn't on, so it isn't the cause here.")
                         } else if !model.engine.canRead {
-                            Text("This engine can't read or write yet. You can still review exactly what would change.")
+                            Text("Assay cannot read or reset that system preference. Editing a copy of the original preset can prevent that copy from selecting it again.")
                         } else {
                             Text("You'll see exactly what changes, and can do a dry run first.")
                         }
                     }
                 } else {
                     Section("What helps") {
-                        Text("Backups run through an on-device tunnel that can lose packets. Keep Assay open with the screen on, turn Low Power Mode off, and choose the Mac companion engine for the fastest, most reliable backups.")
+                        if model.engine.mode != .demo { NavigationLink(value: LabRoute.usbHandoff) { Label("USB backup with a Mac", systemImage: "externaldrive") } }
+                        Text("File Vault backs up selected files. For a standard device backup, use the Mac handoff or Finder over USB. Neither can establish why an earlier transfer stopped.")
                             .foregroundStyle(t.ink)
                     }.rowCard()
                 }
@@ -122,7 +209,9 @@ struct SymptomView: View {
             .navigationTitle("Problem")
             .navigationBarTitleDisplayMode(.inline)
             .safeAreaInset(edge: .bottom) {
-                if s.culprit != nil {
+                if model.engine.mode != .demo && (id == "clock-941" || id == "green-line") {
+                    NavigationLink(value: LabRoute.displayPreset) { Text("Review the exported preset") }.buttonStyle(PrimaryButtonStyle()).padding(.horizontal,20).padding(.vertical,10).background(.bar)
+                } else if s.culprit != nil {
                     Button { model.activePlan = s.plan(current: current) } label: { Text("Review the fix") }
                         .buttonStyle(PrimaryButtonStyle())
                         .disabled(model.engine.canRead && loaded && current != s.culpritValue)
@@ -153,6 +242,12 @@ struct FixSheet: View {
     @State private var dryRun = false
     @State private var understood = false
     @State private var receipt: Receipt?
+
+    private var policy: OperationWritePolicy {
+        OperationWritePolicy(plan: plan, requestedDryRun: dryRun, canWrite: model.engine.canWritePreferences)
+    }
+
+    private var applyLabel: String { model.engine.mode == .demo ? "Apply in Demo" : "Apply changes" }
 
     var body: some View {
         NavigationStack {
@@ -193,22 +288,29 @@ struct FixSheet: View {
                 Label("Current values are read again right before writing.", systemImage: "arrow.triangle.2.circlepath")
                 Label(plan.changes.allSatisfy(\.beforeKnown) ? "Every change can be undone from Undo history." : "Some values can't be read first, so those can't be undone.",
                       systemImage: plan.changes.allSatisfy(\.beforeKnown) ? "arrow.uturn.backward.circle" : "exclamationmark.triangle")
-                if plan.needsRespring { Label("SpringBoard restarts so it takes effect. The screen flashes for a second.", systemImage: "arrow.clockwise") }
+                if plan.needsRespring { Label("The original change normally requires restarting SpringBoard. This preview won’t restart it.", systemImage: "arrow.clockwise") }
                 Label(model.engine.displayName + (model.engine.mode == .demo ? " — nothing real is touched" : ""), systemImage: "iphone")
             }.font(.system(size: 14)).foregroundStyle(t.ink).rowCard()
 
             Section {
-                Toggle("Dry run (write nothing)", isOn: $dryRun)
-                if plan.tier >= .caution && !dryRun {
+                if !model.engine.canWritePreferences {
+                    Label("Preview only. This engine can’t change system preferences.", systemImage: "info.circle")
+                } else {
+                    Toggle("Dry run (write nothing)", isOn: $dryRun)
+                }
+                if policy.requiresAcknowledgement {
                     Toggle("I understand the risk", isOn: $understood)
+                }
+                if let issue = model.receipts.storageIssue {
+                    Label(issue.message + " Open Undo history to continue.", systemImage: "exclamationmark.triangle")
                 }
             } footer: { Text(plan.tier.explanation) }.rowCard()
 
         }
         .safeAreaInset(edge: .bottom) {
-            Button { Task { await run() } } label: { Text(dryRun ? "Run dry run" : "Apply") }
+            Button { Task { await run() } } label: { Text(policy.effectiveDryRun ? "Run preview" : applyLabel) }
                 .buttonStyle(PrimaryButtonStyle())
-                .disabled(!dryRun && plan.tier >= .caution && !understood)
+                .disabled(!policy.permitsRun(acknowledged: understood) || model.receipts.storageIssue != nil)
                 .padding(.horizontal, 20).padding(.vertical, 10)
                 .background(.bar)
         }
@@ -246,19 +348,14 @@ struct FixSheet: View {
                     Text("Please keep Assay open.").font(.system(size: 13.5)).foregroundStyle(t.ink2)
                 }.frame(maxWidth: .infinity).padding(.vertical, 24)
             }.rowCard()
-            Section("Steps") {
-                step("Read current values", done: s != .snapshot)
-                step("Write", done: { if case .writing = s { return false } else { return s == .verifying || s == .done } }(), active: { if case .writing = s { return true } else { return false } }())
-                step("Read back to verify", done: s == .done, active: s == .verifying)
-            }.rowCard()
         }
     }
 
     private func stageText(_ s: OperationRunner.Stage) -> String {
         switch s {
         case .snapshot: "Saving current values…"
-        case .writing(let i, let n): "Writing \(i) of \(n)…"
-        case .verifying: "Reading back to check…"
+        case .previewing(let i, let n): "Previewing \(i) of \(n)…"
+        case .writing(let i, let n): "Writing and checking \(i) of \(n)…"
         case .done: "Done"
         }
     }
@@ -279,7 +376,11 @@ struct FixSheet: View {
                     VStack(spacing: 10) {
                         Image(systemName: icon(r)).font(.system(size: 44)).foregroundStyle(color(r))
                         Text(headline(r)).font(.system(size: 20, weight: .bold)).foregroundStyle(t.ink)
-                        Text("Receipt #\(r.id)").font(.system(size: 13)).foregroundStyle(t.ink3)
+                        if let issue = model.receipts.storageIssue {
+                            Text("History update not saved. " + issue.message).font(.footnote)
+                        } else {
+                            Text("Receipt #\(r.id)").font(.system(size: 13)).foregroundStyle(t.ink3)
+                        }
                     }.frame(maxWidth: .infinity).padding(.vertical, 16)
                 }.rowCard()
 
@@ -292,7 +393,7 @@ struct FixSheet: View {
                     }
                 }.rowCard()
 
-                if !r.dryRun, let q = plan.userCheck, r.status != .failed, model.receipts.receipts.first(where: { $0.id == r.id })?.userConfirmed == nil {
+                if model.receipts.storageIssue == nil, !r.dryRun, let q = plan.userCheck, r.status != .failed, model.receipts.receipts.first(where: { $0.id == r.id })?.userConfirmed == nil {
                     Section {
                         Text(q).foregroundStyle(t.ink)
                         Button("Yes, that's fixed") { model.receipts.confirm(r.id, ok: true); Haptics.success() }
@@ -305,11 +406,11 @@ struct FixSheet: View {
                 }
 
                 Section {
-                    if r.dryRun {
-                        Button("Apply for real") { receipt = nil; dryRun = false; phase = .review }.buttonStyle(PrimaryButtonStyle())
+                    if r.dryRun && model.engine.canWritePreferences {
+                        Button(applyLabel) { receipt = nil; dryRun = false; understood = false; phase = .review }.buttonStyle(PrimaryButtonStyle())
                             .listRowBackground(Color.clear).listRowInsets(.init())
-                    } else if r.undoable {
-                        Button("Undo this") { model.activePlan = model.receipts.undoPlan(for: r) }.buttonStyle(SecondaryButtonStyle())
+                    } else if let plan = model.receipts.undoPlan(for:r,engine:model.engine.mode) {
+                        Button("Undo this") { model.activePlan = plan }.buttonStyle(SecondaryButtonStyle())
                             .listRowBackground(Color.clear).listRowInsets(.init())
                     }
                 }
@@ -320,8 +421,8 @@ struct FixSheet: View {
     private func headline(_ r: Receipt) -> String {
         switch r.status {
         case .complete: "Applied and read back"
-        case .partial: "Applied, partly verified"
-        case .failed: "Nothing was changed"
+        case .partial: "Not all changes were verified"
+        case .failed: "No verified changes"
         case .simulated: "Dry run — nothing written"
         case .rolledBack: "Rolled back"
         }
@@ -333,17 +434,15 @@ struct FixSheet: View {
         switch r.status { case .complete: Palette.mintDeep; case .partial: Palette.butterDeep; case .failed: Palette.peachDeep; default: t.ink2 }
     }
     @ViewBuilder private func outcomeTag(_ o: Receipt.Outcome) -> some View {
-        switch o {
-        case .verified: Tag(style: .reversible, text: "Read back OK")
-        case .unverified: Tag(style: .caution, text: "Unverified")
-        case .failed: Tag(style: .experimental, text: "Failed")
-        case .simulated: Tag(style: .unknown, text: "Dry run")
-        }
+        Tag(style: o.tag.0, text: o.tag.1)
     }
 
     private func run() async {
+        guard case .review = phase, model.receipts.storageIssue == nil, policy.permitsRun(acknowledged: understood) else { return }
+        var reviewed = plan
+        reviewed.riskAcknowledged = understood
         phase = .running(.snapshot)
-        let r = await model.execute(plan, dryRun: dryRun) { stage in phase = .running(stage) }
+        let r = await model.execute(reviewed, dryRun: policy.effectiveDryRun) { stage in phase = .running(stage) }
         receipt = r
         phase = .result(r.id)
         if r.status == .complete { Haptics.success() } else if r.status == .failed { Haptics.error() }

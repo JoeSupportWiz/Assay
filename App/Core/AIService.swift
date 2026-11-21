@@ -97,8 +97,9 @@ final class AIService {
     private(set) var keyRevision = 0
 
     init() {
-        settings = AIStoredSettings.load()
-        if ProcessInfo.processInfo.arguments.contains("-uiDemo") { settings.demoMode = true }
+        var s = AIStoredSettings.load()
+        if AssayPreviewArguments.values.contains("-uiDemo") { s.demoMode = true }   // screenshots: not saved
+        settings = s
     }
 
     // MARK: Status
@@ -141,15 +142,18 @@ final class AIService {
     // MARK: Keys
 
     func saveKey(_ raw: String, for kind: AIProviderKind) throws {
+        let base = settings.baseURL(for: kind)
+        guard AIHost.parse(base)?.scheme?.lowercased() == "https" else { throw AIError.insecureEndpoint }
         try AIKeychain.save(raw, for: kind)
+        revokeConsent(for: kind)
         keyRevision += 1
     }
 
     func deleteKey(for kind: AIProviderKind) {
         AIKeychain.delete(for: kind)
         // Forget consent too: a new key is a new account.
-        settings.consented.removeAll { $0 == kind.rawValue }
-        settings.consentedWithContext.removeAll { $0 == kind.rawValue }
+        settings.consented.removeAll { $0 == kind.rawValue || $0.hasPrefix(kind.rawValue + "|") }
+        settings.consentedWithContext.removeAll { $0 == kind.rawValue || $0.hasPrefix(kind.rawValue + "|") }
         keyRevision += 1
     }
 
@@ -166,13 +170,14 @@ final class AIService {
     }
 
     func recordConsent(provider kind: AIProviderKind, withContext: Bool) {
-        if !settings.consented.contains(kind.rawValue) { settings.consented.append(kind.rawValue) }
-        if withContext && !settings.consentedWithContext.contains(kind.rawValue) { settings.consentedWithContext.append(kind.rawValue) }
+        let scope = settings.consentKey(kind)
+        if !settings.consented.contains(scope) { settings.consented.append(scope) }
+        if withContext && !settings.consentedWithContext.contains(scope) { settings.consentedWithContext.append(scope) }
     }
 
     func revokeConsent(for kind: AIProviderKind) {
-        settings.consented.removeAll { $0 == kind.rawValue }
-        settings.consentedWithContext.removeAll { $0 == kind.rawValue }
+        settings.consented.removeAll { $0 == kind.rawValue || $0.hasPrefix(kind.rawValue + "|") }
+        settings.consentedWithContext.removeAll { $0 == kind.rawValue || $0.hasPrefix(kind.rawValue + "|") }
     }
 
     // MARK: Test

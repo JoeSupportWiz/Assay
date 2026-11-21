@@ -36,7 +36,7 @@ struct NetworkRootView: View {
         }
         .themedList()
         .navigationTitle("Local network")
-        .onAppear { if ProcessInfo.processInfo.arguments.contains("-uiDemo") { bonjour.setDemo(true) } }
+        .onAppear { if AssayPreviewArguments.values.contains("-uiDemo") { bonjour.setDemo(true) } }
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: NetRoute.self) { route in
             switch route {
@@ -65,7 +65,7 @@ struct NetworkRootView: View {
         }
         .onAppear {
             bonjour.screenAppeared()
-            if !scope.accepted { showScope = true }
+            if !scope.accepted && !AssayPreviewArguments.values.contains("-uiDemo") { showScope = true }
         }
         .onDisappear { bonjour.screenDisappeared() }
         .onChange(of: scenePhase) { _, phase in

@@ -5,8 +5,8 @@ import UIKit
 
 struct FoldMark: Shape {
     func path(in r: CGRect) -> Path {
-        let sx = r.width / 50, sy = r.height / 71.5
-        func p(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: r.minX + (x - 17) * sx, y: r.minY + (y - 5.5) * sy) }
+        let scale = min(r.width / 50, r.height / 71.7)
+        func p(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: r.midX + (x - 42) * scale, y: r.midY + (y - 41.35) * scale) }
         var path = Path()
         path.move(to: p(17, 25.5)); path.addQuadCurve(to: p(19.4, 21.4), control: p(17, 22.8))
         path.addLine(to: p(42.5, 8.1)); path.addQuadCurve(to: p(47, 10.8), control: p(47, 5.5))
@@ -91,12 +91,12 @@ struct Tag: View {
     var body: some View {
         if !label.isEmpty {
             Text(label)
-                .font(.system(size: 11.5, weight: .semibold))
+                .font(.caption2.weight(.semibold))
                 .foregroundStyle(colours.fg)
                 .padding(.horizontal, 8).padding(.vertical, 3)
                 .background(colours.bg, in: Capsule())
                 .overlay { if style == .unknown { Capsule().strokeBorder(t.ink3, style: StrokeStyle(lineWidth: 1, dash: [3, 2])) } }
-                .fixedSize()
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }
@@ -123,7 +123,7 @@ struct ThemedBackground: View {
     @Environment(\.theme) private var t
     var body: some View {
         if t.id == .wallpaper, t.wallpaperColors.count == 5 {
-            LinearGradient(colors: [t.wallpaperColors[1], t.wallpaperColors[4]], startPoint: .top, endPoint: .bottom).ignoresSafeArea()
+            LinearGradient(colors: [t.wallpaperColors[1], t.wallpaperColors[4]], startPoint: .top, endPoint: .bottom).overlay(Color.black.opacity(0.58)).ignoresSafeArea()
         } else if t.id == .pinstripe {
             Image(uiImage: PinstripeTile.image).resizable(resizingMode: .tile).ignoresSafeArea()
         } else {
@@ -161,7 +161,7 @@ private struct RowCard: ViewModifier {
     @Environment(\.theme) private var t
     func body(content: Content) -> some View {
         if t.glass {
-            content.listRowBackground(Rectangle().fill(.ultraThinMaterial).overlay(Color.white.opacity(0.05)))
+            content.listRowBackground(Color.black.opacity(0.48))
         } else {
             content.listRowBackground(t.card)
         }
@@ -174,14 +174,14 @@ private struct ThemedBars: ViewModifier {
         switch t.id {
         case .millennium:
             content
-                .toolbarBackground(Color(hex: 0x245EDB), for: .tabBar)
+                .toolbarBackground(Color(hex: 0xE3EACE), for: .tabBar)
                 .toolbarBackground(.visible, for: .tabBar)
-                .toolbarColorScheme(.dark, for: .tabBar)
+                .toolbarColorScheme(.light, for: .tabBar)
         case .pinstripe:
             content
-                .toolbarBackground(Color(hex: 0x1B1B1D), for: .tabBar)
+                .toolbarBackground(Color(hex: 0xDCE2EC), for: .tabBar)
                 .toolbarBackground(.visible, for: .tabBar)
-                .toolbarColorScheme(.dark, for: .tabBar)
+                .toolbarColorScheme(.light, for: .tabBar)
         case .wallpaper:
             content
                 .toolbarBackground(.ultraThinMaterial, for: .tabBar)
@@ -198,7 +198,7 @@ struct PrimaryButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var enabled
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 17, weight: .semibold))
+            .font(.body.weight(.semibold))
             .foregroundStyle(t.onPrimary)
             .frame(maxWidth: .infinity, minHeight: 50)
             .background(t.primary, in: Capsule())
@@ -210,7 +210,7 @@ struct SecondaryButtonStyle: ButtonStyle {
     @Environment(\.theme) private var t
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 17, weight: .semibold))
+            .font(.body.weight(.semibold))
             .foregroundStyle(t.ink)
             .frame(maxWidth: .infinity, minHeight: 50)
             .background(t.ink.opacity(configuration.isPressed ? 0.14 : 0.08), in: Capsule())
@@ -226,9 +226,9 @@ struct FactRow: View {
             Spacer(minLength: 8)
             Text(fact.value).foregroundStyle(t.ink2).multilineTextAlignment(.trailing)
             switch fact.evidence {
-            case .observed: Tag(style: .observed, text: "Obs")
-            case .inferred(let p): Tag(style: .inferred(p), text: "\(p)%")
-            case .unknown: Tag(style: .unknown, text: "?")
+            case .observed: Tag(style: .observed)
+            case .inferred(let p): Tag(style: .inferred(p))
+            case .unknown: Tag(style: .unknown)
             }
         }
         .accessibilityElement(children: .combine)
@@ -238,15 +238,21 @@ struct FactRow: View {
 struct FindingRow: View {
     @Environment(\.theme) private var t
     let finding: Finding
+    private var evidenceTag: TagStyle {
+        if let p = finding.confidence { return .inferred(p) }
+        if finding.evidence.isEmpty || finding.evidence.contains(where: { $0.evidence == .unknown }) { return .unknown }
+        if finding.evidence.contains(where: { if case .inferred = $0.evidence { return true }; return false }) { return .inferred(nil) }
+        return .observed
+    }
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             IconTile(symbol: finding.severity == .info ? "info.circle" : "exclamationmark.triangle", hue: finding.severity == .info ? .sky : .peach)
             VStack(alignment: .leading, spacing: 3) {
-                Text(finding.title).font(.system(size: 16, weight: .semibold)).foregroundStyle(t.ink)
-                Text(finding.reason).font(.system(size: 13.5)).foregroundStyle(t.ink2).lineLimit(3)
+                Text(finding.title).font(.headline).foregroundStyle(t.ink)
+                Text(finding.reason).font(.subheadline).foregroundStyle(t.ink2).fixedSize(horizontal: false, vertical: true)
                 HStack(spacing: 6) {
-                    Tag(style: finding.confidence.map { .inferred($0) } ?? .observed)
-                    if finding.fix != nil { Tag(style: .neutral, text: "Fix available") }
+                    Tag(style: evidenceTag)
+
                 }.padding(.top, 2)
             }
             Spacer(minLength: 0)

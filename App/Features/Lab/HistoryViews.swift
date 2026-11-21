@@ -3,25 +3,42 @@ import SwiftUI
 struct HistoryView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.theme) private var t
+    @State private var confirmNewHistory = false
 
     var body: some View {
         List {
-            if model.receipts.receipts.isEmpty {
+            if let issue = model.receipts.storageIssue {
+                Section("Undo history is paused") {
+                    Label(issue.message, systemImage: "exclamationmark.triangle")
+                    Button("Read history again") { model.receipts.reload() }
+                    if issue == .damaged {
+                        Button("Start a new history…") { confirmNewHistory = true }
+                    }
+                }.rowCard()
+            } else if let backup = model.receipts.lastBackupName {
+                Section("New history") {
+                    Text("The previous history is kept on this device as \(backup).")
+                }.rowCard()
+            }
+            if model.receipts.storageIssue == nil {
+                Section("Activity") { ReceiptCalendarView(receipts: model.receipts.receipts, engine: model.engine.mode) }.rowCard()
+            }
+            if model.receipts.receipts.isEmpty && model.receipts.storageIssue == nil {
                 Section {
                     ContentUnavailableView("Nothing yet", systemImage: "clock.arrow.circlepath",
-                        description: Text("Every change Assay makes leaves a receipt here, with a way to undo it."))
+                        description: Text("Completed checks and changes leave receipts here. An undo is offered only for verified reversible changes."))
                 }.listRowBackground(Color.clear)
-            } else {
+            } else if model.receipts.storageIssue == nil {
                 Section {
                     LabeledContent("Changes made") { Text("\(model.receipts.changeCount)").monospacedDigit() }
                     LabeledContent("Can't be undone") { Text("\(model.receipts.needsYouCount)").monospacedDigit() }
-                    if let plan = model.receipts.restoreAllPlan() {
+                    if let plan = model.receipts.restoreAllPlan(engine:model.engine.mode) {
                         Button { model.activePlan = plan } label: { Text("Restore to before Assay") }
                             .buttonStyle(SecondaryButtonStyle())
                             .listRowBackground(Color.clear).listRowInsets(.init())
                     }
                 } footer: {
-                    Text("Restore reverses every change that was saved first, newest to oldest. Anything marked unverified is left alone and listed.")
+                    Text("Undo is limited to verified changes from the selected engine. If a value or its history is uncertain, Assay leaves it alone.")
                 }.rowCard()
 
                 ForEach(grouped, id: \.0) { day, items in
@@ -36,6 +53,12 @@ struct HistoryView: View {
         .themedList()
         .navigationTitle("Undo history")
         .navigationBarTitleDisplayMode(.inline)
+        .alert("Start a new undo history?", isPresented: $confirmNewHistory) {
+            Button("Keep existing history", role: .cancel) { }
+            Button("Keep backup and start new history") { model.receipts.startNewHistory() }
+        } message: {
+            Text("Assay will keep the original file as a backup. The new history starts empty; old changes won’t be available to undo from it.")
+        }
     }
 
     private var grouped: [(String, [Receipt])] {
@@ -55,7 +78,7 @@ struct HistoryView: View {
             IconTile(symbol: symbol(r), hue: hue(r))
             VStack(alignment: .leading, spacing: 3) {
                 Text(r.title).font(.system(size: 16, weight: .medium)).foregroundStyle(t.ink)
-                Text("#\(r.id) · \(r.date, style: .time) · \(r.items.count) change\(r.items.count == 1 ? "" : "s")")
+                Text("#\(r.id) · \(r.date, style: .time) · \(r.items.count) planned")
                     .font(.system(size: 13)).foregroundStyle(t.ink2)
                 HStack(spacing: 6) {
                     Tag(style: r.statusTag.0, text: r.statusTag.1)
@@ -93,6 +116,7 @@ struct ReceiptView: View {
                     ForEach(Array(r.items.enumerated()), id: \.offset) { _, item in
                         VStack(alignment: .leading, spacing: 6) {
                             Text(item.change.label).font(.system(size: 16, weight: .semibold)).foregroundStyle(t.ink)
+                            Tag(style: item.outcome.tag.0, text: item.outcome.tag.1)
                             HStack(spacing: 6) {
                                 Text(item.change.beforeKnown ? (item.change.before?.display ?? "not set") : "unknown")
                                 Image(systemName: "arrow.right").font(.system(size: 11))
@@ -104,9 +128,9 @@ struct ReceiptView: View {
                     }
                 }.rowCard()
 
-                if r.undoable {
+                if let plan = model.receipts.undoPlan(for:r,engine:model.engine.mode) {
                     Section {
-                        Button { model.activePlan = model.receipts.undoPlan(for: r) } label: { Text("Undo \(r.reversibleCount) change\(r.reversibleCount == 1 ? "" : "s")") }
+                        Button { model.activePlan = plan } label: { Text("Undo \(r.reversibleCount) change\(r.reversibleCount == 1 ? "" : "s")") }
                             .buttonStyle(SecondaryButtonStyle()).listRowBackground(Color.clear).listRowInsets(.init())
                     }
                 }

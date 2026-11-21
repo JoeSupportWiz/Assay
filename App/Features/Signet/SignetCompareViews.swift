@@ -53,7 +53,7 @@ struct SignetMatrixView: View {
             } header: {
                 HStack(spacing: 8) { Text("Profiles side by side"); if inspection.isDemo { SignetDemoTag() } }
             } footer: {
-                Text("✓ in the profile.  – not in the profile and not expected.  ✗ expected for this target but missing from its profile (Inferred from the extension point and Info.plist). Binary entitlements not read.")
+                Text("✓ in the profile.  – not in the profile and not expected.  ✗ expected for this target but missing from its profile (from the executable XML slot if available; inferred from bundle metadata otherwise). This is a key-presence comparison, not a signing verdict.")
             }
             .rowCard()
 
@@ -83,14 +83,14 @@ struct SignetDiffView: View {
     var body: some View {
         List {
             Section {
-                Text("− expected for the target but missing from its profile.  + allowed by the profile but not expected.  A blank sign means both agree. “Requested” is Inferred: Binary entitlements not read.")
+                Text("− expected for the target but missing from its profile.  + allowed by the profile but not expected.  A blank sign means the key is present on both sides; values may still differ. Each target labels its source.")
                     .font(.system(size: 13)).foregroundStyle(t.ink2)
             }.rowCard()
             ForEach(inspection.targets) { tg in
                 let lines = inspection.diff(for: tg)
                 Section {
                     if tg.profile == nil {
-                        Text("No profile, so nothing is allowed.").foregroundStyle(t.ink2)
+                        Text("No profile to compare. The allowed set is unknown.").foregroundStyle(t.ink2)
                     }
                     if lines.isEmpty {
                         Text("Nothing to compare.").foregroundStyle(t.ink2)
@@ -103,13 +103,13 @@ struct SignetDiffView: View {
                                 if !l.note.isEmpty { Text(l.note).font(.system(size: 11.5, design: .monospaced)).opacity(0.8) }
                             }
                             Spacer(minLength: 0)
-                            Text(l.kind == .missing ? "missing" : (l.kind == .extra ? "extra" : "match")).font(.system(size: 11)).opacity(0.8)
+                            Text(l.kind == .missing ? "missing" : (l.kind == .extra ? "extra" : "key present")).font(.system(size: 11)).opacity(0.8)
                         }
                         .foregroundStyle(colour(l.kind))
                         .accessibilityElement(children: .combine)
                     }
                 } header: {
-                    HStack(spacing: 8) { Text(tg.shortName); Text(tg.bundleID).font(.system(size: 11, design: .monospaced)); if tg.isDemo { SignetDemoTag() } }
+                    HStack(spacing: 8) { Text(tg.shortName); Tag(style: tg.binary.state == .xml ? .observed : .inferred(nil)); Text(tg.bundleID).font(.system(size: 11, design: .monospaced)); if tg.isDemo { SignetDemoTag() } }
                 }
                 .rowCard()
             }
